@@ -1,14 +1,14 @@
-﻿namespace spaghetto {
-    public class SNativeLibraryImporter : SValue {
-        public override SBuiltinType BuiltinName => SBuiltinType.NativeLibraryImporter;
-        public Action<Scope> Import { get; set; } = (Scope scope) => { };
+﻿namespace spaghetto;
 
-        public SNativeLibraryImporter(Action<Scope> import) {
-            Import = import;
-        }
+public class SNativeLibraryImporter : SValue {
+    public override SBuiltinType BuiltinName => SBuiltinType.NativeLibraryImporter;
+    public Action<Scope> Import { get; set; } = (Scope scope) => { };
 
-        public override bool IsTruthy() {
-            return true;
-        }
+    public SNativeLibraryImporter(Action<Scope> import) {
+        Import = import;
+    }
+
+    public override bool IsTruthy() {
+        return true;
     }
 }

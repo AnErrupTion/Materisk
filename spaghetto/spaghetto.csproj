@@ -2,25 +2,9 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-	<PublishSingleFile>true</PublishSingleFile>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <NoWarn>1701;1702;CS8619;CS8625;CS8602;CS8604;CS8603;CS8600;CS8618</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <NoWarn>1701;1702;CS8619;CS8625;CS8602;CS8604;CS8603;CS8600;CS8618</NoWarn>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="bin\**" />
-    <EmbeddedResource Remove="bin\**" />
-    <None Remove="bin\**" />
-  </ItemGroup>
 
 </Project>

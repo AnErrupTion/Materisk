@@ -1,29 +1,28 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿namespace spaghetto.Parsing.Nodes;
+
+internal class FloatLiteralNode : SyntaxNode
 {
-    internal class FloatLiteralNode : SyntaxNode
+    private SyntaxToken syntaxToken;
+
+    public FloatLiteralNode(SyntaxToken syntaxToken)
     {
-        private SyntaxToken syntaxToken;
+        this.syntaxToken = syntaxToken;
+    }
 
-        public FloatLiteralNode(SyntaxToken syntaxToken)
-        {
-            this.syntaxToken = syntaxToken;
-        }
+    public override NodeType Type => NodeType.FloatLiteral;
 
-        public override NodeType Type => NodeType.FloatLiteral;
+    public override SValue Evaluate(Scope scope)
+    {
+        return new SFloat((float)syntaxToken.Value);
+    }
 
-        public override SValue Evaluate(Scope scope)
-        {
-            return new SFloat((float)syntaxToken.Value);
-        }
+    public override IEnumerable<SyntaxNode> GetChildren()
+    {
+        yield return new TokenNode(syntaxToken);
+    }
 
-        public override IEnumerable<SyntaxNode> GetChildren()
-        {
-            yield return new TokenNode(syntaxToken);
-        }
-
-        public override string ToString()
-        {
-            return "FloatLitNode:";
-        }
+    public override string ToString()
+    {
+        return "FloatLitNode:";
     }
 }

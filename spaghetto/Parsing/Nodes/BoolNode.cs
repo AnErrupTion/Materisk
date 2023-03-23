@@ -1,29 +1,28 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿namespace spaghetto.Parsing.Nodes;
+
+public class BoolNode : SyntaxNode
 {
-    public class BoolNode : SyntaxNode
+    public override NodeType Type => NodeType.BooleanLiteral;
+
+    public bool Value { get; set; }
+
+    public BoolNode(bool value)
     {
-        public override NodeType Type => NodeType.BooleanLiteral;
+        Value = value;
+    }
 
-        public bool Value { get; set; }
+    public override SValue Evaluate(Scope scope)
+    {
+        return new SInt(Value ? 1 : 0);
+    }
 
-        public BoolNode(bool value)
-        {
-            Value = value;
-        }
+    public override IEnumerable<SyntaxNode> GetChildren()
+    {
+        return Enumerable.Empty<SyntaxNode>();
+    }
 
-        public override SValue Evaluate(Scope scope)
-        {
-            return new SInt(Value ? 1 : 0);
-        }
-
-        public override IEnumerable<SyntaxNode> GetChildren()
-        {
-            return Enumerable.Empty<SyntaxNode>();
-        }
-
-        public override string ToString()
-        {
-            return "BoolNode: " + Value;
-        }
+    public override string ToString()
+    {
+        return "BoolNode: " + Value;
     }
 }

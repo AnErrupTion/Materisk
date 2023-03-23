@@ -1,21 +1,21 @@
-﻿namespace spaghetto {
-    public class SNull : SValue {
-        public override SBuiltinType BuiltinName => SBuiltinType.Null;
+﻿namespace spaghetto;
 
-        public override bool IsNull() {
-            return true;
-        }
+public class SNull : SValue {
+    public override SBuiltinType BuiltinName => SBuiltinType.Null;
 
-        public override bool IsTruthy() {
-            return false;
-        }
+    public override bool IsNull() {
+        return true;
+    }
 
-        public override SString ToSpagString() {
-            return new("null");
-        }
+    public override bool IsTruthy() {
+        return false;
+    }
 
-        public override string ToString() {
-            return "<SNull>";
-        }
+    public override SString ToSpagString() {
+        return new("null");
+    }
+
+    public override string ToString() {
+        return "<SNull>";
     }
 }

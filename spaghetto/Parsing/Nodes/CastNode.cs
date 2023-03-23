@@ -1,39 +1,38 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿namespace spaghetto.Parsing.Nodes;
+
+internal class CastNode : SyntaxNode
 {
-    internal class CastNode : SyntaxNode
+    private SyntaxToken ident;
+    private SyntaxNode node;
+
+    public CastNode(SyntaxToken ident, SyntaxNode node)
     {
-        private SyntaxToken ident;
-        private SyntaxNode node;
+        this.ident = ident;
+        this.node = node;
+    }
 
-        public CastNode(SyntaxToken ident, SyntaxNode node)
+    public override NodeType Type => NodeType.Cast;
+
+    public override SValue Evaluate(Scope scope)
+    {
+        // TODO: maybe improve this
+        switch (ident.Text)
         {
-            this.ident = ident;
-            this.node = node;
+            case "int":
+                return node.Evaluate(scope).CastToBuiltin(SBuiltinType.Int);
+            case "float":
+                return node.Evaluate(scope).CastToBuiltin(SBuiltinType.Float);
+            case "string":
+                return node.Evaluate(scope).CastToBuiltin(SBuiltinType.String);
+            case "list":
+                return node.Evaluate(scope).CastToBuiltin(SBuiltinType.List);
+            default: throw new InvalidOperationException("INTERNAL: Cast was parsed successfully, but cast is not implemented for that!");
         }
+    }
 
-        public override NodeType Type => NodeType.Cast;
-
-        public override SValue Evaluate(Scope scope)
-        {
-            // TODO: maybe improve this
-            switch (ident.Text)
-            {
-                case "int":
-                    return node.Evaluate(scope).CastToBuiltin(SBuiltinType.Int);
-                case "float":
-                    return node.Evaluate(scope).CastToBuiltin(SBuiltinType.Float);
-                case "string":
-                    return node.Evaluate(scope).CastToBuiltin(SBuiltinType.String);
-                case "list":
-                    return node.Evaluate(scope).CastToBuiltin(SBuiltinType.List);
-                default: throw new InvalidOperationException("INTERNAL: Cast was parsed successfully, but cast is not implemented for that!");
-            }
-        }
-
-        public override IEnumerable<SyntaxNode> GetChildren()
-        {
-            yield return new TokenNode(ident);
-            yield return node;
-        }
+    public override IEnumerable<SyntaxNode> GetChildren()
+    {
+        yield return new TokenNode(ident);
+        yield return node;
     }
 }

@@ -1,30 +1,29 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿namespace spaghetto.Parsing.Nodes;
+
+internal class IntLiteralNode : SyntaxNode
 {
-    internal class IntLiteralNode : SyntaxNode
+    private SyntaxToken syntaxToken;
+
+    public IntLiteralNode(SyntaxToken syntaxToken)
     {
-        private SyntaxToken syntaxToken;
+        this.syntaxToken = syntaxToken;
+    }
 
-        public IntLiteralNode(SyntaxToken syntaxToken)
-        {
-            this.syntaxToken = syntaxToken;
-        }
+    public override NodeType Type => NodeType.IntLiteral;
 
-        public override NodeType Type => NodeType.IntLiteral;
+    public override SValue Evaluate(Scope scope)
+    {
+        var sint = new SInt((int)syntaxToken.Value);
+        return sint;
+    }
 
-        public override SValue Evaluate(Scope scope)
-        {
-            var sint = new SInt((int)syntaxToken.Value);
-            return sint;
-        }
+    public override IEnumerable<SyntaxNode> GetChildren()
+    {
+        yield return new TokenNode(syntaxToken);
+    }
 
-        public override IEnumerable<SyntaxNode> GetChildren()
-        {
-            yield return new TokenNode(syntaxToken);
-        }
-
-        public override string ToString()
-        {
-            return "IntLitNode:";
-        }
+    public override string ToString()
+    {
+        return "IntLitNode:";
     }
 }

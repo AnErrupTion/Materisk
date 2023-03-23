@@ -1,29 +1,28 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿namespace spaghetto.Parsing.Nodes;
+
+internal class IdentifierNode : SyntaxNode
 {
-    internal class IdentifierNode : SyntaxNode
+    public SyntaxToken Token { get; private set; }
+
+    public IdentifierNode(SyntaxToken syntaxToken)
     {
-        public SyntaxToken Token { get; private set; }
+        Token = syntaxToken;
+    }
 
-        public IdentifierNode(SyntaxToken syntaxToken)
-        {
-            Token = syntaxToken;
-        }
+    public override NodeType Type => NodeType.Identifier;
 
-        public override NodeType Type => NodeType.Identifier;
+    public override SValue Evaluate(Scope scope)
+    {
+        return scope.Get((string)Token.Value) ?? SValue.Null;
+    }
 
-        public override SValue Evaluate(Scope scope)
-        {
-            return scope.Get((string)Token.Value) ?? SValue.Null;
-        }
+    public override IEnumerable<SyntaxNode> GetChildren()
+    {
+        yield return new TokenNode(Token);
+    }
 
-        public override IEnumerable<SyntaxNode> GetChildren()
-        {
-            yield return new TokenNode(Token);
-        }
-
-        public override string ToString()
-        {
-            return "IdentNode:";
-        }
+    public override string ToString()
+    {
+        return "IdentNode:";
     }
 }

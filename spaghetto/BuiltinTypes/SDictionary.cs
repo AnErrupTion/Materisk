@@ -1,29 +1,29 @@
-﻿namespace spaghetto {
-    // TODO: Allow creation if Dictionaries
-    public class SDictionary : SValue {
-        public List<(SValue key, SValue val)> Value { get; set; } = new();
-        public override SBuiltinType BuiltinName => SBuiltinType.Dictionary;
+﻿namespace spaghetto;
 
-        public SDictionary() { }
+// TODO: Allow creation if Dictionaries
+public class SDictionary : SValue {
+    public List<(SValue key, SValue val)> Value { get; set; } = new();
+    public override SBuiltinType BuiltinName => SBuiltinType.Dictionary;
 
-        public override SString ToSpagString() {
-            return new SString("{\n" + string.Join(",\n  ", Value.Select((v) => v.key.ToSpagString().Value + ": " + v.val.ToSpagString().Value)) + "\n}");
+    public SDictionary() { }
+
+    public override SString ToSpagString() {
+        return new SString("{\n" + string.Join(",\n  ", Value.Select((v) => v.key.ToSpagString().Value + ": " + v.val.ToSpagString().Value)) + "\n}");
+    }
+
+    public override string ToString() {
+        return $"<SDictionary Value={string.Join(", ", Value)}>";
+    }
+
+    public override SValue Idx(SValue other) {
+        foreach(var kvp in Value) {
+            if (kvp.key.Equals(other).IsTruthy()) return kvp.val;
         }
 
-        public override string ToString() {
-            return $"<SDictionary Value={string.Join(", ", Value)}>";
-        }
+        return SValue.Null;
+    }
 
-        public override SValue Idx(SValue other) {
-            foreach(var kvp in Value) {
-                if (kvp.key.Equals(other).IsTruthy()) return kvp.val;
-            }
-
-            return SValue.Null;
-        }
-
-        public override bool IsTruthy() {
-            return Value != null;
-        }
+    public override bool IsTruthy() {
+        return Value != null;
     }
 }
