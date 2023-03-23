@@ -176,25 +176,22 @@ public class Parser {
 
     public SyntaxNode ParseExpression()
     {
-        if(Current is { Type: SyntaxType.Keyword, Text: "var" }) {
-            var fixedType = true;
+        if (Current is { Type: SyntaxType.Keyword, Text: "var" })
+        {
             Position++;
 
-            if(Current.Type == SyntaxType.Mod) {
-                fixedType = false;
-                Position++;
-            }
-
             var ident = MatchToken(SyntaxType.Identifier);
+            var type = MatchToken(SyntaxType.Identifier);
 
-            if(Current.Type == SyntaxType.Equals) {
-                Position++;
-                var expr = ParseExpression();
-                return new InitVariableNode(ident, expr, fixedType);
-            }
-            return new InitVariableNode(ident, fixedType);
+            if (Current.Type != SyntaxType.Equals)
+                throw new InvalidOperationException("Variable initialization needs an expression!");
+
+            Position++;
+            var expr = ParseExpression();
+            return new InitVariableNode(ident, type, expr);
         }
-        if(Current.Type == SyntaxType.Identifier && Peek(1).Type == SyntaxType.Equals) {
+        if (Current.Type == SyntaxType.Identifier && Peek(1).Type == SyntaxType.Equals)
+        {
             var ident = MatchToken(SyntaxType.Identifier);
             MatchToken(SyntaxType.Equals);
             var expr = ParseExpression();

@@ -8,20 +8,14 @@ namespace Materisk.Parsing.Nodes;
 internal class InitVariableNode : SyntaxNode
 {
     private readonly SyntaxToken ident;
+    private readonly SyntaxToken type;
     private readonly SyntaxNode expr;
-    private readonly bool isFixedType = true;
 
-    public InitVariableNode(SyntaxToken ident, bool isFixedType)
+    public InitVariableNode(SyntaxToken ident, SyntaxToken type, SyntaxNode expr)
     {
         this.ident = ident;
-        this.isFixedType = isFixedType;
-    }
-
-    public InitVariableNode(SyntaxToken ident, SyntaxNode expr, bool isFixedType)
-    {
-        this.ident = ident;
+        this.type = type;
         this.expr = expr;
-        this.isFixedType = isFixedType;
     }
 
     public override NodeType Type => NodeType.InitVariable;
@@ -36,13 +30,11 @@ internal class InitVariableNode : SyntaxNode
         if (expr != null)
         {
             var val = expr.Evaluate(scope);
-            val.TypeIsFixed = isFixedType;
+            val.TypeIsFixed = true;
 
             scope.Set(ident.Value.ToString(), val);
             return val;
         }
-
-        if (isFixedType) throw new InvalidOperationException("Tried to initiliaze a fixed type variable with no value; this is not permitted. Use var% instead.");
 
         scope.Set(ident.Value.ToString(), SValue.Null);
         return SValue.Null;
@@ -59,24 +51,15 @@ internal class InitVariableNode : SyntaxNode
         if (variables.ContainsKey(name))
             throw new InvalidOperationException("Can not initialize the same variable twice!");
 
-        if (expr != null)
-        {
-            var value = expr.Emit(variables, module, method, arguments);
-            var variable = new CilLocalVariable(Utils.GetTypeSignatureFor(module, value.GetType()));
-            method.CilMethodBody?.LocalVariables.Add(variable);
-            method.CilMethodBody?.Instructions.Add(CilOpCodes.Stloc, variable);
-            variables.Add(name, variable);
-            return value;
-        }
+        if (expr == null)
+            throw new InvalidOperationException("Variable initialization needs an expression!");
 
-        if (isFixedType)
-            throw new InvalidOperationException("Tried to initialize a fixed type variable with no value; this is not permitted. Use var% instead.");
-
-        var nullVariable = new CilLocalVariable(module.CorLibTypeFactory.Object);
-        method.CilMethodBody?.LocalVariables.Add(nullVariable);
-        method.CilMethodBody?.Instructions.Add(CilOpCodes.Stloc, nullVariable);
-        variables.Add(name, nullVariable);
-        return null;
+        var value = expr.Emit(variables, module, method, arguments);
+        var variable = new CilLocalVariable(Utils.GetTypeSignatureFor(module, type.Value.ToString()));
+        method.CilMethodBody?.LocalVariables.Add(variable);
+        method.CilMethodBody?.Instructions.Add(CilOpCodes.Stloc, variable);
+        variables.Add(name, variable);
+        return value;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

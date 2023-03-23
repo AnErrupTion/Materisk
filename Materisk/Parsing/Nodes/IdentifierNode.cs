@@ -41,6 +41,13 @@ internal class IdentifierNode : SyntaxNode
 
             index++;
         }
+        
+        foreach (var variable in variables)
+            if (variable.Key == name)
+            {
+                method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldloc, variable.Value);
+                return variable.Value;
+            }
 
         throw new InvalidOperationException($"Unable to find value for identifier: {name}");
     }
