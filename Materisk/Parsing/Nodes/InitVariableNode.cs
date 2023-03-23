@@ -27,17 +27,11 @@ internal class InitVariableNode : SyntaxNode
             throw new InvalidOperationException("Can not initiliaze the same variable twice!");
         }
 
-        if (expr != null)
-        {
-            var val = expr.Evaluate(scope);
-            val.TypeIsFixed = true;
+        var val = expr.Evaluate(scope);
+        val.TypeIsFixed = true;
 
-            scope.Set(ident.Value.ToString(), val);
-            return val;
-        }
-
-        scope.Set(ident.Value.ToString(), SValue.Null);
-        return SValue.Null;
+        scope.Set(ident.Value.ToString(), val);
+        return val;
 
     }
 
@@ -51,9 +45,6 @@ internal class InitVariableNode : SyntaxNode
         if (variables.ContainsKey(name))
             throw new InvalidOperationException("Can not initialize the same variable twice!");
 
-        if (expr == null)
-            throw new InvalidOperationException("Variable initialization needs an expression!");
-
         var value = expr.Emit(variables, module, method, arguments);
         var variable = new CilLocalVariable(Utils.GetTypeSignatureFor(module, type.Value.ToString()));
         method.CilMethodBody?.LocalVariables.Add(variable);
@@ -65,7 +56,7 @@ internal class InitVariableNode : SyntaxNode
     public override IEnumerable<SyntaxNode> GetChildren()
     {
         yield return new TokenNode(ident);
-        if (expr != null) yield return expr;
+        yield return expr;
     }
 
     public override string ToString()
