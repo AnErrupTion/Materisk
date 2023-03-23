@@ -19,12 +19,12 @@ public class TokenNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
