@@ -134,26 +134,28 @@ public class Parser {
 
     private SyntaxNode ParseModuleDefinition() {
         MatchKeyword("mod");
+
+        var isStatic = true;
+        
+        if(Current is { Type: SyntaxType.Keyword, Text: "dyn" }) {
+            Position++;
+            isStatic = false;
+        }
+        
         var className = MatchToken(SyntaxType.Identifier);
 
         MatchToken(SyntaxType.LBraces);
-        var body = ParseClassBody();
+        var body = ParseClassBody(isStatic);
         MatchToken(SyntaxType.RBraces);
 
         return new ClassDefinitionNode(className, body);
     }
 
-    private List<SyntaxNode> ParseClassBody() {
+    private List<SyntaxNode> ParseClassBody(bool isStatic) {
         List<SyntaxNode> nodes = new();
 
         while(Current is { Type: SyntaxType.Keyword, Text: "func" }) {
             Position++;
-            var isStatic = true;
-
-            if(Current is { Type: SyntaxType.Keyword, Text: "dyn" }) {
-                Position++;
-                isStatic = false;
-            }
 
             var name = MatchToken(SyntaxType.Identifier);
             var args = ParseFunctionArgs();
