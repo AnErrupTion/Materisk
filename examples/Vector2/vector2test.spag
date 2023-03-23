@@ -2,7 +2,7 @@ import native io;
 import native lang;
 import "vector2.spag";
 
-func runVectorTests() {
+func pub runVectorTests() {
     println("TestStringification:");
     var testStringification = new Vector2(10, 20);
     println(testStringification); // Expected: <Vector2 x: 10 y: 20>
@@ -25,7 +25,5 @@ func runVectorTests() {
 
     println("TestInvert:");
     var testInvert = new Vector2(5, 5);
-    println(Vector2.invert(testInvert)); // Expected: <Vector2 x: -5 y: -5> 
+    println(Vector2Helpers.invert(testInvert)); // Expected: <Vector2 x: -5 y: -5> 
 };
-
-export runVectorTests;

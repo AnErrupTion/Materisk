@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32526.322
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Materisk", "Materisk\Materisk.csproj", "{C38428AD-0F18-4B71-A1B5-EB569B84D945}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MateriskCLI", "MateriskCLI\MateriskCLI.csproj", "{64E44FFD-A8E4-4548-AB1F-43D4B4F0CD7D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Materisk.Stdlib.IO", "Materisk.Stdlib.IO\Materisk.Stdlib.IO.csproj", "{325C4B51-3AB9-455D-BFA3-A452FE7AD672}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Materisk.Stdlib.Lang", "Materisk.Stdlib.Lang\Materisk.Stdlib.Lang.csproj", "{47CCCC78-91BE-4C69-B340-725ACB963E58}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C38428AD-0F18-4B71-A1B5-EB569B84D945}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C38428AD-0F18-4B71-A1B5-EB569B84D945}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C38428AD-0F18-4B71-A1B5-EB569B84D945}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C38428AD-0F18-4B71-A1B5-EB569B84D945}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64E44FFD-A8E4-4548-AB1F-43D4B4F0CD7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64E44FFD-A8E4-4548-AB1F-43D4B4F0CD7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64E44FFD-A8E4-4548-AB1F-43D4B4F0CD7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64E44FFD-A8E4-4548-AB1F-43D4B4F0CD7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{325C4B51-3AB9-455D-BFA3-A452FE7AD672}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{325C4B51-3AB9-455D-BFA3-A452FE7AD672}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{325C4B51-3AB9-455D-BFA3-A452FE7AD672}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{325C4B51-3AB9-455D-BFA3-A452FE7AD672}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47CCCC78-91BE-4C69-B340-725ACB963E58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47CCCC78-91BE-4C69-B340-725ACB963E58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47CCCC78-91BE-4C69-B340-725ACB963E58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47CCCC78-91BE-4C69-B340-725ACB963E58}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EAB579D2-7F8F-4D85-A6AD-CA563DF0667D}
+	EndGlobalSection
+EndGlobal

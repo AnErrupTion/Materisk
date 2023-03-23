@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputPath>../bin</OutputPath>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Materisk.Stdlib.IO\Materisk.Stdlib.IO.csproj" />
+    <ProjectReference Include="..\Materisk.Stdlib.Lang\Materisk.Stdlib.Lang.csproj" />
+    <ProjectReference Include="..\Materisk\Materisk.csproj" />
+  </ItemGroup>
+
+</Project>
