@@ -25,7 +25,13 @@ internal class ClassFunctionDefinitionNode : SyntaxNode
     {
         var targetName = name.Text;
 
-        if (targetName is "ctor" or "toString") targetName = "$$" + targetName;
+        if (targetName is "ctor" or "toString") {
+            if(args.Count(v => v.Text == "self") != 1) {
+                throw new Exception($"Special class method '{targetName}' must contain the argument 'self' exactly once.");
+            }
+
+            targetName = "$$" + targetName;
+        }
 
         var f = new SFunction(scope, targetName, args.Select(v => v.Text).ToList(), body) 
         { 
