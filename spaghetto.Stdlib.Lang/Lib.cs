@@ -16,10 +16,9 @@ public class Lib {
                 if(builtinType == SBuiltinType.ClassInstance) {
                     if (args[0] is not SClassInstance inst) throw new Exception("Unexpected value! BuiltinName was set to ClassInstance but it was not of type SClassInstance!");
                     return new SString(inst.Class.Name);
-                }else {
-                    return new SString(builtinType.ToString());
                 }
-                    
+                return new SString(builtinType.ToString());
+
             },
             expectedArgs: new() { "value" }
         ));

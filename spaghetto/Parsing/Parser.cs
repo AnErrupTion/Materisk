@@ -74,8 +74,9 @@ public class Parser {
         return new BlockNode(nodes);
     }
 
-    public SyntaxNode ParseStatement() {
-        if (Current.Type == SyntaxType.Keyword && Current.Text == "return") {
+    public SyntaxNode ParseStatement()
+    {
+        if (Current is { Type: SyntaxType.Keyword, Text: "return" }) {
             if (Peek(1).Type == SyntaxType.Semicolon) {
                 Position += 2;
                 var ret = new ReturnNode();
@@ -87,47 +88,52 @@ public class Parser {
                 MatchToken(SyntaxType.Semicolon);
                 return ret;
             }
-        } else if (Current.Type == SyntaxType.Keyword && Current.Text == "continue") {
+        }
+
+        if (Current is { Type: SyntaxType.Keyword, Text: "continue" }) {
             Position++;
             MatchToken(SyntaxType.Semicolon);
             return new ContinueNode();
-        } else if (Current.Type == SyntaxType.Keyword && Current.Text == "break") {
+        }
+        if (Current is { Type: SyntaxType.Keyword, Text: "break" }) {
             Position++;
             MatchToken(SyntaxType.Semicolon);
             return new BreakNode();
-        } else if (Current.Type == SyntaxType.Keyword && Current.Text == "import") {
+        }
+        if (Current is { Type: SyntaxType.Keyword, Text: "import" }) {
             Position++;
 
-            if (Current.Type == SyntaxType.Keyword && Current.Text == "native") {
+            if (Current is { Type: SyntaxType.Keyword, Text: "native" }) {
                 Position++;
                 var ident = MatchToken(SyntaxType.Identifier);
                 MatchToken(SyntaxType.Semicolon);
 
                 return new NativeImportNode(ident);
-            } else {
-                var path = MatchToken(SyntaxType.String);
-                MatchToken(SyntaxType.Semicolon);
-
-                return new ImportNode(path);
             }
-        } else if (Current.Type == SyntaxType.Keyword && Current.Text == "export") {
+
+            var path = MatchToken(SyntaxType.String);
+            MatchToken(SyntaxType.Semicolon);
+
+            return new ImportNode(path);
+        }
+        if (Current is { Type: SyntaxType.Keyword, Text: "export" }) {
             Position++;
 
             var ident = MatchToken(SyntaxType.Identifier);
             MatchToken(SyntaxType.Semicolon);
             return new ExportNode(ident);
-        } else if (Current.Type == SyntaxType.Keyword && Current.Text == "class") {
-            return ParseClassDefinition();
-        } else {
-            var exprNode = ParseExpression();
-            MatchToken(SyntaxType.Semicolon);
-
-            return exprNode;
         }
+        if (Current is { Type: SyntaxType.Keyword, Text: "mod" }) {
+            return ParseModuleDefinition();
+        }
+        var exprNode = ParseExpression();
+        MatchToken(SyntaxType.Semicolon);
+
+        return exprNode;
     }
 
-    private SyntaxNode ParseClassDefinition() {
-        MatchKeyword("class");
+    private SyntaxNode ParseModuleDefinition() {
+        MatchKeyword("mod");
         var className = MatchToken(SyntaxType.Identifier);
 
         MatchToken(SyntaxType.LBraces);
@@ -140,11 +146,11 @@ public class Parser {
     private List<SyntaxNode> ParseClassBody() {
         List<SyntaxNode> nodes = new();
 
-        while(Current.Type == SyntaxType.Keyword && Current.Text == "func") {
+        while(Current is { Type: SyntaxType.Keyword, Text: "func" }) {
             Position++;
             var isStatic = false;
 
-            if(Current.Type == SyntaxType.Keyword && Current.Text == "static") {
+            if(Current is { Type: SyntaxType.Keyword, Text: "static" }) {
                 Position++;
                 isStatic = true;
             }
@@ -159,8 +165,9 @@ public class Parser {
         return nodes;
     }
 
-    public SyntaxNode ParseExpression() {
-        if(Current.Type == SyntaxType.Keyword && Current.Text == "var") {
+    public SyntaxNode ParseExpression()
+    {
+        if(Current is { Type: SyntaxType.Keyword, Text: "var" }) {
             var fixedType = true;
             Position++;
 
@@ -175,29 +182,28 @@ public class Parser {
                 Position++;
                 var expr = ParseExpression();
                 return new InitVariableNode(ident, expr, fixedType);
-            }else {
-                return new InitVariableNode(ident, fixedType);
             }
-        }else if(Current.Type == SyntaxType.Identifier && Peek(1).Type == SyntaxType.Equals) {
+            return new InitVariableNode(ident, fixedType);
+        }
+        if(Current.Type == SyntaxType.Identifier && Peek(1).Type == SyntaxType.Equals) {
             var ident = MatchToken(SyntaxType.Identifier);
             MatchToken(SyntaxType.Equals);
             var expr = ParseExpression();
             return new AssignVariableNode(ident, expr);
-        }else {
-            return ParseCompExpression();
         }
+        return ParseCompExpression();
     }
 
-    public SyntaxNode ParseCompExpression() {
+    public SyntaxNode ParseCompExpression()
+    {
         if(Current.Type == SyntaxType.Bang) {
             Position++;
             return new UnaryExpressionNode(Peek(-1), ParseCompExpression());
-        }else {
-            return BinaryOperation(() => { return ParseArithmeticExpression(); },
-                new List<SyntaxType>() {
-                    SyntaxType.EqualsEquals, SyntaxType.LessThan, SyntaxType.LessThanEqu, SyntaxType.GreaterThan, SyntaxType.GreaterThanEqu
-                });
         }
+        return BinaryOperation(() => { return ParseArithmeticExpression(); },
+            new List<SyntaxType>() {
+                SyntaxType.EqualsEquals, SyntaxType.LessThan, SyntaxType.LessThanEqu, SyntaxType.GreaterThan, SyntaxType.GreaterThanEqu
+            });
     }
 
     public SyntaxNode ParseArithmeticExpression() {
@@ -277,7 +283,8 @@ public class Parser {
         return atomNode;
     }
 
-    public SyntaxNode ParseCastExpression() {
+    public SyntaxNode ParseCastExpression()
+    {
         if(Current.Type is SyntaxType.LessThan) {
             MatchToken(SyntaxType.LessThan);
             var ident = MatchToken(SyntaxType.Identifier);
@@ -288,46 +295,56 @@ public class Parser {
 
             var node = ParseCastExpression();
             return new CastNode(ident, node);
-        }else {
-            return ParseAtomExpression();
         }
+        return ParseAtomExpression();
     }
 
-    public SyntaxNode ParseAtomExpression() {
+    public SyntaxNode ParseAtomExpression()
+    {
         if (Current.Type is SyntaxType.Int) {
             Position++;
             return new IntLiteralNode(Peek(-1));
-        } else if (Current.Type is SyntaxType.Float) {
+        }
+
+        if (Current.Type is SyntaxType.Float) {
             Position++;
             return new FloatLiteralNode(Peek(-1));
-        } else if (Current.Type is SyntaxType.String) {
+        }
+        if (Current.Type is SyntaxType.String) {
             Position++;
             return new StringLiteralNode(Peek(-1));
-        } else if (Current.Type is SyntaxType.Identifier) {
+        }
+        if (Current.Type is SyntaxType.Identifier) {
             Position++;
             return new IdentifierNode(Peek(-1));
-        } else if (Current.Type is SyntaxType.LParen) {
+        }
+        if (Current.Type is SyntaxType.LParen) {
             Position++;
             var expr = ParseExpression();
 
             MatchToken(SyntaxType.RParen);
 
             return expr; // TODO: Do we have to create a ParenthisizedExpr? (probably not, but what if we do?)
-        } else if (Current.Type is SyntaxType.LSqBracket) {
-            return ParseListExpression();
-        } else if (Current.Type is SyntaxType.Keyword && Current.Text == "if") {
-            return ParseIfExpression();
-        } else if (Current.Type is SyntaxType.Keyword && Current.Text == "for") {
-            return ParseForExpression();
-        } else if (Current.Type is SyntaxType.Keyword && Current.Text == "while") {
-            return ParseWhileExpression();
-        } else if (Current.Type is SyntaxType.Keyword && Current.Text == "func") {
-            return ParseFunctionExpression();
-        } else if (Current.Type is SyntaxType.Keyword && Current.Text == "new") {
-            return ParseInstantiateExpression();
-        } else {
-            throw new Exception($"Unexpected token {Current.Type} at pos {Current.Position} in atom expression!");
         }
+        if (Current.Type is SyntaxType.LSqBracket) {
+            return ParseListExpression();
+        }
+        if (Current.Type is SyntaxType.Keyword && Current.Text == "if") {
+            return ParseIfExpression();
+        }
+        if (Current.Type is SyntaxType.Keyword && Current.Text == "for") {
+            return ParseForExpression();
+        }
+        if (Current.Type is SyntaxType.Keyword && Current.Text == "while") {
+            return ParseWhileExpression();
+        }
+        if (Current.Type is SyntaxType.Keyword && Current.Text == "func") {
+            return ParseFunctionExpression();
+        }
+        if (Current.Type is SyntaxType.Keyword && Current.Text == "new") {
+            return ParseInstantiateExpression();
+        }
+        throw new Exception($"Unexpected token {Current.Type} at pos {Current.Position} in atom expression!");
     }
 
     public SyntaxNode ParseListExpression() {
@@ -377,7 +394,7 @@ public class Parser {
             node.AddCase(cond, block);
         }
 
-        if(Current.Type == SyntaxType.Keyword && Current.Text == "else") {
+        if(Current is { Type: SyntaxType.Keyword, Text: "else" }) {
             Position++;
             var block = ParseScopedStatements();
 

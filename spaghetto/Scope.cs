@@ -50,10 +50,9 @@ public class Scope
         if(updateEx == null) {
             ex = new Exception();
             return true;
-        }else {
-            ex = updateEx;
-            return false;
         }
+        ex = updateEx;
+        return false;
     }
 
     public Scope GetRoot() {

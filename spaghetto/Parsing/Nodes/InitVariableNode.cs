@@ -36,13 +36,11 @@ internal class InitVariableNode : SyntaxNode
             scope.Set(ident.Value.ToString(), val);
             return val;
         }
-        else
-        {
-            if (isFixedType) throw new InvalidOperationException("Tried to initiliaze a fixed type variable with no value; this is not permitted. Use var% instead.");
 
-            scope.Set(ident.Value.ToString(), SValue.Null);
-            return SValue.Null;
-        }
+        if (isFixedType) throw new InvalidOperationException("Tried to initiliaze a fixed type variable with no value; this is not permitted. Use var% instead.");
+
+        scope.Set(ident.Value.ToString(), SValue.Null);
+        return SValue.Null;
 
     }
 

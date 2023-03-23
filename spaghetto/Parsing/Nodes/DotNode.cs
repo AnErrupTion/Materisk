@@ -36,7 +36,7 @@ internal class DotNode : SyntaxNode
                     var lhs = currentValue.Dot(new SString((string)ident.Value));
 
                     var args = cn.EvaluateArgs(scope);
-                    if (lhs is SBaseFunction func && func.IsClassInstanceMethod) {
+                    if (lhs is SBaseFunction { IsClassInstanceMethod: true } func) {
                         var idxOfSelf = func.ExpectedArgs.IndexOf("self");
                         if(idxOfSelf != -1) args.Insert(idxOfSelf, currentValue);
                     }

@@ -207,10 +207,9 @@ public class Lexer {
         if(isDecimal) {
             if (!float.TryParse(numStr, NumberStyles.Float, CultureInfo.InvariantCulture, out var floatVal)) throw new Exception("Invalid number (tried to parse " + numStr + " as float)");
             return new(SyntaxType.Float, Position-1, floatVal, numStr);
-        }else {
-            if (!int.TryParse(numStr, out var intVal)) throw new Exception("Invalid number!");
-            return new(SyntaxType.Int, Position-1, intVal, numStr);
         }
+        if (!int.TryParse(numStr, out var intVal)) throw new Exception("Invalid number!");
+        return new(SyntaxType.Int, Position-1, intVal, numStr);
     }
 }
 
@@ -269,7 +268,7 @@ public static class SyntaxFacts {
             or "if" or "elseif" or "else"
             or "for" or "while" or "func" or "var"
             or "import" or "native" or "new"
-            or "class" or "static" or "export") {
+            or "mod" or "static" or "export") {
             token.Type = SyntaxType.Keyword;
         }
     }

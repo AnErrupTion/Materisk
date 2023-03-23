@@ -31,7 +31,7 @@ internal class ReturnNode : SyntaxNode
     public override IEnumerable<SyntaxNode> GetChildren()
     {
         if (ReturnValueNode == null) yield break;
-        else yield return ReturnValueNode;
+        yield return ReturnValueNode;
     }
 
     public override string ToString()

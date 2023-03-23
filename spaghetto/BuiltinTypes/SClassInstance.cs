@@ -29,13 +29,12 @@ public class SClassInstance : SValue {
 
         if (toStringVal is not SBaseFunction toStringFunc) {
             return new SString("<instance of class " + Class.Name + ">");
-        }else {
-            // TODO: Find a solution to pass the scope; maybe keep a "DefiningScope" on each value?
-            var ret = toStringFunc.Call(null, new() { this });
-
-            if (ret is not SString str) throw new Exception("A classes toString function must return a string!");
-            return str;
         }
+        // TODO: Find a solution to pass the scope; maybe keep a "DefiningScope" on each value?
+        var ret = toStringFunc.Call(null, new() { this });
+
+        if (ret is not SString str) throw new Exception("A classes toString function must return a string!");
+        return str;
     }
 
     public override string ToString() {
