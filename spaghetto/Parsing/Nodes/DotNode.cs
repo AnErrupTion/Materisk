@@ -10,7 +10,7 @@ internal class DotNode : SyntaxNode
     }
 
     public SyntaxNode CallNode { get; }
-    public List<SyntaxNode> NextNodes { get; internal set; } = new();
+    public List<SyntaxNode> NextNodes { get; } = new();
 
     public override NodeType Type => NodeType.Dot;
 

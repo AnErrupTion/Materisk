@@ -3,8 +3,8 @@
 namespace spaghetto;
 
 public class SClassInstance : SValue {
-    public SClass Class { get; set; }
-    public List<(SValue key, SValue val)> InstanceTable { get; set; } = new();
+    public SClass Class { get; }
+    public List<(SValue key, SValue val)> InstanceTable { get; } = new();
 
     public override SBuiltinType BuiltinName => SBuiltinType.ClassInstance;
 

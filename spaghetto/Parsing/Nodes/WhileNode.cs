@@ -2,8 +2,8 @@
 
 internal class WhileNode : SyntaxNode
 {
-    private SyntaxNode condNode;
-    private SyntaxNode block;
+    private readonly SyntaxNode condNode;
+    private readonly SyntaxNode block;
 
     public WhileNode(SyntaxNode condNode, SyntaxNode block)
     {

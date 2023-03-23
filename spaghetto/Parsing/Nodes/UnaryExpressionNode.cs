@@ -2,8 +2,8 @@
 
 internal class UnaryExpressionNode : SyntaxNode
 {
-    private SyntaxToken token;
-    private SyntaxNode rhs;
+    private readonly SyntaxToken token;
+    private readonly SyntaxNode rhs;
 
     public UnaryExpressionNode(SyntaxToken token, SyntaxNode rhs)
     {

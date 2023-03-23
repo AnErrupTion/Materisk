@@ -4,7 +4,7 @@ public class BoolNode : SyntaxNode
 {
     public override NodeType Type => NodeType.BooleanLiteral;
 
-    public bool Value { get; set; }
+    public bool Value { get; }
 
     public BoolNode(bool value)
     {

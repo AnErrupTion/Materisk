@@ -2,7 +2,7 @@
 
 internal class FloatLiteralNode : SyntaxNode
 {
-    private SyntaxToken syntaxToken;
+    private readonly SyntaxToken syntaxToken;
 
     public FloatLiteralNode(SyntaxToken syntaxToken)
     {

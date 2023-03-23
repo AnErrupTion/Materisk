@@ -3,10 +3,10 @@
 namespace spaghetto;
 
 public class Lexer {
-    public string Code { get; set; }
-    public int Position { get; set; } = 0;
+    public string Code { get; }
+    public int Position { get; set; }
 
-    public char Current => Peek(0);
+    public char Current => Peek();
 
     public char Peek(int off = 0) {
         if (Position + off >= Code.Length || Position + off < 0) return '\0';
@@ -150,7 +150,7 @@ public class Lexer {
     }
 
     private SyntaxToken ParseIdentifierOrKeyword() {
-        var str = "";
+        var str = string.Empty;
 
         while (Current != '\0' && Current != ' ' && (char.IsLetterOrDigit(Current) || Current == '_')) {
             str += Current;
@@ -165,7 +165,7 @@ public class Lexer {
 
 
     private SyntaxToken ParseString() {
-        var str = "";
+        var str = string.Empty;
 
         Position++;
         while(!(Current == '"' && Peek(-1) != '\\') && Current != '\0') {
@@ -191,7 +191,7 @@ public class Lexer {
     }
 
     private SyntaxToken ParseNumber() {
-        var numStr = "";
+        var numStr = string.Empty;
         var isDecimal = false;
 
         while((char.IsDigit(Current) || Current == '.') && Current != '\0') {
@@ -215,9 +215,9 @@ public class Lexer {
 
 public struct SyntaxToken {
     public SyntaxType Type { get; set; }
-    public int Position { get; set; }
-    public object Value { get; set; }
-    public string Text { get; set; }
+    public int Position { get; }
+    public object Value { get; }
+    public string Text { get; }
 
     public SyntaxToken(SyntaxType type, int pos, object val, string txt) {
         Type = type;
@@ -268,7 +268,7 @@ public static class SyntaxFacts {
             or "if" or "elseif" or "else"
             or "for" or "while" or "func" or "var"
             or "import" or "native" or "new"
-            or "mod" or "dyn" or "export") {
+            or "mod" or "dyn" or "pub") {
             token.Type = SyntaxType.Keyword;
         }
     }

@@ -2,17 +2,19 @@
 
 internal class ClassFunctionDefinitionNode : SyntaxNode
 {
-    private SyntaxToken name;
-    private List<SyntaxToken> args;
-    private SyntaxNode body;
-    private bool isStatic;
+    private readonly SyntaxToken name;
+    private readonly List<SyntaxToken> args;
+    private readonly SyntaxNode body;
+    private readonly bool isStatic;
+    private readonly bool isPublic;
 
-    public ClassFunctionDefinitionNode(SyntaxToken name, List<SyntaxToken> args, SyntaxNode body, bool isStatic)
+    public ClassFunctionDefinitionNode(SyntaxToken name, List<SyntaxToken> args, SyntaxNode body, bool isStatic, bool isPublic)
     {
         this.name = name;
         this.args = args;
         this.body = body;
         this.isStatic = isStatic;
+        this.isPublic = isPublic;
     }
 
     public override NodeType Type => NodeType.ClassFunctionDefinition;
@@ -23,8 +25,11 @@ internal class ClassFunctionDefinitionNode : SyntaxNode
 
         if (targetName is "ctor" or "toString") targetName = "$$" + targetName;
 
-        var f = new SFunction(scope, targetName, args.Select((v) => v.Text).ToList(), body);
-        f.IsClassInstanceMethod = !isStatic;
+        var f = new SFunction(scope, targetName, args.Select(v => v.Text).ToList(), body) 
+        { 
+            IsClassInstanceMethod = !isStatic
+        };
+        if (isPublic) scope.GetRoot().ExportTable.Add(name.Text, f);
         return f;
     }
 

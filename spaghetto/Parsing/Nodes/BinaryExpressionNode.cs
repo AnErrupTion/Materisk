@@ -2,9 +2,9 @@
 
 internal class BinaryExpressionNode : SyntaxNode
 {
-    private SyntaxNode left;
-    private SyntaxToken operatorToken;
-    private SyntaxNode right;
+    private readonly SyntaxNode left;
+    private readonly SyntaxToken operatorToken;
+    private readonly SyntaxNode right;
 
     public BinaryExpressionNode(SyntaxNode left, SyntaxToken operatorToken, SyntaxNode right)
     {

@@ -2,12 +2,12 @@
 
 public class Scope
 {
-    public Dictionary<string, SValue> Table { get; set; } = new();
-    public Dictionary<string, SValue> ExportTable { get; set; } = new();
-    public Scope ParentScope { get; set; }
+    public Dictionary<string, SValue> Table { get; } = new();
+    public Dictionary<string, SValue> ExportTable { get; } = new();
+    public Scope ParentScope { get; }
 
     public ScopeState State { get; private set; } = ScopeState.None;
-    public SValue ReturnValue { get; set; } = SValue.Null;
+    public SValue ReturnValue { get; private set; } = SValue.Null;
 
     public Scope() { }
     public Scope(Scope parentScope)

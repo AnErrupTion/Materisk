@@ -2,21 +2,25 @@
 
 internal class ClassDefinitionNode : SyntaxNode
 {
-    private SyntaxToken className;
-    private IEnumerable<SyntaxNode> body;
+    private readonly SyntaxToken className;
+    private readonly IEnumerable<SyntaxNode> body;
+    private readonly bool isPublic;
 
-    public ClassDefinitionNode(SyntaxToken className, IEnumerable<SyntaxNode> body)
+    public ClassDefinitionNode(SyntaxToken className, IEnumerable<SyntaxNode> body, bool isPublic)
     {
         this.className = className;
         this.body = body;
+        this.isPublic = isPublic;
     }
 
     public override NodeType Type => NodeType.ClassDefinition;
 
     public override SValue Evaluate(Scope scope)
     {
-        var @class = new SClass();
-        @class.Name = className.Text;
+        var @class = new SClass
+        {
+            Name = className.Text
+        };
 
         foreach (var bodyNode in body)
         {
@@ -37,6 +41,7 @@ internal class ClassDefinitionNode : SyntaxNode
         }
 
         scope.Set(className.Text, @class);
+        if (isPublic) scope.GetRoot().ExportTable.Add(className.Text, @class);
         return @class;
     }
 

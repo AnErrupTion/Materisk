@@ -2,7 +2,7 @@
 
 internal class StringLiteralNode : SyntaxNode
 {
-    private SyntaxToken syntaxToken;
+    private readonly SyntaxToken syntaxToken;
 
     public StringLiteralNode(SyntaxToken syntaxToken)
     {

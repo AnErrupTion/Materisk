@@ -5,7 +5,7 @@ using System.Text;
 namespace spaghettoCLI;
 
 public class Program {
-    static bool showLexOutput = false, showParseOutput = false, timings = false, rethrow = false;
+    static bool showLexOutput, showParseOutput, timings, rethrow;
     static Interpreter interpreter;
 
     static void Main(string[] args) {

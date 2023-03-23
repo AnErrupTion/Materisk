@@ -2,8 +2,8 @@
 
 internal class CallNode : SyntaxNode
 {
-    public SyntaxNode ToCallNode { get; set; }
-    private List<SyntaxNode> argumentNodes;
+    public SyntaxNode ToCallNode { get; }
+    private readonly List<SyntaxNode> argumentNodes;
 
     public CallNode(SyntaxNode atomNode, List<SyntaxNode> argumentNodes)
     {

@@ -2,23 +2,29 @@
 
 internal class FunctionDefinitionNode : SyntaxNode
 {
-    private SyntaxToken? nameToken;
-    private List<SyntaxToken> args;
-    private SyntaxNode block;
+    private readonly SyntaxToken? nameToken;
+    private readonly List<SyntaxToken> args;
+    private readonly SyntaxNode block;
+    private readonly bool isPublic;
 
-    public FunctionDefinitionNode(SyntaxToken? nameToken, List<SyntaxToken> args, SyntaxNode block)
+    public FunctionDefinitionNode(SyntaxToken? nameToken, List<SyntaxToken> args, SyntaxNode block, bool isPublic)
     {
         this.nameToken = nameToken;
         this.args = args;
         this.block = block;
+        this.isPublic = isPublic;
     }
 
     public override NodeType Type => NodeType.FunctionDefinition;
 
     public override SValue Evaluate(Scope scope)
     {
-        var f = new SFunction(scope, nameToken?.Text ?? "<anonymous>", args.Select((v) => v.Text).ToList(), block);
-        if (nameToken != null) scope.Set(nameToken.Value.Text, f);
+        var f = new SFunction(scope, nameToken?.Text ?? "<anonymous>", args.Select(v => v.Text).ToList(), block);
+        if (nameToken != null)
+        {
+            scope.Set(nameToken?.Text, f);
+            if (isPublic) scope.GetRoot().ExportTable.Add(nameToken?.Text, f);
+        }
         return f;
     }
 

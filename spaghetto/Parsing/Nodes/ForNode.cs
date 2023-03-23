@@ -2,10 +2,10 @@
 
 internal class ForNode : SyntaxNode
 {
-    private SyntaxNode initialExpressionNode;
-    private SyntaxNode condNode;
-    private SyntaxNode stepNode;
-    private SyntaxNode block;
+    private readonly SyntaxNode initialExpressionNode;
+    private readonly SyntaxNode condNode;
+    private readonly SyntaxNode stepNode;
+    private readonly SyntaxNode block;
 
     public ForNode(SyntaxNode initialExpressionNode, SyntaxNode condNode, SyntaxNode stepNode, SyntaxNode block)
     {

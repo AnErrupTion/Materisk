@@ -6,7 +6,7 @@
 public class TokenNode : SyntaxNode
 {
     public override NodeType Type => NodeType.Token;
-    public SyntaxToken Token { get; set; }
+    public SyntaxToken Token { get; }
 
     public TokenNode(SyntaxToken token)
     {

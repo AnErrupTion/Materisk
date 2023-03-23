@@ -3,13 +3,13 @@
 namespace spaghetto.Parsing;
 
 public class Parser {
-    public List<SyntaxToken> Tokens { get; set; }
-    public int Position = 0;
+    public List<SyntaxToken> Tokens { get; }
+    public int Position;
 
-    public SyntaxToken Current => Peek(0);
+    public SyntaxToken Current => Peek();
 
     public SyntaxToken Peek(int off = 0) {
-        if (Position + off >= Tokens.Count || Position + off < 0) return new(SyntaxType.BadToken, 0, null, "");
+        if (Position + off >= Tokens.Count || Position + off < 0) return new(SyntaxType.BadToken, 0, null, string.Empty);
         return Tokens[Position + off];
     }
 
@@ -116,13 +116,6 @@ public class Parser {
 
             return new ImportNode(path);
         }
-        if (Current is { Type: SyntaxType.Keyword, Text: "export" }) {
-            Position++;
-
-            var ident = MatchToken(SyntaxType.Identifier);
-            MatchToken(SyntaxType.Semicolon);
-            return new ExportNode(ident);
-        }
         if (Current is { Type: SyntaxType.Keyword, Text: "mod" }) {
             return ParseModuleDefinition();
         }
@@ -135,20 +128,26 @@ public class Parser {
     private SyntaxNode ParseModuleDefinition() {
         MatchKeyword("mod");
 
+        var isPublic = false;
         var isStatic = true;
-        
+
+        if(Current is { Type: SyntaxType.Keyword, Text: "pub" }) {
+            Position++;
+            isPublic = true;
+        }
+
         if(Current is { Type: SyntaxType.Keyword, Text: "dyn" }) {
             Position++;
             isStatic = false;
         }
-        
+
         var className = MatchToken(SyntaxType.Identifier);
 
         MatchToken(SyntaxType.LBraces);
         var body = ParseClassBody(isStatic);
         MatchToken(SyntaxType.RBraces);
 
-        return new ClassDefinitionNode(className, body);
+        return new ClassDefinitionNode(className, body, isPublic);
     }
 
     private List<SyntaxNode> ParseClassBody(bool isStatic) {
@@ -157,11 +156,18 @@ public class Parser {
         while(Current is { Type: SyntaxType.Keyword, Text: "func" }) {
             Position++;
 
+            var isPublic = false;
+
+            if(Current is { Type: SyntaxType.Keyword, Text: "pub" }) {
+                Position++;
+                isPublic = true;
+            }
+
             var name = MatchToken(SyntaxType.Identifier);
             var args = ParseFunctionArgs();
             var body = ParseScopedStatements();
 
-            nodes.Add(new ClassFunctionDefinitionNode(name, args, body, isStatic));
+            nodes.Add(new ClassFunctionDefinitionNode(name, args, body, isStatic, isPublic));
         }
 
         return nodes;
@@ -202,18 +208,19 @@ public class Parser {
             Position++;
             return new UnaryExpressionNode(Peek(-1), ParseCompExpression());
         }
-        return BinaryOperation(() => { return ParseArithmeticExpression(); },
-            new List<SyntaxType>() {
+        return BinaryOperation(ParseArithmeticExpression,
+            new List<SyntaxType>
+            {
                 SyntaxType.EqualsEquals, SyntaxType.LessThan, SyntaxType.LessThanEqu, SyntaxType.GreaterThan, SyntaxType.GreaterThanEqu
             });
     }
 
     public SyntaxNode ParseArithmeticExpression() {
-        return BinaryOperation(() => { return ParseTermExpression(); }, new() { SyntaxType.Plus, SyntaxType.Minus });
+        return BinaryOperation(ParseTermExpression, new() { SyntaxType.Plus, SyntaxType.Minus });
     }
 
     public SyntaxNode ParseTermExpression() {
-        return BinaryOperation(() => { return ParseFactorExpression(); }, new() { SyntaxType.Mul, SyntaxType.Div, SyntaxType.Mod, SyntaxType.Idx });
+        return BinaryOperation(ParseFactorExpression, new() { SyntaxType.Mul, SyntaxType.Div, SyntaxType.Mod, SyntaxType.Idx });
     }
 
     public SyntaxNode ParseFactorExpression() {
@@ -228,7 +235,7 @@ public class Parser {
     }
 
     public SyntaxNode ParsePowerExpression() {
-        return BinaryOperation(() => { return ParseDotExpression(); }, new() { SyntaxType.Pow }, () => { return ParseFactorExpression(); });
+        return BinaryOperation(ParseDotExpression, new() { SyntaxType.Pow }, () => { return ParseFactorExpression(); });
     }
 
     public SyntaxNode ParseDotExpression() {
@@ -435,6 +442,13 @@ public class Parser {
     public SyntaxNode ParseFunctionExpression() {
         MatchKeyword("func");
 
+        var isPublic = false;
+
+        if(Current is { Type: SyntaxType.Keyword, Text: "pub" }) {
+            Position++;
+            isPublic = true;
+        }
+
         SyntaxToken? nameToken = null;
         if(Current.Type == SyntaxType.Identifier)
             nameToken = MatchToken(SyntaxType.Identifier);
@@ -443,7 +457,7 @@ public class Parser {
 
         var block = ParseScopedStatements();
 
-        return new FunctionDefinitionNode(nameToken, args, block);
+        return new FunctionDefinitionNode(nameToken, args, block, isPublic);
     }
 
     public SyntaxNode ParseInstantiateExpression() {
@@ -511,7 +525,7 @@ public class Parser {
 }
 
 internal class ImportNode : SyntaxNode {
-    private SyntaxToken path;
+    private readonly SyntaxToken path;
 
     public ImportNode(SyntaxToken path) {
         this.path = path;
@@ -554,27 +568,5 @@ internal class ImportNode : SyntaxNode {
 
     public override IEnumerable<SyntaxNode> GetChildren() {
         throw new NotImplementedException();
-    }
-}
-
-internal class ExportNode : SyntaxNode {
-    private SyntaxToken ident;
-
-    public ExportNode(SyntaxToken ident) {
-        this.ident = ident;
-    }
-
-    public override NodeType Type => NodeType.Export;
-
-    public override SValue Evaluate(Scope scope) {
-        var val = scope.Get(ident.Text);
-        if (val == null) throw new Exception("Can not export value of non-existent identifier");
-
-        scope.GetRoot().ExportTable.Add(ident.Text, val);
-        return val;
-    }
-
-    public override IEnumerable<SyntaxNode> GetChildren() {
-        yield return new TokenNode(ident);
     }
 }

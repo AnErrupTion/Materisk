@@ -2,13 +2,13 @@
 
 // TODO: Allow creation if Dictionaries
 public class SDictionary : SValue {
-    public List<(SValue key, SValue val)> Value { get; set; } = new();
+    public List<(SValue key, SValue val)> Value { get; } = new();
     public override SBuiltinType BuiltinName => SBuiltinType.Dictionary;
 
     public SDictionary() { }
 
     public override SString ToSpagString() {
-        return new SString("{\n" + string.Join(",\n  ", Value.Select((v) => v.key.ToSpagString().Value + ": " + v.val.ToSpagString().Value)) + "\n}");
+        return new SString("{\n" + string.Join(",\n  ", Value.Select(v => v.key.ToSpagString().Value + ": " + v.val.ToSpagString().Value)) + "\n}");
     }
 
     public override string ToString() {

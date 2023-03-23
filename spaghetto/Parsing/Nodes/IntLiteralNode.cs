@@ -2,7 +2,7 @@
 
 internal class IntLiteralNode : SyntaxNode
 {
-    private SyntaxToken syntaxToken;
+    private readonly SyntaxToken syntaxToken;
 
     public IntLiteralNode(SyntaxToken syntaxToken)
     {

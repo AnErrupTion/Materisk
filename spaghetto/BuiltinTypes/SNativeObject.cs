@@ -6,7 +6,7 @@
 public class SNativeObject : SValue
 {
     public override SBuiltinType BuiltinName => SBuiltinType.NativeObject;
-    public object Value { get; set; }
+    public object Value { get; }
 
     public SNativeObject() {
         Value = 0;

@@ -5,9 +5,9 @@ namespace spaghetto;
 
 public class SFunction : SBaseFunction {
     public override SBuiltinType BuiltinName => SBuiltinType.Function;
-    public string FunctionName { get; set; }
-    public SyntaxNode Callback { get; set; }
-    public Scope DefiningScope { get; set; }
+    public string FunctionName { get; }
+    public SyntaxNode Callback { get; }
+    public Scope DefiningScope { get; }
 
 
     public SFunction(Scope definingScope, string functionName, List<string> args, SyntaxNode callback) {

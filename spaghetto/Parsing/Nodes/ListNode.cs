@@ -2,7 +2,7 @@
 
 internal class ListNode : SyntaxNode
 {
-    private List<SyntaxNode> list;
+    private readonly List<SyntaxNode> list;
 
     public ListNode(List<SyntaxNode> list)
     {

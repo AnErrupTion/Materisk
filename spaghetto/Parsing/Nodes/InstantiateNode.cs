@@ -2,8 +2,8 @@
 
 internal class InstantiateNode : SyntaxNode
 {
-    private SyntaxToken ident;
-    private List<SyntaxNode> argumentNodes;
+    private readonly SyntaxToken ident;
+    private readonly List<SyntaxNode> argumentNodes;
 
     public InstantiateNode(SyntaxToken ident, List<SyntaxNode> argumentNodes)
     {

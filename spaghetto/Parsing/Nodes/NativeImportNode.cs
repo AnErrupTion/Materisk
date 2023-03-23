@@ -2,7 +2,7 @@
 
 internal class NativeImportNode : SyntaxNode
 {
-    private SyntaxToken ident;
+    private readonly SyntaxToken ident;
 
     public NativeImportNode(SyntaxToken ident)
     {

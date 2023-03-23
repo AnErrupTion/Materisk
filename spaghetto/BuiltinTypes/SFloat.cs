@@ -2,7 +2,7 @@
 
 public class SFloat : SValue {
     public override SBuiltinType BuiltinName => SBuiltinType.Float;
-    public float Value { get; set; }
+    public float Value { get; }
 
     public SFloat() {
         Value = 0;

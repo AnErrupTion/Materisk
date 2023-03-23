@@ -3,7 +3,7 @@
 public class SInt : SValue
 {
     public override SBuiltinType BuiltinName => SBuiltinType.Int;
-    public int Value { get; set; }
+    public int Value { get; }
 
     public static SInt Zero => new SInt(0);
     public static SInt One => new SInt(1);

@@ -1,13 +1,13 @@
 ﻿namespace spaghetto;
 
 public class SList : SValue {
-    public List<SValue> Value { get; set; } = new();
+    public List<SValue> Value { get; } = new();
     public override SBuiltinType BuiltinName => SBuiltinType.List;
 
     public SList() { }
 
     public override SString ToSpagString() {
-        return new SString("[" + string.Join(", ", Value.Select((v) => v.ToSpagString().Value)) + "]");
+        return new SString("[" + string.Join(", ", Value.Select(v => v.ToSpagString().Value)) + "]");
     }
 
     public override string ToString() {

@@ -2,7 +2,7 @@
 
 public class SString : SValue
 {
-    public string Value { get; set; }
+    public string Value { get; }
     public override SBuiltinType BuiltinName => SBuiltinType.String;
 
     public SString() { }

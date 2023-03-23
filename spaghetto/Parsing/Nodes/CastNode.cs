@@ -2,8 +2,8 @@
 
 internal class CastNode : SyntaxNode
 {
-    private SyntaxToken ident;
-    private SyntaxNode node;
+    private readonly SyntaxToken ident;
+    private readonly SyntaxNode node;
 
     public CastNode(SyntaxToken ident, SyntaxNode node)
     {

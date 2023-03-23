@@ -2,10 +2,10 @@
 
 // TODO: Allow creation if Dictionaries
 public class SClass : SValue {
-    public List<(SValue key, SValue val)> StaticTable { get; set; } = new();
-    public List<(SValue key, SValue val)> InstanceBaseTable { get; set; } = new();
+    public List<(SValue key, SValue val)> StaticTable { get; } = new();
+    public List<(SValue key, SValue val)> InstanceBaseTable { get; } = new();
 
-    public string Name { get; set; } = "";
+    public string Name { get; set; } = string.Empty;
     public override SBuiltinType BuiltinName => SBuiltinType.Class;
 
     public SClass() {

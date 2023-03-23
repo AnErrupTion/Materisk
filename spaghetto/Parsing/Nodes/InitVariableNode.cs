@@ -2,8 +2,8 @@
 
 internal class InitVariableNode : SyntaxNode
 {
-    private SyntaxToken ident;
-    private SyntaxNode expr;
+    private readonly SyntaxToken ident;
+    private readonly SyntaxNode expr;
     private readonly bool isFixedType = true;
 
     public InitVariableNode(SyntaxToken ident, bool isFixedType)

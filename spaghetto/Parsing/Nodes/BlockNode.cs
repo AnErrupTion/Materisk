@@ -4,7 +4,7 @@ namespace spaghetto.Parsing.Nodes;
 
 internal class BlockNode : SyntaxNode
 {
-    private List<SyntaxNode> nodes;
+    private readonly List<SyntaxNode> nodes;
     private readonly bool createNewScope;
 
     public BlockNode(List<SyntaxNode> nodes, bool createNewScope = true)
