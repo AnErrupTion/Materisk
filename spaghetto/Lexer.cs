@@ -268,7 +268,7 @@ public static class SyntaxFacts {
             or "if" or "elseif" or "else"
             or "for" or "while" or "func" or "var"
             or "import" or "native" or "new"
-            or "mod" or "static" or "export") {
+            or "mod" or "dyn" or "export") {
             token.Type = SyntaxType.Keyword;
         }
     }

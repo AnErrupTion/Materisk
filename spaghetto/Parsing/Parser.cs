@@ -148,11 +148,11 @@ public class Parser {
 
         while(Current is { Type: SyntaxType.Keyword, Text: "func" }) {
             Position++;
-            var isStatic = false;
+            var isStatic = true;
 
-            if(Current is { Type: SyntaxType.Keyword, Text: "static" }) {
+            if(Current is { Type: SyntaxType.Keyword, Text: "dyn" }) {
                 Position++;
-                isStatic = true;
+                isStatic = false;
             }
 
             var name = MatchToken(SyntaxType.Identifier);
