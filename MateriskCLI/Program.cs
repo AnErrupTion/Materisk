@@ -1,20 +1,34 @@
 ﻿using System.Text;
+using AsmResolver.DotNet;
 using Materisk;
 using Materisk.BuiltinTypes;
+using Materisk.Parsing;
 using Materisk.Parsing.Nodes;
 
 namespace MateriskCLI;
 
-public static class Program {
+public static class Program
+{
     private static bool showLexOutput, showParseOutput, timings, rethrow;
     private static Interpreter interpreter;
 
-    public static void Main(string[] args) {
+    public static void Main(string[] args)
+    {
         InitInterpreter();
 
         if (args.Length == 1)
         {
-            RunCode(interpreter, File.ReadAllText(args[0]));
+            var lexer = new Lexer(File.ReadAllText(args[0]));
+            var lexedTokens = lexer.Lex();
+
+            var parser = new Parser(lexedTokens);
+            var ast = parser.Parse();
+
+            var module = new ModuleDefinition("MateriskModule", KnownCorLibs.SystemRuntime_v7_0_0_0);
+
+            //ast.Emit(module);
+
+            module.Write("output.dll");
         }
         else
         {

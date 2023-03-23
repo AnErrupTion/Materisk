@@ -1,12 +1,10 @@
-﻿using Materisk.BuiltinTypes;
+﻿using AsmResolver.DotNet;
+using Materisk.BuiltinTypes;
 
 namespace Materisk.Parsing.Nodes;
 
 internal class AssignVariableNode : SyntaxNode
 {
-    private SyntaxToken ident;
-    private SyntaxNode expr;
-
     public AssignVariableNode(SyntaxToken ident, SyntaxNode expr)
     {
         Ident = ident;
@@ -15,8 +13,9 @@ internal class AssignVariableNode : SyntaxNode
 
     public override NodeType Type => NodeType.AssignVariable;
 
-    public SyntaxToken Ident { get => ident; set => ident = value; }
-    public SyntaxNode Expr { get => expr; set => expr = value; }
+    public SyntaxToken Ident { get; }
+
+    public SyntaxNode Expr { get; }
 
     public override SValue Evaluate(Scope scope)
     {
