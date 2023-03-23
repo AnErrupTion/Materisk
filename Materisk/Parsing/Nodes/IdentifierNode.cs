@@ -4,7 +4,7 @@ namespace Materisk.Parsing.Nodes;
 
 internal class IdentifierNode : SyntaxNode
 {
-    public SyntaxToken Token { get; private set; }
+    public SyntaxToken Token { get; }
 
     public IdentifierNode(SyntaxToken syntaxToken)
     {

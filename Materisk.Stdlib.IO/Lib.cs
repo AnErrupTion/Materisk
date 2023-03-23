@@ -14,7 +14,9 @@ public class Lib {
                 return args[0];
             },
             expectedArgs: new() { "text" }
-        ));
+        ){
+            IsPublic = true
+        });
 
         scope.Set("print", new SNativeFunction(
             impl: (Scope callingScope, List<SValue> args) => {
@@ -22,17 +24,23 @@ public class Lib {
                 return args[0];
             },
             expectedArgs: new() { "text" }
-        ));
+        ){
+            IsPublic = true
+        });
 
         scope.Set("read", new SNativeFunction(
             impl: (Scope callingScope, List<SValue> args) => {
                 return new SString(Console.ReadKey().KeyChar.ToString());
             }
-        ));
+        ){
+            IsPublic = true
+        });
 
         scope.Set("readline", new SNativeFunction((Scope callingScope, List<SValue> args) => {
             return new SString(Console.ReadLine());
-        }));
+        }){
+            IsPublic = true
+        });
 
         scope.Set("file", File.CreateClass());
     }

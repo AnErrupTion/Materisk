@@ -23,14 +23,18 @@ public class Lib {
 
             },
             expectedArgs: new() { "value" }
-        ));
+        ){
+            IsPublic = true
+        });
 
         scope.Set("toString", new SNativeFunction(
             impl: (Scope callingScope, List<SValue> args) => {
                 return args[0].ToSpagString();
             },
             expectedArgs: new() { "value" }
-        ));
+        ){
+            IsPublic = true
+        });
 
         scope.Set("eval", new SNativeFunction(
             impl: (Scope callingScope, List<SValue> args) => {
@@ -52,7 +56,9 @@ public class Lib {
                 return res.LastValue;
             },
             expectedArgs: new() { "code" }
-        ));
+        ){
+            IsPublic = true
+        });
 
         scope.Set("int", Int.CreateClass());
         scope.Set("float", Float.CreateClass());

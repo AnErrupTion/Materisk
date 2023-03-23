@@ -14,7 +14,9 @@ public class File {
                 return new SString(System.IO.File.ReadAllText(str.Value));
             },
             expectedArgs: new() { "path" }
-        )));
+        ){
+            IsPublic = true
+        }));
 
         @class.StaticTable.Add((new SString("writetext"), new SNativeFunction(
             impl: (Scope scope, List<SValue> args) => {
@@ -26,7 +28,9 @@ public class File {
                 return new SInt(1);
             },
             expectedArgs: new() { "path", "data" }
-        )));
+        ){
+            IsPublic = true
+        }));
 
         return @class;
     }

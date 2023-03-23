@@ -4,7 +4,7 @@ namespace Materisk.Parsing.Nodes;
 
 internal class IfNode : SyntaxNode
 {
-    public List<(SyntaxNode cond, SyntaxNode block)> Conditions { get; private set; } = new();
+    public List<(SyntaxNode cond, SyntaxNode block)> Conditions { get; } = new();
 
     public override NodeType Type => NodeType.If;
 

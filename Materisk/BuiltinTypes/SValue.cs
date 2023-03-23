@@ -4,6 +4,8 @@ public abstract class SValue
 {
     public static SValue Null => new SNull();
 
+    public bool IsPublic { get; init; }
+
     public abstract SBuiltinType BuiltinName { get; }
 
     #region Metadata

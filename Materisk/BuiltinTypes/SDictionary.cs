@@ -20,7 +20,7 @@ public class SDictionary : SValue {
             if (kvp.key.Equals(other).IsTruthy()) return kvp.val;
         }
 
-        return SValue.Null;
+        return Null;
     }
 
     public override bool IsTruthy() {

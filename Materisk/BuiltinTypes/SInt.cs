@@ -44,28 +44,28 @@ public class SInt : SValue
     }
 
     public override SValue Equals(SValue other) {
-        if (other is not SInt otherInt) return SInt.Zero;
-        return Value == otherInt.Value ? SInt.One : SInt.Zero;
+        if (other is not SInt otherInt) return Zero;
+        return Value == otherInt.Value ? One : Zero;
     }
 
     public override SValue LessThan(SValue other) {
-        if (other is not SInt otherInt) return SInt.Zero;
-        return Value < otherInt.Value ? SInt.One : SInt.Zero;
+        if (other is not SInt otherInt) return Zero;
+        return Value < otherInt.Value ? One : Zero;
     }
 
     public override SValue LessThanEqu(SValue other) {
-        if (other is not SInt otherInt) return SInt.Zero;
-        return Value <= otherInt.Value ? SInt.One : SInt.Zero;
+        if (other is not SInt otherInt) return Zero;
+        return Value <= otherInt.Value ? One : Zero;
     }
 
     public override SValue GreaterThan(SValue other) {
-        if (other is not SInt otherInt) return SInt.Zero;
-        return Value > otherInt.Value ? SInt.One : SInt.Zero;
+        if (other is not SInt otherInt) return Zero;
+        return Value > otherInt.Value ? One : Zero;
     }
 
     public override SValue GreaterThanEqu(SValue other) {
-        if (other is not SInt otherInt) return SInt.Zero;
-        return Value >= otherInt.Value ? SInt.One : SInt.Zero;
+        if (other is not SInt otherInt) return Zero;
+        return Value >= otherInt.Value ? One : Zero;
     }
 
     public override SValue ArithNot() {

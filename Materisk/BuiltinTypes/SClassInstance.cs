@@ -41,14 +41,36 @@ public class SClassInstance : SValue {
 
     public override SValue Dot(SValue other) {
         foreach (var kvp in Class.StaticTable) {
-            if (kvp.key.Equals(other).IsTruthy()) return kvp.val;
+            if (kvp.key.Equals(other).IsTruthy())
+            {
+                if (kvp.val is SBaseFunction)
+                {
+                    if (!kvp.val.IsPublic)
+                        continue;
+
+                    return kvp.val;
+                }
+
+                return kvp.val;
+            }
         }
 
         foreach (var kvp in InstanceTable) {
-            if (kvp.key.Equals(other).IsTruthy()) return kvp.val;
+            if (kvp.key.Equals(other).IsTruthy())
+            {
+                if (kvp.val is SBaseFunction)
+                {
+                    if (!kvp.val.IsPublic)
+                        continue;
+
+                    return kvp.val;
+                }
+
+                return kvp.val;
+            }
         }
 
-        return SValue.Null;
+        return Null;
     }
 
     public override SValue DotAssignment(SValue key, SValue other) {

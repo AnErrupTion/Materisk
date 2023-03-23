@@ -6,7 +6,7 @@ using Materisk.Parsing.Nodes;
 namespace Materisk;
 
 public class Interpreter {
-    public Scope GlobalScope { get; private set; }
+    public Scope GlobalScope { get; }
 
     public Interpreter() {
         GlobalScope = new();

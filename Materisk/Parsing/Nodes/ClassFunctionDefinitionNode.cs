@@ -35,9 +35,10 @@ internal class ClassFunctionDefinitionNode : SyntaxNode
 
         var f = new SFunction(scope, targetName, args.Select(v => v.Text).ToList(), body) 
         { 
-            IsClassInstanceMethod = !isStatic
+            IsClassInstanceMethod = !isStatic,
+            IsPublic = isPublic
         };
-        if (isPublic) scope.GetRoot().ExportTable.Add(name.Text, f);
+        if (isPublic) scope.GetRoot().ExportTable.Add(targetName, f);
         return f;
     }
 

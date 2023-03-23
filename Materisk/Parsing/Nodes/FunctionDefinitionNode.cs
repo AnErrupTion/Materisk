@@ -21,7 +21,10 @@ internal class FunctionDefinitionNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        var f = new SFunction(scope, nameToken?.Text ?? "<anonymous>", args.Select(v => v.Text).ToList(), block);
+        var f = new SFunction(scope, nameToken?.Text ?? "<anonymous>", args.Select(v => v.Text).ToList(), block)
+        {
+            IsPublic = isPublic
+        };
         if (nameToken != null)
         {
             scope.Set(nameToken?.Text, f);

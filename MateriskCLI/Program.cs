@@ -80,6 +80,9 @@ public static class Program {
                     },
                     expectedArgs: new() { "self", "r", "g", "b" }
                 )
+                {
+                    IsPublic = true
+                }
             ));
 
         classInstTest.InstanceBaseTable.Add((new SString("mul"),
@@ -97,6 +100,9 @@ public static class Program {
                     expectedArgs: new() { "self", "other" },
                     isClassInstanceFunc: true
                 )
+                {
+                    IsPublic = true
+                }
             ));
 
         classInstTest.InstanceBaseTable.Add((new SString("$$toString"),
@@ -108,6 +114,9 @@ public static class Program {
                     expectedArgs: new() { "self" },
                     isClassInstanceFunc: true
                 )
+                {
+                    IsPublic = true
+                }
             ));
 
         interpreter.GlobalScope.Set("test", tdict);

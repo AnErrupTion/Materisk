@@ -9,8 +9,8 @@ internal class AssignVariableNode : SyntaxNode
 
     public AssignVariableNode(SyntaxToken ident, SyntaxNode expr)
     {
-        this.Ident = ident;
-        this.Expr = expr;
+        Ident = ident;
+        Expr = expr;
     }
 
     public override NodeType Type => NodeType.AssignVariable;

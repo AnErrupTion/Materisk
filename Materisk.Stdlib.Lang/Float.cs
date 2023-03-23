@@ -15,7 +15,9 @@ public class Float {
                 return new SFloat(valFloat);
             },
             expectedArgs: new() { "toParse" }
-        )));
+        ){
+            IsPublic = true
+        }));
 
         return @class;
     }
