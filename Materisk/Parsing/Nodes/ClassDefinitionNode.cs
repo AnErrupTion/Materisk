@@ -30,7 +30,7 @@ internal class ClassDefinitionNode : SyntaxNode
 
             var funcRaw = cfdn.Evaluate(scope);
 
-            if (funcRaw is not SFunction func) throw new Exception("Expected ClassFunctionDefinitionNode to return SFunction");
+            if (funcRaw is not SBaseFunction func) throw new Exception("Expected ClassFunctionDefinitionNode to return SBaseFunction");
 
             if (func.IsClassInstanceMethod)
             {

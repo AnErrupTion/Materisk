@@ -104,14 +104,6 @@ public class Parser {
         if (Current is { Type: SyntaxType.Keyword, Text: "import" }) {
             Position++;
 
-            if (Current is { Type: SyntaxType.Keyword, Text: "native" }) {
-                Position++;
-                var ident = MatchToken(SyntaxType.Identifier);
-                MatchToken(SyntaxType.Semicolon);
-
-                return new NativeImportNode(ident);
-            }
-
             var path = MatchToken(SyntaxType.String);
             MatchToken(SyntaxType.Semicolon);
 
@@ -145,17 +137,24 @@ public class Parser {
         var className = MatchToken(SyntaxType.Identifier);
 
         MatchToken(SyntaxType.LBraces);
-        var body = ParseClassBody(isStatic);
+        var body = ParseClassBody(className, isStatic);
         MatchToken(SyntaxType.RBraces);
 
         return new ClassDefinitionNode(className, body, isPublic);
     }
 
-    private List<SyntaxNode> ParseClassBody(bool isStatic) {
+    private List<SyntaxNode> ParseClassBody(SyntaxToken className, bool isStatic) {
         List<SyntaxNode> nodes = new();
 
-        while(Current is { Type: SyntaxType.Keyword, Text: "func" }) {
+        while(Current is { Type: SyntaxType.Keyword, Text: "fn" }) {
             Position++;
+
+            var isNative = false;
+
+            if (Current is { Type: SyntaxType.Keyword, Text: "native" }) {
+                Position++;
+                isNative = true;
+            }
 
             var isPublic = false;
 
@@ -168,7 +167,7 @@ public class Parser {
             var args = ParseFunctionArgs();
             var body = ParseScopedStatements();
 
-            nodes.Add(new ClassFunctionDefinitionNode(name, args, body, isStatic, isPublic));
+            nodes.Add(new ClassFunctionDefinitionNode(className, name, args, body, isStatic, isPublic, isNative));
         }
 
         return nodes;
@@ -348,7 +347,7 @@ public class Parser {
         if (Current.Type is SyntaxType.Keyword && Current.Text == "while") {
             return ParseWhileExpression();
         }
-        if (Current.Type is SyntaxType.Keyword && Current.Text == "func") {
+        if (Current.Type is SyntaxType.Keyword && Current.Text == "fn") {
             return ParseFunctionExpression();
         }
         if (Current.Type is SyntaxType.Keyword && Current.Text == "new") {
@@ -441,7 +440,14 @@ public class Parser {
     }
 
     public SyntaxNode ParseFunctionExpression() {
-        MatchKeyword("func");
+        MatchKeyword("fn");
+
+        var isNative = false;
+
+        if (Current is { Type: SyntaxType.Keyword, Text: "native" }) {
+            Position++;
+            isNative = true;
+        }
 
         var isPublic = false;
 
@@ -458,7 +464,7 @@ public class Parser {
 
         var block = ParseScopedStatements();
 
-        return new FunctionDefinitionNode(nameToken, args, block, isPublic);
+        return new FunctionDefinitionNode(nameToken, args, block, isPublic, isNative);
     }
 
     public SyntaxNode ParseInstantiateExpression() {
@@ -539,15 +545,6 @@ internal class ImportNode : SyntaxNode {
         var text = File.ReadAllText(path.Text);
 
         Interpreter ip = new();
-        var rootScope = scope.GetRoot();
-
-        // copy available namespaces provided by runtime
-        foreach (var kvp in rootScope.Table) {
-            if (kvp.Key.StartsWith("nlimporter$$")) {
-                ip.GlobalScope.Table[kvp.Key] = kvp.Value;
-            }
-        }
-
         InterpreterResult res = new();
 
         try {

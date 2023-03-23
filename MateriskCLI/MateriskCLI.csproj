@@ -10,8 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Materisk.Stdlib.IO\Materisk.Stdlib.IO.csproj" />
-    <ProjectReference Include="..\Materisk.Stdlib.Lang\Materisk.Stdlib.Lang.csproj" />
     <ProjectReference Include="..\Materisk\Materisk.csproj" />
   </ItemGroup>
 

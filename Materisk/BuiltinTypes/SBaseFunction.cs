@@ -6,5 +6,7 @@ public abstract class SBaseFunction : SValue {
     /// </summary>
     public bool IsClassInstanceMethod { get; set; }
 
+    public string FunctionName { get; init; }
+
     public List<string> ExpectedArgs { get; set; }
 }

@@ -4,7 +4,6 @@ namespace Materisk.BuiltinTypes;
 
 public class SFunction : SBaseFunction {
     public override SBuiltinType BuiltinName => SBuiltinType.Function;
-    public string FunctionName { get; }
     public SyntaxNode Callback { get; }
     public Scope DefiningScope { get; }
 

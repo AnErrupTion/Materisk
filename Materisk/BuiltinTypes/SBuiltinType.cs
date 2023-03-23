@@ -9,9 +9,7 @@ public enum SBuiltinType
     Null,
     NativeFunc,
     Function,
-    NativeLibraryImporter,
     Dictionary,
     Class,
-    NativeObject,
-    ClassInstance,
+    ClassInstance
 }

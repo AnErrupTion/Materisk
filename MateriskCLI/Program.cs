@@ -2,7 +2,6 @@
 using Materisk;
 using Materisk.BuiltinTypes;
 using Materisk.Parsing.Nodes;
-using Materisk.Stdlib.Lang;
 
 namespace MateriskCLI;
 
@@ -58,8 +57,6 @@ public static class Program {
 
     private static void InitInterpreter() {
         interpreter = new Interpreter();
-        Lib.Mount(interpreter.GlobalScope);
-        Materisk.Stdlib.IO.Lib.Mount(interpreter.GlobalScope);
 
         var tdict = new SDictionary();
         tdict.Value.Add((new SString("ok"), new SString("works string key")));
@@ -67,7 +64,7 @@ public static class Program {
 
         var classInstTest = new SClass("color");
         classInstTest.InstanceBaseTable.Add((new SString("$$ctor"),
-                new SNativeFunction(
+                new SNativeFunction("$$ctor",
                     impl: (Scope scope, List<SValue> args) => {
                         // TODO: Add dot stack assignment; not possible yet
 
@@ -86,7 +83,7 @@ public static class Program {
             ));
 
         classInstTest.InstanceBaseTable.Add((new SString("mul"),
-                new SNativeFunction(
+                new SNativeFunction("mul",
                     impl: (Scope scope, List<SValue> args) => {
                         if (args[1] is not SClassInstance inst || inst.Class.Name != "color") throw new Exception("Expected argument 0 to be of type 'color'");
 
@@ -106,7 +103,7 @@ public static class Program {
             ));
 
         classInstTest.InstanceBaseTable.Add((new SString("$$toString"),
-                new SNativeFunction(
+                new SNativeFunction("$$toString",
                     impl: (Scope scope, List<SValue> args) => {
                         var current = args[0] as SClassInstance;
                         return new SString("<Color R=" + args[0].Dot(new SString("r")).SpagToCsString() + " G=" + args[0].Dot(new SString("g")).SpagToCsString() + " B=" + args[0].Dot(new SString("b")).SpagToCsString() + ">");

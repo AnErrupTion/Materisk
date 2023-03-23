@@ -1,22 +1,27 @@
 ﻿using Materisk.BuiltinTypes;
+using Materisk.Native;
 
 namespace Materisk.Parsing.Nodes;
 
 internal class ClassFunctionDefinitionNode : SyntaxNode
 {
+    private readonly SyntaxToken className;
     private readonly SyntaxToken name;
     private readonly List<SyntaxToken> args;
     private readonly SyntaxNode body;
     private readonly bool isStatic;
     private readonly bool isPublic;
+    private readonly bool isNative;
 
-    public ClassFunctionDefinitionNode(SyntaxToken name, List<SyntaxToken> args, SyntaxNode body, bool isStatic, bool isPublic)
+    public ClassFunctionDefinitionNode(SyntaxToken className, SyntaxToken name, List<SyntaxToken> args, SyntaxNode body, bool isStatic, bool isPublic, bool isNative)
     {
+        this.className = className;
         this.name = name;
         this.args = args;
         this.body = body;
         this.isStatic = isStatic;
         this.isPublic = isPublic;
+        this.isNative = isNative;
     }
 
     public override NodeType Type => NodeType.ClassFunctionDefinition;
@@ -33,12 +38,27 @@ internal class ClassFunctionDefinitionNode : SyntaxNode
             targetName = "$$" + targetName;
         }
 
-        var f = new SFunction(scope, targetName, args.Select(v => v.Text).ToList(), body) 
-        { 
-            IsClassInstanceMethod = !isStatic,
-            IsPublic = isPublic
-        };
-        if (isPublic) scope.GetRoot().ExportTable.Add(targetName, f);
+        var fullName = $"{className.Text}:{targetName}";
+
+        SBaseFunction f;
+
+        if (isNative)
+        {
+            f = new SNativeFunction(targetName, NativeFuncImpl.GetImplFor(fullName), args.Select(v => v.Text).ToList(), !isStatic)
+            {
+                IsPublic = isPublic
+            };
+        }
+        else
+        {
+            f = new SFunction(scope, targetName, args.Select(v => v.Text).ToList(), body) 
+            { 
+                IsClassInstanceMethod = !isStatic,
+                IsPublic = isPublic
+            };
+        }
+        
+        if (isPublic) scope.GetRoot().ExportTable.Add(fullName, f);
         return f;
     }
 

@@ -39,6 +39,7 @@ public class SClassInstance : SValue {
         return $"<SClassInstance ClassName={Class.Name}>";
     }
 
+    // TODO: Not just SBaseFunction!
     public override SValue Dot(SValue other) {
         foreach (var kvp in Class.StaticTable) {
             if (kvp.key.Equals(other).IsTruthy())
