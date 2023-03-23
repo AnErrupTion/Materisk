@@ -70,7 +70,6 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
         return f;
     }
 
-    // TODO: Native functions
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
     {
         var targetName = name.Text;
@@ -105,7 +104,10 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
             MethodSignature.CreateStatic(Utils.GetTypeSignatureFor(module, returnType.Value.ToString()), parameters));
         newMethod.CilMethodBody = new(newMethod);
 
-        body.Emit(variables, module, newMethod, argts);
+        if (isNative)
+            CilNativeFuncImpl.Emit(module, className.Text, newMethod);
+        else
+            body.Emit(variables, module, newMethod, argts);
 
         newMethod.CilMethodBody.Instructions.Add(CilOpCodes.Ret);
         

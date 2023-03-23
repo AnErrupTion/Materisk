@@ -58,7 +58,6 @@ internal class FunctionDefinitionNode : SyntaxNode
         return f;
     }
 
-    // TODO: Native functions
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
     {
         if (nameToken is null)
@@ -85,7 +84,10 @@ internal class FunctionDefinitionNode : SyntaxNode
 
         module.TopLevelTypes[1].Methods.Add(newMethod);
 
-        block.Emit(variables, module, newMethod, argts);
+        if (isNative)
+            CilNativeFuncImpl.Emit(module, module.TopLevelTypes[1].Name, newMethod);
+        else
+            block.Emit(variables, module, newMethod, argts);
 
         newMethod.CilMethodBody.Instructions.Add(CilOpCodes.Ret);
 

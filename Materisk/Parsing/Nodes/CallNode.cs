@@ -40,10 +40,8 @@ internal class CallNode : SyntaxNode
 
     public void EmitArgs(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
     {
-        var args = new List<object>();
-
         foreach (var n in argumentNodes)
-            args.Add(n.Emit(variables, module, method, arguments));
+            n.Emit(variables, module, method, arguments);
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
