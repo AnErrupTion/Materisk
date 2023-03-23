@@ -137,13 +137,13 @@ public class Parser {
         var className = MatchToken(SyntaxType.Identifier);
 
         MatchToken(SyntaxType.LBraces);
-        var body = ParseClassBody(className, isStatic);
+        var body = ParseModuleBody(className, isStatic);
         MatchToken(SyntaxType.RBraces);
 
-        return new ClassDefinitionNode(className, body, isPublic);
+        return new ModuleDefinitionNode(className, body, isPublic);
     }
 
-    private List<SyntaxNode> ParseClassBody(SyntaxToken className, bool isStatic) {
+    private List<SyntaxNode> ParseModuleBody(SyntaxToken className, bool isStatic) {
         List<SyntaxNode> nodes = new();
 
         while(Current is { Type: SyntaxType.Keyword, Text: "fn" }) {
@@ -167,7 +167,7 @@ public class Parser {
             var args = ParseFunctionArgs();
             var body = ParseScopedStatements();
 
-            nodes.Add(new ClassFunctionDefinitionNode(className, name, args, body, isStatic, isPublic, isNative));
+            nodes.Add(new ModuleFunctionDefinitionNode(className, name, args, body, isStatic, isPublic, isNative));
         }
 
         return nodes;

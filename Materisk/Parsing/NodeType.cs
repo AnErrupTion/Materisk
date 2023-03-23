@@ -25,7 +25,7 @@ public enum NodeType
     While,
     FunctionDefinition,
     Instantiate,
-    ClassDefinition,
-    ClassFunctionDefinition,
+    ModuleDefinition,
+    ModuleFunctionDefinition,
     Import
 }

@@ -33,7 +33,7 @@ internal class InstantiateNode : SyntaxNode
         return instance;
     }
 
-    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, Dictionary<string, object> arguments)
     {
         throw new NotImplementedException();
     }

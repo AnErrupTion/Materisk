@@ -49,24 +49,33 @@ internal class InitVariableNode : SyntaxNode
 
     }
 
-    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, Dictionary<string, object> arguments)
     {
-        // TODO: Check if variable already exists
-        
+        var name = ident.Value.ToString();
+
+        if (name is null)
+            throw new InvalidOperationException("Can not assign to a non-existent identifier!");
+
+        if (variables.ContainsKey(name))
+            throw new InvalidOperationException("Can not initialize the same variable twice!");
+
         if (expr != null)
         {
-            var value = expr.Emit(module, body);
+            var value = expr.Emit(variables, module, method, arguments);
             var variable = new CilLocalVariable(Utils.GetTypeSignatureFor(module, value.GetType()));
-            body.LocalVariables.Add(variable);
-            body.Instructions.Add(CilOpCodes.Stloc, variable);
+            method.CilMethodBody?.LocalVariables.Add(variable);
+            method.CilMethodBody?.Instructions.Add(CilOpCodes.Stloc, variable);
+            variables.Add(name, variable);
             return value;
         }
 
-        if (isFixedType) throw new InvalidOperationException("Tried to initiliaze a fixed type variable with no value; this is not permitted. Use var% instead.");
+        if (isFixedType)
+            throw new InvalidOperationException("Tried to initialize a fixed type variable with no value; this is not permitted. Use var% instead.");
 
         var nullVariable = new CilLocalVariable(module.CorLibTypeFactory.Object);
-        body.LocalVariables.Add(nullVariable);
-        body.Instructions.Add(CilOpCodes.Stloc, nullVariable);
+        method.CilMethodBody?.LocalVariables.Add(nullVariable);
+        method.CilMethodBody?.Instructions.Add(CilOpCodes.Stloc, nullVariable);
+        variables.Add(name, nullVariable);
         return null;
     }
 

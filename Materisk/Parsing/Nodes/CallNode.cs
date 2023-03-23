@@ -25,7 +25,7 @@ internal class CallNode : SyntaxNode
         return toCall.Call(scope, args);
     }
 
-    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, Dictionary<string, object> arguments)
     {
         throw new NotImplementedException();
     }
@@ -35,6 +35,15 @@ internal class CallNode : SyntaxNode
         var args = new List<SValue>();
 
         foreach (var n in argumentNodes) args.Add(n.Evaluate(scope));
+        return args;
+    }
+
+    public List<object> EmitArgs(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, Dictionary<string, object> arguments)
+    {
+        var args = new List<object>();
+
+        foreach (var n in argumentNodes)
+            args.Add(n.Emit(variables, module, method, arguments));
         return args;
     }
 

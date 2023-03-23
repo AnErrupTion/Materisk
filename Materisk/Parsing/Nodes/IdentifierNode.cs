@@ -1,5 +1,6 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
+using AsmResolver.PE.DotNet.Cil;
 using Materisk.BuiltinTypes;
 
 namespace Materisk.Parsing.Nodes;
@@ -20,9 +21,28 @@ internal class IdentifierNode : SyntaxNode
         return scope.Get((string)Token.Value) ?? SValue.Null;
     }
 
-    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, Dictionary<string, object> arguments)
     {
-        throw new NotImplementedException();
+        var name = Token.Value.ToString();
+
+        foreach (var type in module.TopLevelTypes)
+            if (type.Name == name)
+                return type;
+
+        var index = 0;
+
+        foreach (var argument in arguments)
+        {
+            if (argument.Key == name)
+            {
+                method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldarg, method.Parameters[index]);
+                return argument.Value;
+            }
+
+            index++;
+        }
+
+        throw new InvalidOperationException($"Unable to find value for identifier: {name}");
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

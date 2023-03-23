@@ -1,5 +1,6 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
+using AsmResolver.PE.DotNet.Cil;
 using Materisk.BuiltinTypes;
 
 namespace Materisk.Parsing.Nodes;
@@ -59,9 +60,62 @@ internal class DotNode : SyntaxNode
         return currentValue;
     }
 
-    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, Dictionary<string, object> arguments)
     {
-        throw new NotImplementedException();
+        var currentValue = CallNode.Emit(variables, module, method, arguments);
+
+        foreach (var node in NextNodes)
+            switch (node)
+            {
+                case IdentifierNode rvn:
+                {
+                    /*var ident = rvn.Token;
+                    currentValue = currentValue.Dot(new SString((string)ident.Value));
+                    break;*/
+                    throw new NotImplementedException();
+                }
+                case AssignVariableNode avn:
+                {
+                    /*var ident = avn.Ident;
+                    return currentValue.DotAssignment(new SString(ident.Text), avn.Expr.Evaluate(scope));*/
+                    throw new NotImplementedException();
+                }
+                case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:
+                {
+                    var ident = cnIdentNode.Token;
+                    var name = ident.Value.ToString();
+
+                    MethodDefinition newMethod = null;
+                    foreach (var type in module.TopLevelTypes)
+                        foreach (var meth in type.Methods)
+                            if (meth.Name == name)
+                            {
+                                newMethod = meth;
+                                break;
+                            }
+
+                    if (newMethod == null)
+                        throw new InvalidOperationException($"Unable to find method with name: {name}");
+
+                    cn.EmitArgs(variables, module, method, arguments);
+                    // TODO?
+                    /*if (!method.IsStatic)
+                    {
+                        var idxOfSelf = method.ExpectedArgs.IndexOf("self");
+                        if (idxOfSelf != -1)
+                            args.Insert(idxOfSelf, currentValue);
+                    }*/
+
+                    method.CilMethodBody?.Instructions.Add(CilOpCodes.Call, newMethod);
+                    break;
+                }
+                case CallNode _:
+                    throw new Exception("Tried to call a non identifier in dot node stack.");
+                default:
+                    throw new Exception("Unexpected node in dot node stack!");
+            }
+
+        return currentValue;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

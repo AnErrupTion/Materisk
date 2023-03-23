@@ -22,10 +22,10 @@ internal class IntLiteralNode : SyntaxNode
         return sint;
     }
 
-    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, Dictionary<string, object> arguments)
     {
         var value = (int)syntaxToken.Value;
-        body.Instructions.Add(CilInstruction.CreateLdcI4(value));
+        method.CilMethodBody?.Instructions.Add(CilInstruction.CreateLdcI4(value));
         return value;
     }
 

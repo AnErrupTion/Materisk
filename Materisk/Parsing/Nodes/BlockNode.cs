@@ -48,13 +48,13 @@ internal class BlockNode : SyntaxNode
         return lastVal;
     }
 
-    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, Dictionary<string, object> arguments)
     {
         object lastVal = null;
 
         foreach (var node in nodes)
         {
-            var res = node.Emit(module, body);
+            var res = node.Emit(variables, module, method, arguments);
 
             if (res != null)
                 lastVal = res;

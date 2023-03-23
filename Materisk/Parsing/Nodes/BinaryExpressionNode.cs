@@ -42,7 +42,7 @@ internal class BinaryExpressionNode : SyntaxNode
         };
     }
 
-    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, Dictionary<string, object> arguments)
     {
         /*var leftType = left.Emit(module, body);
         var rightType = right.Emit(module, body);

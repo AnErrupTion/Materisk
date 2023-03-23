@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using AsmResolver.DotNet.Signatures;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
 using Materisk;
 using Materisk.BuiltinTypes;
@@ -21,19 +20,24 @@ public static class Program
 
         if (args.Length == 1)
         {
-            var lexer = new Lexer(File.ReadAllText(args[0]));
+            var path = args[0];
+            var name = Path.GetFileNameWithoutExtension(path);
+
+            var lexer = new Lexer(File.ReadAllText(path));
             var lexedTokens = lexer.Lex();
 
             var parser = new Parser(lexedTokens);
             var ast = parser.Parse();
 
-            var module = new ModuleDefinition("MateriskModule", KnownCorLibs.SystemRuntime_v7_0_0_0);
-            var type = new TypeDefinition("MateriskType", "Program", TypeAttributes.Public | TypeAttributes.Class);
-            module.TopLevelTypes.Add(type);
+            var module = new ModuleDefinition(name, KnownCorLibs.SystemRuntime_v7_0_0_0);
+            var mainType = new TypeDefinition(name, "Program", TypeAttributes.Public | TypeAttributes.Class);
+            module.TopLevelTypes.Add(mainType);
 
-            ast.Emit(module, null);
+            var variables = new Dictionary<string, CilLocalVariable>();
 
-            module.Write("output.dll");
+            ast.Emit(variables, module, null, null);
+
+            module.Write($"{name}.dll");
         }
         else
         {

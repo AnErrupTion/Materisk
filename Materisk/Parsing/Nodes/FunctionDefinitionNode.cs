@@ -1,6 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.DotNet.Signatures;
+using AsmResolver.DotNet.Signatures.Types;
 using AsmResolver.PE.DotNet.Cil;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
 using Materisk.BuiltinTypes;
@@ -55,7 +56,8 @@ internal class FunctionDefinitionNode : SyntaxNode
         return f;
     }
 
-    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    // TODO: Native functions
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, Dictionary<string, object> arguments)
     {
         if (nameToken is null)
             throw new InvalidOperationException("Function name is null.");
@@ -65,21 +67,32 @@ internal class FunctionDefinitionNode : SyntaxNode
         if (isPublic)
             attributes |= MethodAttributes.Public;
 
-        var method = new MethodDefinition(nameToken.Value.Text,
+        var parameters = new List<TypeSignature>();
+        var argts = new Dictionary<string, object>();
+
+        foreach (var arg in args)
+        {
+            // TODO!
+            parameters.Add(module.CorLibTypeFactory.Int32);
+            argts.Add(arg.Text, 9);
+        }
+
+        var newMethod = new MethodDefinition(nameToken.Value.Text,
             attributes,
-            MethodSignature.CreateStatic(module.CorLibTypeFactory.Void)); // TODO: Return value
-        method.CilMethodBody = new(method);
+            MethodSignature.CreateStatic(module.CorLibTypeFactory.Void, parameters)); // TODO: Return value
+        newMethod.CilMethodBody = new(newMethod);
 
-        module.TopLevelTypes[1].Methods.Add(method);
+        module.TopLevelTypes[1].Methods.Add(newMethod);
 
-        block.Emit(module, method.CilMethodBody);
+        block.Emit(variables, module, newMethod, argts);
 
-        method.CilMethodBody.Instructions.Add(CilOpCodes.Ret);
+        newMethod.CilMethodBody.Instructions.Add(CilOpCodes.Ret);
 
-        foreach (var inst in method.CilMethodBody.Instructions)
+        foreach (var inst in newMethod.CilMethodBody.Instructions)
             Console.WriteLine(inst.ToString());
+        Console.WriteLine("----");
 
-        return method;
+        return newMethod;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
