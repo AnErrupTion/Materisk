@@ -1,4 +1,6 @@
-﻿using Materisk.BuiltinTypes;
+﻿using AsmResolver.DotNet;
+using AsmResolver.DotNet.Code.Cil;
+using Materisk.BuiltinTypes;
 using Materisk.Native;
 
 namespace Materisk.Parsing.Nodes;
@@ -60,6 +62,11 @@ internal class ClassFunctionDefinitionNode : SyntaxNode
 
         if (isPublic) scope.GetRoot().ExportTable.Add(fullName, f);
         return f;
+    }
+
+    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    {
+        throw new NotImplementedException();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

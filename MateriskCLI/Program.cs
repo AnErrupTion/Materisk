@@ -1,5 +1,8 @@
 ﻿using System.Text;
 using AsmResolver.DotNet;
+using AsmResolver.DotNet.Code.Cil;
+using AsmResolver.DotNet.Signatures;
+using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
 using Materisk;
 using Materisk.BuiltinTypes;
 using Materisk.Parsing;
@@ -25,8 +28,10 @@ public static class Program
             var ast = parser.Parse();
 
             var module = new ModuleDefinition("MateriskModule", KnownCorLibs.SystemRuntime_v7_0_0_0);
+            var type = new TypeDefinition("MateriskType", "Program", TypeAttributes.Public | TypeAttributes.Class);
+            module.TopLevelTypes.Add(type);
 
-            //ast.Emit(module);
+            ast.Emit(module, null);
 
             module.Write("output.dll");
         }

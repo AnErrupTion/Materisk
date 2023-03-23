@@ -1,4 +1,6 @@
-﻿using Materisk.BuiltinTypes;
+﻿using AsmResolver.DotNet;
+using AsmResolver.DotNet.Code.Cil;
+using Materisk.BuiltinTypes;
 
 namespace Materisk.Parsing.Nodes;
 
@@ -10,6 +12,11 @@ internal class BreakNode : SyntaxNode
     {
         scope.SetState(ScopeState.ShouldBreak);
         return SValue.Null;
+    }
+
+    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    {
+        throw new NotImplementedException();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

@@ -1,4 +1,6 @@
-﻿using Materisk.BuiltinTypes;
+﻿using AsmResolver.DotNet;
+using AsmResolver.DotNet.Code.Cil;
+using Materisk.BuiltinTypes;
 
 namespace Materisk.Parsing.Nodes;
 
@@ -16,6 +18,11 @@ public class BoolNode : SyntaxNode
     public override SValue Evaluate(Scope scope)
     {
         return new SInt(Value ? 1 : 0);
+    }
+
+    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    {
+        throw new NotImplementedException();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

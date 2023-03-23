@@ -1,4 +1,7 @@
-﻿using Materisk.BuiltinTypes;
+﻿using AsmResolver.DotNet;
+using AsmResolver.DotNet.Code.Cil;
+using AsmResolver.PE.DotNet.Cil;
+using Materisk.BuiltinTypes;
 
 namespace Materisk.Parsing.Nodes;
 
@@ -17,6 +20,13 @@ internal class IntLiteralNode : SyntaxNode
     {
         var sint = new SInt((int)syntaxToken.Value);
         return sint;
+    }
+
+    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    {
+        var value = (int)syntaxToken.Value;
+        body.Instructions.Add(CilInstruction.CreateLdcI4(value));
+        return value;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

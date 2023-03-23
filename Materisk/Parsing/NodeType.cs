@@ -24,11 +24,8 @@ public enum NodeType
     Cast,
     While,
     FunctionDefinition,
-    NativeImport,
     Instantiate,
     ClassDefinition,
     ClassFunctionDefinition,
-    DotAssign,
-    Export,
     Import
 }

@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using AsmResolver.DotNet;
+using AsmResolver.DotNet.Code.Cil;
 using Materisk.BuiltinTypes;
 
 namespace Materisk.Parsing.Nodes;
@@ -32,8 +34,7 @@ internal class BlockNode : SyntaxNode
                 lastVal = res;
             }
 
-            if (scope.State == ScopeState.ShouldBreak
-                || scope.State == ScopeState.ShouldContinue) return lastVal;
+            if (scope.State is ScopeState.ShouldBreak or ScopeState.ShouldContinue) return lastVal;
 
             if (scope.State == ScopeState.ShouldReturn)
             {
@@ -42,6 +43,21 @@ internal class BlockNode : SyntaxNode
                 var v = scope.ReturnValue;
                 return v;
             }
+        }
+
+        return lastVal;
+    }
+
+    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    {
+        object lastVal = null;
+
+        foreach (var node in nodes)
+        {
+            var res = node.Emit(module, body);
+
+            if (res != null)
+                lastVal = res;
         }
 
         return lastVal;

@@ -1,4 +1,7 @@
-﻿using Materisk.BuiltinTypes;
+﻿using AsmResolver.DotNet;
+using AsmResolver.DotNet.Code.Cil;
+using AsmResolver.PE.DotNet.Cil;
+using Materisk.BuiltinTypes;
 
 namespace Materisk.Parsing.Nodes;
 
@@ -44,6 +47,27 @@ internal class InitVariableNode : SyntaxNode
         scope.Set(ident.Value.ToString(), SValue.Null);
         return SValue.Null;
 
+    }
+
+    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    {
+        // TODO: Check if variable already exists
+        
+        if (expr != null)
+        {
+            var value = expr.Emit(module, body);
+            var variable = new CilLocalVariable(Utils.GetTypeSignatureFor(module, value.GetType()));
+            body.LocalVariables.Add(variable);
+            body.Instructions.Add(CilOpCodes.Stloc, variable);
+            return value;
+        }
+
+        if (isFixedType) throw new InvalidOperationException("Tried to initiliaze a fixed type variable with no value; this is not permitted. Use var% instead.");
+
+        var nullVariable = new CilLocalVariable(module.CorLibTypeFactory.Object);
+        body.LocalVariables.Add(nullVariable);
+        body.Instructions.Add(CilOpCodes.Stloc, nullVariable);
+        return null;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

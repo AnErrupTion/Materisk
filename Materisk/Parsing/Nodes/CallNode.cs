@@ -1,4 +1,6 @@
-﻿using Materisk.BuiltinTypes;
+﻿using AsmResolver.DotNet;
+using AsmResolver.DotNet.Code.Cil;
+using Materisk.BuiltinTypes;
 
 namespace Materisk.Parsing.Nodes;
 
@@ -21,6 +23,11 @@ internal class CallNode : SyntaxNode
         var args = EvaluateArgs(scope);
 
         return toCall.Call(scope, args);
+    }
+
+    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    {
+        throw new NotImplementedException();
     }
 
     public List<SValue> EvaluateArgs(Scope scope)

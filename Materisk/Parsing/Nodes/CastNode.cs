@@ -1,4 +1,6 @@
-﻿using Materisk.BuiltinTypes;
+﻿using AsmResolver.DotNet;
+using AsmResolver.DotNet.Code.Cil;
+using Materisk.BuiltinTypes;
 
 namespace Materisk.Parsing.Nodes;
 
@@ -30,6 +32,11 @@ internal class CastNode : SyntaxNode
                 return node.Evaluate(scope).CastToBuiltin(SBuiltinType.List);
             default: throw new InvalidOperationException("INTERNAL: Cast was parsed successfully, but cast is not implemented for that!");
         }
+    }
+
+    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    {
+        throw new NotImplementedException();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

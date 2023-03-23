@@ -1,4 +1,7 @@
-﻿using Materisk.BuiltinTypes;
+﻿using AsmResolver.DotNet;
+using AsmResolver.DotNet.Code.Cil;
+using AsmResolver.PE.DotNet.Cil;
+using Materisk.BuiltinTypes;
 
 namespace Materisk.Parsing.Nodes;
 
@@ -22,34 +25,74 @@ internal class BinaryExpressionNode : SyntaxNode
         var leftRes = left.Evaluate(scope);
         var rightRes = right.Evaluate(scope);
 
+        return operatorToken.Type switch
+        {
+            SyntaxType.Plus => leftRes.Add(rightRes),
+            SyntaxType.Minus => leftRes.Sub(rightRes),
+            SyntaxType.Div => leftRes.Div(rightRes),
+            SyntaxType.Mul => leftRes.Mul(rightRes),
+            SyntaxType.Mod => leftRes.Mod(rightRes),
+            SyntaxType.EqualsEquals => leftRes.Equals(rightRes),
+            SyntaxType.Idx => leftRes.Idx(rightRes),
+            SyntaxType.LessThan => leftRes.LessThan(rightRes),
+            SyntaxType.LessThanEqu => leftRes.LessThanEqu(rightRes),
+            SyntaxType.GreaterThan => leftRes.GreaterThan(rightRes),
+            SyntaxType.GreaterThanEqu => leftRes.GreaterThanEqu(rightRes),
+            _ => throw new NotImplementedException()
+        };
+    }
+
+    public override object Emit(ModuleDefinition module, CilMethodBody body)
+    {
+        /*var leftType = left.Emit(module, body);
+        var rightType = right.Emit(module, body);
+
         switch (operatorToken.Type)
         {
             case SyntaxType.Plus:
-                return leftRes.Add(rightRes);
+                body.Instructions.Add(CilOpCodes.Add);
+                return leftType;
             case SyntaxType.Minus:
-                return leftRes.Sub(rightRes);
+                body.Instructions.Add(CilOpCodes.Sub);
+                return leftType;
             case SyntaxType.Div:
-                return leftRes.Div(rightRes);
+                body.Instructions.Add(CilOpCodes.Div);
+                return leftType;
             case SyntaxType.Mul:
-                return leftRes.Mul(rightRes);
+                body.Instructions.Add(CilOpCodes.Mul);
+                return leftType;
             case SyntaxType.Mod:
-                return leftRes.Mod(rightRes);
+                body.Instructions.Add(CilOpCodes.Rem);
+                return leftType;
             case SyntaxType.EqualsEquals:
-                return leftRes.Equals(rightRes);
+                body.Instructions.Add(CilOpCodes.Ceq);
+                return SBuiltinType.Int;
             case SyntaxType.Idx:
-                return leftRes.Idx(rightRes);
+                // TODO: Correct type
+                body.Instructions.Add(CilOpCodes.Ldelem);
+                return SBuiltinType.Null;
             case SyntaxType.LessThan:
-                return leftRes.LessThan(rightRes);
+                body.Instructions.Add(CilOpCodes.Clt);
+                return SBuiltinType.Int;
             case SyntaxType.LessThanEqu:
-                return leftRes.LessThanEqu(rightRes);
+                body.Instructions.Add(CilOpCodes.Cgt);
+                body.Instructions.Add(CilOpCodes.Ldc_I4_0);
+                body.Instructions.Add(CilOpCodes.Ceq);
+                return SBuiltinType.Int;
             case SyntaxType.GreaterThan:
-                return leftRes.GreaterThan(rightRes);
+                body.Instructions.Add(CilOpCodes.Cgt);
+                return SBuiltinType.Int;
             case SyntaxType.GreaterThanEqu:
-                return leftRes.GreaterThanEqu(rightRes);
+                body.Instructions.Add(CilOpCodes.Clt);
+                body.Instructions.Add(CilOpCodes.Ldc_I4_0);
+                body.Instructions.Add(CilOpCodes.Ceq);
+                return SBuiltinType.Int;
 
             default:
                 throw new NotImplementedException();
-        }
+        }*/
+
+        throw new NotImplementedException();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
