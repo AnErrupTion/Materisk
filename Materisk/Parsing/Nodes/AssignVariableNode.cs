@@ -32,7 +32,7 @@ internal class AssignVariableNode : SyntaxNode
         return val;
     }
 
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, Dictionary<string, object> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
     {
         var name = Ident.Value.ToString();
 

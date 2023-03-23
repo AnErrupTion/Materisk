@@ -13,17 +13,19 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
 {
     private readonly SyntaxToken className;
     private readonly SyntaxToken name;
-    private readonly List<SyntaxToken> args;
+    private readonly Dictionary<SyntaxToken, SyntaxToken> args;
+    private readonly SyntaxToken returnType;
     private readonly SyntaxNode body;
     private readonly bool isStatic;
     private readonly bool isPublic;
     private readonly bool isNative;
 
-    public ModuleFunctionDefinitionNode(SyntaxToken className, SyntaxToken name, List<SyntaxToken> args, SyntaxNode body, bool isStatic, bool isPublic, bool isNative)
+    public ModuleFunctionDefinitionNode(SyntaxToken className, SyntaxToken name, Dictionary<SyntaxToken, SyntaxToken> args, SyntaxToken returnType, SyntaxNode body, bool isStatic, bool isPublic, bool isNative)
     {
         this.className = className;
         this.name = name;
         this.args = args;
+        this.returnType = returnType;
         this.body = body;
         this.isStatic = isStatic;
         this.isPublic = isPublic;
@@ -37,7 +39,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
         var targetName = name.Text;
 
         if (targetName is "ctor" or "toString") {
-            if(args.Count(v => v.Text == "self") != 1) {
+            if(args.Count(v => v.Value.Text == "self") != 1) {
                 throw new Exception($"Special module method '{targetName}' must contain the argument 'self' exactly once.");
             }
 
@@ -50,14 +52,14 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
 
         if (isNative)
         {
-            f = new SNativeFunction(targetName, NativeFuncImpl.GetImplFor(fullName), args.Select(v => v.Text).ToList(), !isStatic)
+            f = new SNativeFunction(targetName, NativeFuncImpl.GetImplFor(fullName), args.Select(v => v.Value.Text).ToList(), !isStatic)
             {
                 IsPublic = isPublic
             };
         }
         else
         {
-            f = new SFunction(scope, targetName, args.Select(v => v.Text).ToList(), body) 
+            f = new SFunction(scope, targetName, args.Select(v => v.Value.Text).ToList(), body) 
             { 
                 IsClassInstanceMethod = !isStatic,
                 IsPublic = isPublic
@@ -69,13 +71,13 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
     }
 
     // TODO: Native functions
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, Dictionary<string, object> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
     {
         var targetName = name.Text;
 
         if (targetName is "ctor" or "toString")
         {
-            if(args.Count(v => v.Text == "self") != 1)
+            if(args.Count(v => v.Value.Text == "self") != 1)
                 throw new Exception($"Special module method '{targetName}' must contain the argument 'self' exactly once.");
 
             targetName = "$$" + targetName;
@@ -90,18 +92,17 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
             attributes |= MethodAttributes.Static;
 
         var parameters = new List<TypeSignature>();
-        var argts = new Dictionary<string, object>();
+        var argts = new List<string>();
 
         foreach (var arg in args)
         {
-            // TODO!
-            parameters.Add(module.CorLibTypeFactory.Int32);
-            argts.Add(arg.Text, 9);
+            parameters.Add(Utils.GetTypeSignatureFor(module, arg.Key.Value.ToString()));
+            argts.Add(arg.Value.Text);
         }
 
         var newMethod = new MethodDefinition(targetName,
             attributes,
-            MethodSignature.CreateStatic(module.CorLibTypeFactory.Void, parameters)); // TODO: Return value
+            MethodSignature.CreateStatic(Utils.GetTypeSignatureFor(module, returnType.Value.ToString()), parameters));
         newMethod.CilMethodBody = new(newMethod);
 
         body.Emit(variables, module, newMethod, argts);
@@ -118,7 +119,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
     public override IEnumerable<SyntaxNode> GetChildren()
     {
         yield return new TokenNode(name);
-        foreach (var tok in args) yield return new TokenNode(tok);
+        foreach (var tok in args) yield return new TokenNode(tok.Value);
         yield return body;
     }
 }

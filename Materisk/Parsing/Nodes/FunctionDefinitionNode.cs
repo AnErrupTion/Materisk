@@ -12,15 +12,17 @@ namespace Materisk.Parsing.Nodes;
 internal class FunctionDefinitionNode : SyntaxNode
 {
     private readonly SyntaxToken? nameToken;
-    private readonly List<SyntaxToken> args;
+    private readonly Dictionary<SyntaxToken, SyntaxToken> args;
+    private readonly SyntaxToken returnType;
     private readonly SyntaxNode block;
     private readonly bool isPublic;
     private readonly bool isNative;
 
-    public FunctionDefinitionNode(SyntaxToken? nameToken, List<SyntaxToken> args, SyntaxNode block, bool isPublic, bool isNative)
+    public FunctionDefinitionNode(SyntaxToken? nameToken, Dictionary<SyntaxToken, SyntaxToken> args, SyntaxToken returnType, SyntaxNode block, bool isPublic, bool isNative)
     {
         this.nameToken = nameToken;
         this.args = args;
+        this.returnType = returnType;
         this.block = block;
         this.isPublic = isPublic;
         this.isNative = isNative;
@@ -35,14 +37,14 @@ internal class FunctionDefinitionNode : SyntaxNode
 
         if (isNative)
         {
-            f = new SNativeFunction(name, NativeFuncImpl.GetImplFor(name), args.Select(v => v.Text).ToList())
+            f = new SNativeFunction(name, NativeFuncImpl.GetImplFor(name), args.Select(v => v.Value.Text).ToList())
             {
                 IsPublic = isPublic
             };
         }
         else
         {
-            f = new SFunction(scope, name, args.Select(v => v.Text).ToList(), block)
+            f = new SFunction(scope, name, args.Select(v => v.Value.Text).ToList(), block)
             {
                 IsPublic = isPublic
             };
@@ -57,7 +59,7 @@ internal class FunctionDefinitionNode : SyntaxNode
     }
 
     // TODO: Native functions
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, Dictionary<string, object> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
     {
         if (nameToken is null)
             throw new InvalidOperationException("Function name is null.");
@@ -68,18 +70,17 @@ internal class FunctionDefinitionNode : SyntaxNode
             attributes |= MethodAttributes.Public;
 
         var parameters = new List<TypeSignature>();
-        var argts = new Dictionary<string, object>();
+        var argts = new List<string>();
 
         foreach (var arg in args)
         {
-            // TODO!
-            parameters.Add(module.CorLibTypeFactory.Int32);
-            argts.Add(arg.Text, 9);
+            parameters.Add(Utils.GetTypeSignatureFor(module, arg.Key.Value.ToString()));
+            argts.Add(arg.Value.Text);
         }
 
         var newMethod = new MethodDefinition(nameToken.Value.Text,
             attributes,
-            MethodSignature.CreateStatic(module.CorLibTypeFactory.Void, parameters)); // TODO: Return value
+            MethodSignature.CreateStatic(Utils.GetTypeSignatureFor(module, returnType.Value.ToString()), parameters));
         newMethod.CilMethodBody = new(newMethod);
 
         module.TopLevelTypes[1].Methods.Add(newMethod);
@@ -98,7 +99,7 @@ internal class FunctionDefinitionNode : SyntaxNode
     public override IEnumerable<SyntaxNode> GetChildren()
     {
         if (nameToken != null) yield return new TokenNode(nameToken.Value);
-        foreach (var t in args) yield return new TokenNode(t);
+        foreach (var t in args) yield return new TokenNode(t.Value);
         yield return block;
     }
 }

@@ -3,7 +3,6 @@ using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
 using Materisk;
-using Materisk.BuiltinTypes;
 using Materisk.Parsing;
 using Materisk.Parsing.Nodes;
 
@@ -16,7 +15,7 @@ public static class Program
 
     public static void Main(string[] args)
     {
-        InitInterpreter();
+        interpreter = new Interpreter();
 
         if (args.Length == 1)
         {
@@ -70,7 +69,7 @@ public static class Program
                     }
 
                     if (text.StartsWith("#reset")) {
-                        InitInterpreter();
+                        interpreter = new Interpreter();
                         Console.WriteLine("Reset interpreter");
                     }
 
@@ -84,71 +83,6 @@ public static class Program
                 RunCode(interpreter, text);
             }
         }
-    }
-
-    private static void InitInterpreter() {
-        interpreter = new Interpreter();
-
-        var tdict = new SDictionary();
-        tdict.Value.Add((new SString("ok"), new SString("works string key")));
-        tdict.Value.Add((new SInt(0), new SString("works int key")));
-
-        var classInstTest = new SClass("color");
-        classInstTest.InstanceBaseTable.Add((new SString("$$ctor"),
-                new SNativeFunction("$$ctor",
-                    impl: (Scope scope, List<SValue> args) => {
-                        // TODO: Add dot stack assignment; not possible yet
-
-                        // TODO: Remove this code and replace it by safe methods
-                        (args[0] as SClassInstance).InstanceTable.Add((new SString("r"), args[1] as SInt));
-                        (args[0] as SClassInstance).InstanceTable.Add((new SString("g"), args[2] as SInt));
-                        (args[0] as SClassInstance).InstanceTable.Add((new SString("b"), args[3] as SInt));
-
-                        return args[0];
-                    },
-                    expectedArgs: new() { "self", "r", "g", "b" }
-                )
-                {
-                    IsPublic = true
-                }
-            ));
-
-        classInstTest.InstanceBaseTable.Add((new SString("mul"),
-                new SNativeFunction("mul",
-                    impl: (Scope scope, List<SValue> args) => {
-                        if (args[1] is not SClassInstance inst || inst.Class.Name != "color") throw new Exception("Expected argument 0 to be of type 'color'");
-
-                        var current = args[0] as SClassInstance;
-
-                        SClassInstance newInst = new(inst.Class);
-                        newInst.CallConstructor(scope, new() { newInst, current.Dot(new SString("r")).Mul(inst.Dot(new SString("r"))), current.Dot(new SString("g")).Mul(inst.Dot(new SString("g"))), current.Dot(new SString("b")).Mul(inst.Dot(new SString("b"))) });
-
-                        return newInst;
-                    },
-                    expectedArgs: new() { "self", "other" },
-                    isClassInstanceFunc: true
-                )
-                {
-                    IsPublic = true
-                }
-            ));
-
-        classInstTest.InstanceBaseTable.Add((new SString("$$toString"),
-                new SNativeFunction("$$toString",
-                    impl: (Scope scope, List<SValue> args) => {
-                        var current = args[0] as SClassInstance;
-                        return new SString("<Color R=" + args[0].Dot(new SString("r")).SpagToCsString() + " G=" + args[0].Dot(new SString("g")).SpagToCsString() + " B=" + args[0].Dot(new SString("b")).SpagToCsString() + ">");
-                    },
-                    expectedArgs: new() { "self" },
-                    isClassInstanceFunc: true
-                )
-                {
-                    IsPublic = true
-                }
-            ));
-
-        interpreter.GlobalScope.Set("test", tdict);
-        interpreter.GlobalScope.Set("color", classInstTest);
     }
 
     private static void RunCode(Interpreter interpreter, string text) {

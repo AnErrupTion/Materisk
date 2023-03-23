@@ -16,6 +16,21 @@ public static class Utils
         if (type == typeof(string))
             return module.CorLibTypeFactory.String;
 
+        if (type == typeof(void))
+            return module.CorLibTypeFactory.Void;
+
         throw new NotImplementedException($"Unimplemented type: {type}");
+    }
+
+    public static TypeSignature GetTypeSignatureFor(ModuleDefinition module, string type)
+    {
+        return type switch
+        {
+            "int" => module.CorLibTypeFactory.Int32,
+            "float" => module.CorLibTypeFactory.Single,
+            "string" => module.CorLibTypeFactory.String,
+            "void" => module.CorLibTypeFactory.Void,
+            _ => throw new NotImplementedException($"Unimplemented type: {type}")
+        };
     }
 }

@@ -165,9 +165,10 @@ public class Parser {
 
             var name = MatchToken(SyntaxType.Identifier);
             var args = ParseFunctionArgs();
+            var returnType = MatchToken(SyntaxType.Identifier);
             var body = ParseScopedStatements();
 
-            nodes.Add(new ModuleFunctionDefinitionNode(className, name, args, body, isStatic, isPublic, isNative));
+            nodes.Add(new ModuleFunctionDefinitionNode(className, name, args, returnType, body, isStatic, isPublic, isNative));
         }
 
         return nodes;
@@ -461,10 +462,10 @@ public class Parser {
             nameToken = MatchToken(SyntaxType.Identifier);
 
         var args = ParseFunctionArgs();
-
+        var returnType = MatchToken(SyntaxType.Identifier);
         var block = ParseScopedStatements();
 
-        return new FunctionDefinitionNode(nameToken, args, block, isPublic, isNative);
+        return new FunctionDefinitionNode(nameToken, args, returnType, block, isPublic, isNative);
     }
 
     public SyntaxNode ParseInstantiateExpression() {
@@ -494,26 +495,27 @@ public class Parser {
         return new InstantiateNode(ident, argumentNodes);
     }
 
-    public List<SyntaxToken> ParseFunctionArgs() {
+    public Dictionary<SyntaxToken, SyntaxToken> ParseFunctionArgs() {
         MatchToken(SyntaxType.LParen);
 
-        List<SyntaxToken> args = new();
+        var args = new Dictionary<SyntaxToken, SyntaxToken>();
 
-        if (Current.Type == SyntaxType.RParen) {
-            MatchToken(SyntaxType.RParen);
-        } else {
+        if (Current.Type != SyntaxType.RParen)
+        {
+            var type = MatchToken(SyntaxType.Identifier);
             var ident = MatchToken(SyntaxType.Identifier);
-            args.Add(ident);
+            args.Add(type, ident);
 
-            while (Current.Type == SyntaxType.Comma) {
+            while (Current.Type == SyntaxType.Comma)
+            {
                 Position++;
+                type = MatchToken(SyntaxType.Identifier);
                 ident = MatchToken(SyntaxType.Identifier);
-                args.Add(ident);
+                args.Add(type, ident);
             }
-
-            MatchToken(SyntaxType.RParen);
         }
 
+        MatchToken(SyntaxType.RParen);
         return args;
     }
     public SyntaxNode BinaryOperation(Func<SyntaxNode> leftParse, List<SyntaxType> allowedTypes, Func<SyntaxNode> rightParse = null) {
