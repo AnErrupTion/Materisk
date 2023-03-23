@@ -9,49 +9,57 @@ public static class Program {
     private static bool showLexOutput, showParseOutput, timings, rethrow;
     private static Interpreter interpreter;
 
-    public static void Main(string[] _) {
+    public static void Main(string[] args) {
         InitInterpreter();
 
-        while (true) {
-            Console.Write("> ");
-            var text = Console.ReadLine();
+        if (args.Length == 1)
+        {
+            RunCode(interpreter, File.ReadAllText(args[0]));
+        }
+        else
+        {
+            while (true)
+            {
+                Console.Write("> ");
+                var text = Console.ReadLine();
 
-            if (text.Trim() == string.Empty) continue;
+                if (text.Trim() == string.Empty) continue;
 
-            if (text.StartsWith("#")) {
-                if (text.StartsWith("#lex")) {
-                    showLexOutput = !showLexOutput;
-                    Console.WriteLine("Showing Lex Output: " + showLexOutput);
+                if (text.StartsWith("#")) {
+                    if (text.StartsWith("#lex")) {
+                        showLexOutput = !showLexOutput;
+                        Console.WriteLine("Showing Lex Output: " + showLexOutput);
+                    }
+
+                    if (text.StartsWith("#parse")) {
+                        showParseOutput = !showParseOutput;
+                        Console.WriteLine("Showing Parse Output: " + showParseOutput);
+                    }
+
+                    if(text.StartsWith("#time")) {
+                        timings = !timings;
+                        Console.WriteLine("Timings: " + timings);
+                    }
+
+                    if (text.StartsWith("#rethrow")) {
+                        rethrow = !rethrow;
+                        Console.WriteLine("Rethrow: " + rethrow);
+                    }
+
+                    if (text.StartsWith("#reset")) {
+                        InitInterpreter();
+                        Console.WriteLine("Reset interpreter");
+                    }
+
+                    if (text.StartsWith("#quit")) {
+                        Environment.Exit(0);
+                    }
+
+                    continue;
                 }
 
-                if (text.StartsWith("#parse")) {
-                    showParseOutput = !showParseOutput;
-                    Console.WriteLine("Showing Parse Output: " + showParseOutput);
-                }
-
-                if(text.StartsWith("#time")) {
-                    timings = !timings;
-                    Console.WriteLine("Timings: " + timings);
-                }
-
-                if (text.StartsWith("#rethrow")) {
-                    rethrow = !rethrow;
-                    Console.WriteLine("Rethrow: " + rethrow);
-                }
-
-                if (text.StartsWith("#reset")) {
-                    InitInterpreter();
-                    Console.WriteLine("Reset interpreter");
-                }
-
-                if (text.StartsWith("#quit")) {
-                    Environment.Exit(0);
-                }
-
-                continue;
+                RunCode(interpreter, text);
             }
-
-            RunCode(interpreter, text);
         }
     }
 

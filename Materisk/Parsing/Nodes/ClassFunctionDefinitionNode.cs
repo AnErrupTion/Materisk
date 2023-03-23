@@ -57,7 +57,7 @@ internal class ClassFunctionDefinitionNode : SyntaxNode
                 IsPublic = isPublic
             };
         }
-        
+
         if (isPublic) scope.GetRoot().ExportTable.Add(fullName, f);
         return f;
     }
