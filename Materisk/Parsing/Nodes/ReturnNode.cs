@@ -34,13 +34,14 @@ internal class ReturnNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
     {
-        throw new NotImplementedException();
+        ReturnValueNode?.Emit(variables, module, method, arguments);
+        return null;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        if (ReturnValueNode == null) yield break;
-        yield return ReturnValueNode;
+        if (ReturnValueNode != null)
+            yield return ReturnValueNode;
     }
 
     public override string ToString()

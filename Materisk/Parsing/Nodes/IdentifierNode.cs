@@ -29,6 +29,11 @@ internal class IdentifierNode : SyntaxNode
             if (type.Name == name)
                 return type;
 
+        foreach (var type in module.TopLevelTypes)
+            foreach (var meth in type.Methods)
+                if (meth.Name == name)
+                    return meth;
+
         var index = 0;
 
         foreach (var argument in arguments)
