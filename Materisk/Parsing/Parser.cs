@@ -160,10 +160,10 @@ public class Parser {
             var nameToken = MatchToken(SyntaxType.Identifier);
             var type = MatchToken(SyntaxType.Identifier);
 
-            if (Current.Type != SyntaxType.Equals)
-                nodes.Add(new ModuleFieldDefinitionNode(isPublic, isStatic, nameToken, type));
+            if (Current.Type == SyntaxType.Equals)
+                throw new InvalidOperationException("Can not initialize a field directly!");
 
-            throw new InvalidOperationException("Can not initialize a field directly!");
+            nodes.Add(new ModuleFieldDefinitionNode(isPublic, isStatic, nameToken, type));
         }
 
         while (Current is { Type: SyntaxType.Keyword, Text: "fn" })
@@ -501,10 +501,10 @@ public class Parser {
         var nameToken = MatchToken(SyntaxType.Identifier);
         var type = MatchToken(SyntaxType.Identifier);
 
-        if (Current.Type != SyntaxType.Equals)
-            return new FieldDefinitionNode(isPublic, nameToken, type);
+        if (Current.Type == SyntaxType.Equals)
+            throw new InvalidOperationException("Can not initialize a field directly!");
 
-        throw new InvalidOperationException("Can not initialize a field directly!");
+        return new FieldDefinitionNode(isPublic, nameToken, type);
     }
 
     public SyntaxNode ParseInstantiateExpression() {
