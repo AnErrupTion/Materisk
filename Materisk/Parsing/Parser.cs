@@ -108,6 +108,9 @@ public class Parser {
 
             return new ImportNode(path);
         }
+        if (Current is { Type: SyntaxType.Keyword, Text: "fn" }) {
+            return ParseFunctionDefinition();
+        }
         if (Current is { Type: SyntaxType.Keyword, Text: "mod" }) {
             return ParseModuleDefinition();
         }
@@ -333,7 +336,6 @@ public class Parser {
             Position++;
             return new IntLiteralNode(Peek(-1));
         }
-
         if (Current.Type is SyntaxType.Float) {
             Position++;
             return new FloatLiteralNode(Peek(-1));
@@ -365,9 +367,6 @@ public class Parser {
         }
         if (Current.Type is SyntaxType.Keyword && Current.Text == "while") {
             return ParseWhileExpression();
-        }
-        if (Current.Type is SyntaxType.Keyword && Current.Text == "fn") {
-            return ParseFunctionExpression();
         }
         if (Current.Type is SyntaxType.Keyword && Current.Text == "fld") {
             return ParseFieldExpression();
@@ -461,7 +460,7 @@ public class Parser {
         return new WhileNode(condNode, block);
     }
 
-    public SyntaxNode ParseFunctionExpression() {
+    public SyntaxNode ParseFunctionDefinition() {
         MatchKeyword("fn");
 
         var isNative = false;
