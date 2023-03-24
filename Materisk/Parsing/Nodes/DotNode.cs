@@ -115,8 +115,6 @@ internal class DotNode : SyntaxNode
                     if (newMethod == null)
                         throw new InvalidOperationException($"Unable to find method with name: {name}");
 
-                    // TODO: In CIL, remove "self" argument
-                    // TODO: Field definition not in module
                     cn.EmitArgs(variables, module, method, arguments);
 
                     method.CilMethodBody?.Instructions.Add(CilOpCodes.Call, newMethod);

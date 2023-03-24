@@ -1,5 +1,6 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
+using AsmResolver.PE.DotNet.Cil;
 using Materisk.BuiltinTypes;
 
 namespace Materisk.Parsing.Nodes;
@@ -35,36 +36,43 @@ internal class InstantiateNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
     {
-        /*var name = ident.Text;
+        var name = ident.Text;
 
-        TypeDefinition? typeDef = null;
-        foreach (var type in module.TopLevelTypes)
-            if (type.Name == name)
-            {
-                typeDef = type;
-                break;
-            }
-
-        if (typeDef == null)
-            throw new InvalidOperationException($"Unable to find type with name: {name}");
-
+        MethodDefinition? actualCtor = null;
+        TypeDefinition? actualCtorType = null;
         MethodDefinition? constructor = null;
-        foreach (var meth in typeDef.Methods)
-            if (meth.Name == "ctor")
+
+        foreach (var type in module.TopLevelTypes)
+            foreach (var meth in type.Methods)
             {
-                constructor = meth;
-                break;
+                if (constructor != null && actualCtor != null)
+                    break;
+
+                if (type.Name == name)
+                {
+                    actualCtorType = type;
+                    if (meth.Name == "cctor")
+                        constructor = meth;
+                    else if (meth.IsConstructor)
+                        actualCtor = meth;
+                }
             }
+        
+        if (actualCtorType == null)
+            throw new InvalidOperationException($"Unable to find type with name: {name}");
 
         if (constructor == null)
             throw new InvalidOperationException($"Unable to find constructor for type: {name}");
 
+        actualCtor ??= actualCtorType.GetOrCreateStaticConstructor();
+
         foreach (var arg in argumentNodes)
             arg.Emit(variables, module, method, arguments);
 
+        method.CilMethodBody?.Instructions.Add(CilOpCodes.Newobj, actualCtor);
+        method.CilMethodBody?.Instructions.Add(CilOpCodes.Dup);
         method.CilMethodBody?.Instructions.Add(CilOpCodes.Call, constructor);
-        return typeDef;*/
-        throw new NotImplementedException();
+        return null;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

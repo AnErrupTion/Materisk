@@ -43,12 +43,10 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
     {
         var targetName = name.Text;
 
-        if (targetName is "ctor" or "toString")
+        if (targetName is "cctor" or "toString")
         {
             if(args.Count(v => v.Value.Text == "self") != 1)
-                throw new Exception($"Special module method '{targetName}' must contain the argument 'self' exactly once.");
-
-            targetName = "$$" + targetName;
+                throw new Exception($"Special module method \"{targetName}\" must contain the argument 'self' exactly once.");
         }
 
         MethodAttributes attributes = 0;
@@ -56,7 +54,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
         if (isPublic)
             attributes |= MethodAttributes.Public;
 
-        if (isStatic)
+        if (isStatic || targetName is "cctor")
             attributes |= MethodAttributes.Static;
 
         var parameters = new List<TypeSignature>();
