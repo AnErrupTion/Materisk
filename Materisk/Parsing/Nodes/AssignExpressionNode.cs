@@ -5,15 +5,15 @@ using Materisk.BuiltinTypes;
 
 namespace Materisk.Parsing.Nodes;
 
-internal class AssignVariableNode : SyntaxNode
+internal class AssignExpressionNode : SyntaxNode
 {
-    public AssignVariableNode(SyntaxToken ident, SyntaxNode expr)
+    public AssignExpressionNode(SyntaxToken ident, SyntaxNode expr)
     {
         Ident = ident;
         Expr = expr;
     }
 
-    public override NodeType Type => NodeType.AssignVariable;
+    public override NodeType Type => NodeType.AssignExpression;
 
     public SyntaxToken Ident { get; }
 
@@ -29,12 +29,25 @@ internal class AssignVariableNode : SyntaxNode
         var name = Ident.Value.ToString();
 
         if (name is null || !variables.ContainsKey(name))
-            throw new InvalidOperationException("Can not assign to a non-existent identifier!");
+        {
+            if (method.DeclaringType != null)
+            {
+                foreach (var field in method.DeclaringType.Fields)
+                    if (field.Name == name)
+                    {
+                        var fieldValue = Expr.Emit(variables, module, method, arguments);
+                        method.CilMethodBody?.Instructions.Add(field.IsStatic ? CilOpCodes.Stsfld : CilOpCodes.Stfld, field);
+                        return fieldValue;
+                    }
+            }
 
-        var value = Expr.Emit(variables, module, method, arguments);
+            throw new InvalidOperationException("Can not assign to a non-existent identifier!");
+        }
+
+        var varValue = Expr.Emit(variables, module, method, arguments);
         var variable = variables[name];
         method.CilMethodBody?.Instructions.Add(CilOpCodes.Stloc, variable);
-        return value;
+        return varValue;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

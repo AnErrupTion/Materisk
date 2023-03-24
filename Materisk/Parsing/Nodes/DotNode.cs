@@ -27,9 +27,9 @@ internal class DotNode : SyntaxNode
             {
                 var ident = rvn.Token;
                 currentValue = currentValue.Dot(new SString((string)ident.Value));
-            }else if(node is AssignVariableNode avn) {
-                var ident = avn.Ident;
-                return currentValue.DotAssignment(new SString(ident.Text), avn.Expr.Evaluate(scope));
+            }else if(node is AssignExpressionNode aen) {
+                var ident = aen.Ident;
+                return currentValue.DotAssignment(new SString(ident.Text), aen.Expr.Evaluate(scope));
             }
             else if (node is CallNode cn)
             {
@@ -74,12 +74,12 @@ internal class DotNode : SyntaxNode
                     break;*/
                     throw new NotImplementedException();
                 }
-                case AssignVariableNode avn:
+                case AssignExpressionNode aen:
                 {
-                    var name = avn.Ident.Text;
+                    var name = aen.Ident.Text;
                     var typeName = method.Parameters[0].ParameterType.Name;
 
-                    avn.Expr.Emit(variables, module, method, arguments);
+                    aen.Expr.Emit(variables, module, method, arguments);
 
                     FieldDefinition? fieldDef = null;
 

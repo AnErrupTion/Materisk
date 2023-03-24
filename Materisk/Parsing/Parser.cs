@@ -160,12 +160,10 @@ public class Parser {
             var nameToken = MatchToken(SyntaxType.Identifier);
             var type = MatchToken(SyntaxType.Identifier);
 
-            if (Current.Type == SyntaxType.Equals)
-            {
-                Position++;
-                var statement = ParseStatement();
-                nodes.Add(new ModuleFieldDefinitionNode(isPublic, isStatic, nameToken, type, statement));
-            } else nodes.Add(new ModuleFieldDefinitionNode(isPublic, isStatic, nameToken, type));
+            if (Current.Type != SyntaxType.Equals)
+                nodes.Add(new ModuleFieldDefinitionNode(isPublic, isStatic, nameToken, type));
+
+            throw new InvalidOperationException("Can not initialize a field directly!");
         }
 
         while (Current is { Type: SyntaxType.Keyword, Text: "fn" })
@@ -218,7 +216,7 @@ public class Parser {
             var ident = MatchToken(SyntaxType.Identifier);
             MatchToken(SyntaxType.Equals);
             var expr = ParseExpression();
-            return new AssignVariableNode(ident, expr);
+            return new AssignExpressionNode(ident, expr);
         }
         return ParseCompExpression();
     }
@@ -273,7 +271,7 @@ public class Parser {
                         MatchToken(SyntaxType.Equals);
                         var expr = ParseExpression();
 
-                        accessStack.NextNodes.Add(new AssignVariableNode(ident, expr));
+                        accessStack.NextNodes.Add(new AssignExpressionNode(ident, expr));
                     } else {
                         var n = ParseCallExpression();
                         accessStack.NextNodes.Add(n);
@@ -503,14 +501,10 @@ public class Parser {
         var nameToken = MatchToken(SyntaxType.Identifier);
         var type = MatchToken(SyntaxType.Identifier);
 
-        if (Current.Type == SyntaxType.Equals)
-        {
-            Position++;
-            var statement = ParseStatement();
-            return new FieldDefinitionNode(isPublic, nameToken, type, statement);
-        }
+        if (Current.Type != SyntaxType.Equals)
+            return new FieldDefinitionNode(isPublic, nameToken, type);
 
-        return new FieldDefinitionNode(isPublic, nameToken, type);
+        throw new InvalidOperationException("Can not initialize a field directly!");
     }
 
     public SyntaxNode ParseInstantiateExpression() {

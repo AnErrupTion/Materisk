@@ -10,7 +10,7 @@ public enum NodeType
     Continue,
     Break,
     InitVariable,
-    AssignVariable,
+    AssignExpression,
     UnaryExpression,
     Dot,
     Call,
