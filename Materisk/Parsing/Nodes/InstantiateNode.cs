@@ -69,6 +69,7 @@ internal class InstantiateNode : SyntaxNode
         foreach (var arg in argumentNodes)
             arg.Emit(variables, module, method, arguments);
 
+        // TODO: Improve performance by setting "cctor" to the default CIL constructor
         method.CilMethodBody?.Instructions.Add(CilOpCodes.Newobj, actualCtor);
         method.CilMethodBody?.Instructions.Add(CilOpCodes.Dup);
         method.CilMethodBody?.Instructions.Add(CilOpCodes.Call, constructor);

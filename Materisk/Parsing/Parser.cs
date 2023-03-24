@@ -413,7 +413,7 @@ public class Parser {
 
         node.AddCase(initialCond, initialBlock);
 
-        while (Current.Type == SyntaxType.Keyword && (string)Current.Value == "elseif") {
+        while (Current.Type == SyntaxType.Keyword && (string)Current.Value == "elif") {
             Position++;
 
             MatchToken(SyntaxType.LParen);
