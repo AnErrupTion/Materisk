@@ -43,11 +43,8 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
     {
         var targetName = name.Text;
 
-        if (targetName is "cctor" or "toString")
-        {
-            if(args.Count(v => v.Value.Text == "self") != 1)
-                throw new Exception($"Special module method \"{targetName}\" must contain the argument 'self' exactly once.");
-        }
+        if (targetName is "cctor" or "toString" && args.Count(v => v.Value.Text == "self") != 1) 
+            throw new Exception($"Special module method \"{targetName}\" must contain the argument 'self' exactly once.");
 
         MethodAttributes attributes = 0;
 
