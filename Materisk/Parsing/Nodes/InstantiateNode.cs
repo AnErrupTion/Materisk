@@ -20,7 +20,7 @@ internal class InstantiateNode : SyntaxNode
     public override SValue Evaluate(Scope scope)
     {
         var @class = scope.Get(ident.Text);
-        if (@class == null || @class is not SClass sclass) throw new Exception("Class not found!");
+        if (@class is not SClass sclass) throw new Exception("Module not found!");
 
 
         var instance = new SClassInstance(sclass);
@@ -35,11 +35,40 @@ internal class InstantiateNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
     {
+        /*var name = ident.Text;
+
+        TypeDefinition? typeDef = null;
+        foreach (var type in module.TopLevelTypes)
+            if (type.Name == name)
+            {
+                typeDef = type;
+                break;
+            }
+
+        if (typeDef == null)
+            throw new InvalidOperationException($"Unable to find type with name: {name}");
+
+        MethodDefinition? constructor = null;
+        foreach (var meth in typeDef.Methods)
+            if (meth.Name == "ctor")
+            {
+                constructor = meth;
+                break;
+            }
+
+        if (constructor == null)
+            throw new InvalidOperationException($"Unable to find constructor for type: {name}");
+
+        foreach (var arg in argumentNodes)
+            arg.Emit(variables, module, method, arguments);
+
+        method.CilMethodBody?.Instructions.Add(CilOpCodes.Call, constructor);
+        return typeDef;*/
         throw new NotImplementedException();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        throw new NotImplementedException();
+        yield break;
     }
 }

@@ -1,6 +1,5 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using AsmResolver.PE.DotNet.Cil;
 using Materisk.BuiltinTypes;
 
 namespace Materisk.Parsing.Nodes;

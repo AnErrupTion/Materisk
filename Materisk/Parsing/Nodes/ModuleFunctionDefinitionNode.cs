@@ -11,7 +11,7 @@ namespace Materisk.Parsing.Nodes;
 
 internal class ModuleFunctionDefinitionNode : SyntaxNode
 {
-    private readonly SyntaxToken className;
+    private readonly SyntaxToken moduleName;
     private readonly SyntaxToken name;
     private readonly Dictionary<SyntaxToken, SyntaxToken> args;
     private readonly SyntaxToken returnType;
@@ -20,9 +20,9 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
     private readonly bool isPublic;
     private readonly bool isNative;
 
-    public ModuleFunctionDefinitionNode(SyntaxToken className, SyntaxToken name, Dictionary<SyntaxToken, SyntaxToken> args, SyntaxToken returnType, SyntaxNode body, bool isStatic, bool isPublic, bool isNative)
+    public ModuleFunctionDefinitionNode(SyntaxToken moduleName, SyntaxToken name, Dictionary<SyntaxToken, SyntaxToken> args, SyntaxToken returnType, SyntaxNode body, bool isStatic, bool isPublic, bool isNative)
     {
-        this.className = className;
+        this.moduleName = moduleName;
         this.name = name;
         this.args = args;
         this.returnType = returnType;
@@ -46,7 +46,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
             targetName = "$$" + targetName;
         }
 
-        var fullName = $"{className.Text}:{targetName}";
+        var fullName = $"{moduleName.Text}:{targetName}";
 
         SBaseFunction f;
 
@@ -105,12 +105,13 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
         newMethod.CilMethodBody = new(newMethod);
 
         if (isNative)
-            CilNativeFuncImpl.Emit(module, className.Text, newMethod);
+            CilNativeFuncImpl.Emit(module, moduleName.Text, newMethod);
         else
             body.Emit(variables, module, newMethod, argts);
 
         newMethod.CilMethodBody.Instructions.Add(CilOpCodes.Ret);
-        
+
+        Console.WriteLine(newMethod.Name);
         foreach (var inst in newMethod.CilMethodBody.Instructions)
             Console.WriteLine(inst.ToString());
         Console.WriteLine("----");

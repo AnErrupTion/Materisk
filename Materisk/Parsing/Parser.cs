@@ -1,5 +1,4 @@
-﻿using Materisk.BuiltinTypes;
-using Materisk.Parsing.Nodes;
+﻿using Materisk.Parsing.Nodes;
 
 namespace Materisk.Parsing;
 
@@ -143,10 +142,34 @@ public class Parser {
         return new ModuleDefinitionNode(className, body, isPublic);
     }
 
-    private List<SyntaxNode> ParseModuleBody(SyntaxToken className, bool isStatic) {
+    private List<SyntaxNode> ParseModuleBody(SyntaxToken moduleName, bool isStatic) {
         List<SyntaxNode> nodes = new();
 
-        while(Current is { Type: SyntaxType.Keyword, Text: "fn" }) {
+        while (Current is { Type: SyntaxType.Keyword, Text: "fld" })
+        {
+            Position++;
+
+            var isPublic = false;
+
+            if (Current is { Type: SyntaxType.Keyword, Text: "pub" })
+            {
+                Position++;
+                isPublic = true;
+            }
+
+            var nameToken = MatchToken(SyntaxType.Identifier);
+            var type = MatchToken(SyntaxType.Identifier);
+
+            if (Current.Type == SyntaxType.Equals)
+            {
+                Position++;
+                var statement = ParseStatement();
+                nodes.Add(new ModuleFieldDefinitionNode(isPublic, isStatic, nameToken, type, statement));
+            } else nodes.Add(new ModuleFieldDefinitionNode(isPublic, isStatic, nameToken, type));
+        }
+
+        while (Current is { Type: SyntaxType.Keyword, Text: "fn" })
+        {
             Position++;
 
             var isNative = false;
@@ -168,7 +191,7 @@ public class Parser {
             var returnType = MatchToken(SyntaxType.Identifier);
             var body = ParseScopedStatements();
 
-            nodes.Add(new ModuleFunctionDefinitionNode(className, name, args, returnType, body, isStatic, isPublic, isNative));
+            nodes.Add(new ModuleFunctionDefinitionNode(moduleName, name, args, returnType, body, isStatic, isPublic, isNative));
         }
 
         return nodes;
@@ -348,6 +371,9 @@ public class Parser {
         if (Current.Type is SyntaxType.Keyword && Current.Text == "fn") {
             return ParseFunctionExpression();
         }
+        if (Current.Type is SyntaxType.Keyword && Current.Text == "fld") {
+            return ParseFieldExpression();
+        }
         if (Current.Type is SyntaxType.Keyword && Current.Text == "new") {
             return ParseInstantiateExpression();
         }
@@ -454,15 +480,37 @@ public class Parser {
             isPublic = true;
         }
 
-        SyntaxToken? nameToken = null;
-        if(Current.Type == SyntaxType.Identifier)
-            nameToken = MatchToken(SyntaxType.Identifier);
-
+        var nameToken = MatchToken(SyntaxType.Identifier);
         var args = ParseFunctionArgs();
         var returnType = MatchToken(SyntaxType.Identifier);
         var block = ParseScopedStatements();
 
         return new FunctionDefinitionNode(nameToken, args, returnType, block, isPublic, isNative);
+    }
+
+    public SyntaxNode ParseFieldExpression()
+    {
+        MatchKeyword("fld");
+
+        var isPublic = false;
+
+        if (Current is { Type: SyntaxType.Keyword, Text: "pub" })
+        {
+            Position++;
+            isPublic = true;
+        }
+
+        var nameToken = MatchToken(SyntaxType.Identifier);
+        var type = MatchToken(SyntaxType.Identifier);
+
+        if (Current.Type == SyntaxType.Equals)
+        {
+            Position++;
+            var statement = ParseStatement();
+            return new FieldDefinitionNode(isPublic, nameToken, type, statement);
+        }
+
+        return new FieldDefinitionNode(isPublic, nameToken, type);
     }
 
     public SyntaxNode ParseInstantiateExpression() {

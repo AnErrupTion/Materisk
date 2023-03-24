@@ -76,9 +76,36 @@ internal class DotNode : SyntaxNode
                 }
                 case AssignVariableNode avn:
                 {
-                    /*var ident = avn.Ident;
-                    return currentValue.DotAssignment(new SString(ident.Text), avn.Expr.Evaluate(scope));*/
-                    throw new NotImplementedException();
+                    var name = avn.Ident.Text;
+                    var typeName = method.Parameters[0].ParameterType.Name;
+
+                    avn.Expr.Emit(variables, module, method, arguments);
+
+                    TypeDefinition? typeDef = null;
+                    foreach (var type in module.TopLevelTypes)
+                        if (type.Name == typeName)
+                        {
+                            typeDef = type;
+                            break;
+                        }
+
+                    if (typeDef == null)
+                        throw new InvalidOperationException($"Unable to find type with name: {typeName}");
+
+                    FieldDefinition? fieldDef = null;
+
+                    foreach (var field in typeDef.Fields)
+                        if (field.Name == name)
+                        {
+                            fieldDef = field;
+                            break;
+                        }
+
+                    if (fieldDef == null)
+                        throw new InvalidOperationException($"Unable to find field with name: {name}");
+
+                    method.CilMethodBody?.Instructions.Add(CilOpCodes.Stfld, fieldDef);
+                    break;
                 }
                 case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:
                 {
@@ -97,7 +124,8 @@ internal class DotNode : SyntaxNode
                     if (newMethod == null)
                         throw new InvalidOperationException($"Unable to find method with name: {name}");
 
-                    // TODO: "self" argument?
+                    // TODO: In CIL, remove "self" argument
+                    // TODO: Field definition not in module
                     cn.EmitArgs(variables, module, method, arguments);
 
                     method.CilMethodBody?.Instructions.Add(CilOpCodes.Call, newMethod);

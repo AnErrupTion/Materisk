@@ -5,15 +5,19 @@ namespace Materisk;
 
 public static class Utils
 {
-    public static TypeSignature GetTypeSignatureFor(ModuleDefinition module, string type)
+    public static TypeSignature GetTypeSignatureFor(ModuleDefinition module, string name)
     {
-        return type switch
+        switch (name)
         {
-            "int" => module.CorLibTypeFactory.Int32,
-            "float" => module.CorLibTypeFactory.Single,
-            "string" => module.CorLibTypeFactory.String,
-            "void" => module.CorLibTypeFactory.Void,
-            _ => throw new NotImplementedException($"Unimplemented type: {type}")
-        };
+            case "int": return module.CorLibTypeFactory.Int32;
+            case "float": return module.CorLibTypeFactory.Single;
+            case "string": return module.CorLibTypeFactory.String;
+            case "void": return module.CorLibTypeFactory.Void;
+            default:
+                foreach (var type in module.TopLevelTypes)
+                    if (type.Name == name)
+                        return type.ToTypeSignature();
+                throw new NotImplementedException($"Unimplemented type: {name}");
+        }
     }
 }

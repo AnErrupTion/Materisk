@@ -24,6 +24,8 @@ public enum NodeType
     Cast,
     While,
     FunctionDefinition,
+    FieldDefinition,
+    ModuleFieldDefinition,
     Instantiate,
     ModuleDefinition,
     ModuleFunctionDefinition,

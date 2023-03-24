@@ -21,15 +21,7 @@ internal class AssignVariableNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        if (scope.Get(Ident.Value.ToString()) == null)
-        {
-            throw new InvalidOperationException("Can not assign to a non-existant identifier");
-        }
-
-        var val = Expr.Evaluate(scope);
-        var key = Ident.Value.ToString();
-        if (!scope.Update(key, val, out var ex)) throw ex;
-        return val;
+        return null;
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)

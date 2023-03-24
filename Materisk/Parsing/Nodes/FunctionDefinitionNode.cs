@@ -11,14 +11,14 @@ namespace Materisk.Parsing.Nodes;
 
 internal class FunctionDefinitionNode : SyntaxNode
 {
-    private readonly SyntaxToken? nameToken;
+    private readonly SyntaxToken nameToken;
     private readonly Dictionary<SyntaxToken, SyntaxToken> args;
     private readonly SyntaxToken returnType;
     private readonly SyntaxNode block;
     private readonly bool isPublic;
     private readonly bool isNative;
 
-    public FunctionDefinitionNode(SyntaxToken? nameToken, Dictionary<SyntaxToken, SyntaxToken> args, SyntaxToken returnType, SyntaxNode block, bool isPublic, bool isNative)
+    public FunctionDefinitionNode(SyntaxToken nameToken, Dictionary<SyntaxToken, SyntaxToken> args, SyntaxToken returnType, SyntaxNode block, bool isPublic, bool isNative)
     {
         this.nameToken = nameToken;
         this.args = args;
@@ -33,7 +33,7 @@ internal class FunctionDefinitionNode : SyntaxNode
     public override SValue Evaluate(Scope scope)
     {
         SBaseFunction f;
-        var name = nameToken?.Text ?? "<anonymous>";
+        var name = nameToken.Text;
 
         if (isNative)
         {
@@ -50,19 +50,13 @@ internal class FunctionDefinitionNode : SyntaxNode
             };
         }
 
-        if (name != "<anonymous>")
-        {
-            scope.Set(name, f);
-            if (isPublic) scope.GetRoot().ExportTable.Add(name, f);
-        }
+        scope.Set(name, f);
+        if (isPublic) scope.GetRoot().ExportTable.Add(name, f);
         return f;
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
     {
-        if (nameToken is null)
-            throw new InvalidOperationException("Function name is null.");
-
         var attributes = MethodAttributes.Static;
 
         if (isPublic)
@@ -77,7 +71,7 @@ internal class FunctionDefinitionNode : SyntaxNode
             argts.Add(arg.Value.Text);
         }
 
-        var newMethod = new MethodDefinition(nameToken.Value.Text,
+        var newMethod = new MethodDefinition(nameToken.Text,
             attributes,
             MethodSignature.CreateStatic(Utils.GetTypeSignatureFor(module, returnType.Value.ToString()), parameters));
         newMethod.CilMethodBody = new(newMethod);
@@ -91,6 +85,7 @@ internal class FunctionDefinitionNode : SyntaxNode
 
         newMethod.CilMethodBody.Instructions.Add(CilOpCodes.Ret);
 
+        Console.WriteLine(newMethod.Name);
         foreach (var inst in newMethod.CilMethodBody.Instructions)
             Console.WriteLine(inst.ToString());
         Console.WriteLine("----");
@@ -100,7 +95,7 @@ internal class FunctionDefinitionNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        if (nameToken != null) yield return new TokenNode(nameToken.Value);
+        yield return new TokenNode(nameToken);
         foreach (var t in args) yield return new TokenNode(t.Value);
         yield return block;
     }

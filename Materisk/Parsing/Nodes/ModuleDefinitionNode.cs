@@ -63,15 +63,16 @@ internal class ModuleDefinitionNode : SyntaxNode
 
         foreach (var bodyNode in body)
         {
-            if (bodyNode is not ModuleFunctionDefinitionNode funcNode)
-                throw new Exception("Unexpected node in module definition");
+            if (bodyNode is not ModuleFunctionDefinitionNode and not ModuleFieldDefinitionNode)
+                throw new Exception($"Unexpected node in module definition: {bodyNode.GetType()}");
 
-            var funcRaw = funcNode.Emit(variables, module, method, arguments);
+            var value = bodyNode.Emit(variables, module, method, arguments);
 
-            if (funcRaw is not MethodDefinition func)
-                throw new Exception("Expected ModuleFunctionDefinitionNode to return MethodDefinition");
-
-            type.Methods.Add(func);
+            switch (value)
+            {
+                case MethodDefinition methodDef: type.Methods.Add(methodDef); break;
+                case FieldDefinition fieldDef: type.Fields.Add(fieldDef); break;
+            }
         }
 
         return type;
