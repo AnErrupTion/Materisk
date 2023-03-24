@@ -21,6 +21,7 @@ internal class IdentifierNode : SyntaxNode
         return scope.Get((string)Token.Value) ?? SValue.Null;
     }
 
+    // TODO: Find a way to not make the names conflict?
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
     {
         var name = Token.Value.ToString();
@@ -29,10 +30,9 @@ internal class IdentifierNode : SyntaxNode
             if (type.Name == name)
                 return type;
 
-        foreach (var type in module.TopLevelTypes)
-            foreach (var meth in type.Methods)
-                if (meth.Name == name)
-                    return meth;
+        foreach (var meth in module.TopLevelTypes[1].Methods)
+            if (meth.Name == name)
+                return meth;
 
         var index = 0;
 
@@ -46,7 +46,7 @@ internal class IdentifierNode : SyntaxNode
 
             index++;
         }
-        
+
         foreach (var variable in variables)
             if (variable.Key == name)
             {

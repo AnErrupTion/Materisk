@@ -81,25 +81,15 @@ internal class DotNode : SyntaxNode
 
                     avn.Expr.Emit(variables, module, method, arguments);
 
-                    TypeDefinition? typeDef = null;
-                    foreach (var type in module.TopLevelTypes)
-                        if (type.Name == typeName)
-                        {
-                            typeDef = type;
-                            break;
-                        }
-
-                    if (typeDef == null)
-                        throw new InvalidOperationException($"Unable to find type with name: {typeName}");
-
                     FieldDefinition? fieldDef = null;
 
-                    foreach (var field in typeDef.Fields)
-                        if (field.Name == name)
-                        {
-                            fieldDef = field;
-                            break;
-                        }
+                    foreach (var type in module.TopLevelTypes)
+                        foreach (var field in type.Fields)
+                            if (type.Name == typeName && field.Name == name)
+                            {
+                                fieldDef = field;
+                                break;
+                            }
 
                     if (fieldDef == null)
                         throw new InvalidOperationException($"Unable to find field with name: {name}");
@@ -110,12 +100,13 @@ internal class DotNode : SyntaxNode
                 case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:
                 {
                     var ident = cnIdentNode.Token;
+                    var typeName = currentValue.ToString();
                     var name = ident.Value.ToString();
 
                     MethodDefinition newMethod = null;
                     foreach (var type in module.TopLevelTypes)
                         foreach (var meth in type.Methods)
-                            if (meth.Name == name)
+                            if (type.FullName == typeName && meth.Name == name)
                             {
                                 newMethod = meth;
                                 break;
