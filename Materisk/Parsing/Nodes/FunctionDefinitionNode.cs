@@ -32,27 +32,7 @@ internal class FunctionDefinitionNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        SBaseFunction f;
-        var name = nameToken.Text;
-
-        if (isNative)
-        {
-            f = new SNativeFunction(name, NativeFuncImpl.GetImplFor(name), args.Select(v => v.Value.Text).ToList())
-            {
-                IsPublic = isPublic
-            };
-        }
-        else
-        {
-            f = new SFunction(scope, name, args.Select(v => v.Value.Text).ToList(), block)
-            {
-                IsPublic = isPublic
-            };
-        }
-
-        scope.Set(name, f);
-        if (isPublic) scope.GetRoot().ExportTable.Add(name, f);
-        return f;
+        return null;
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)

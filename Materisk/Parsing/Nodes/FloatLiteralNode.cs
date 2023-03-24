@@ -18,7 +18,7 @@ internal class FloatLiteralNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        return new SFloat((float)syntaxToken.Value);
+        return null;
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)

@@ -22,17 +22,7 @@ internal class InitVariableNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        if (scope.Get(ident.Value.ToString()) != null)
-        {
-            throw new InvalidOperationException("Can not initiliaze the same variable twice!");
-        }
-
-        var val = expr.Evaluate(scope);
-        val.TypeIsFixed = true;
-
-        scope.Set(ident.Value.ToString(), val);
-        return val;
-
+        return null;
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)

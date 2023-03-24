@@ -20,32 +20,7 @@ internal class BlockNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        var lastVal = SValue.Null;
-        var blockScope = scope;
-
-        if (createNewScope) blockScope = new Scope(scope);
-
-        foreach (var node in nodes)
-        {
-            var res = node.Evaluate(blockScope);
-
-            if (!res.IsNull())
-            {
-                lastVal = res;
-            }
-
-            if (scope.State is ScopeState.ShouldBreak or ScopeState.ShouldContinue) return lastVal;
-
-            if (scope.State == ScopeState.ShouldReturn)
-            {
-                Debug.WriteLine("Returning from call node");
-                scope.SetState(ScopeState.None);
-                var v = scope.ReturnValue;
-                return v;
-            }
-        }
-
-        return lastVal;
+        return null;
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)

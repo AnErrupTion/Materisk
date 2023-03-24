@@ -21,15 +21,7 @@ internal class ReturnNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        scope.SetState(ScopeState.ShouldReturn);
-
-        if (ReturnValueNode != null)
-        {
-            var v = ReturnValueNode.Evaluate(scope);
-            scope.SetReturnValue(v);
-        }
-
-        return SValue.Null;
+        return null;
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)

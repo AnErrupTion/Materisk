@@ -18,7 +18,7 @@ internal class IdentifierNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        return scope.Get((string)Token.Value) ?? SValue.Null;
+        return null;
     }
 
     // TODO: Find a way to not make the names conflict?

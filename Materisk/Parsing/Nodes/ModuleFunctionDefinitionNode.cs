@@ -36,38 +36,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        var targetName = name.Text;
-
-        if (targetName is "ctor" or "toString") {
-            if(args.Count(v => v.Value.Text == "self") != 1) {
-                throw new Exception($"Special module method '{targetName}' must contain the argument 'self' exactly once.");
-            }
-
-            targetName = "$$" + targetName;
-        }
-
-        var fullName = $"{moduleName.Text}:{targetName}";
-
-        SBaseFunction f;
-
-        if (isNative)
-        {
-            f = new SNativeFunction(targetName, NativeFuncImpl.GetImplFor(fullName), args.Select(v => v.Value.Text).ToList(), !isStatic)
-            {
-                IsPublic = isPublic
-            };
-        }
-        else
-        {
-            f = new SFunction(scope, targetName, args.Select(v => v.Value.Text).ToList(), body) 
-            { 
-                IsClassInstanceMethod = !isStatic,
-                IsPublic = isPublic
-            };
-        }
-
-        if (isPublic) scope.GetRoot().ExportTable.Add(fullName, f);
-        return f;
+        return null;
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)

@@ -22,32 +22,7 @@ internal class ModuleDefinitionNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        var @class = new SClass
-        {
-            Name = className.Text
-        };
-
-        foreach (var bodyNode in body)
-        {
-            if (bodyNode is not ModuleFunctionDefinitionNode cfdn) throw new Exception("Unexpected node in module definition");
-
-            var funcRaw = cfdn.Evaluate(scope);
-
-            if (funcRaw is not SBaseFunction func) throw new Exception("Expected ModuleFunctionDefinitionNode to return SBaseFunction");
-
-            if (func.IsClassInstanceMethod)
-            {
-                @class.InstanceBaseTable.Add((new SString(func.FunctionName), func));
-            }
-            else
-            {
-                @class.StaticTable.Add((new SString(func.FunctionName), func));
-            }
-        }
-
-        scope.Set(className.Text, @class);
-        if (isPublic) scope.GetRoot().ExportTable.Add(className.Text, @class);
-        return @class;
+        return null;
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)

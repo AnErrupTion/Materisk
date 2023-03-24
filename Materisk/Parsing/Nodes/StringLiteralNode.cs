@@ -18,7 +18,7 @@ internal class StringLiteralNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        return new SString((string)syntaxToken.Value);
+        return null;
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)

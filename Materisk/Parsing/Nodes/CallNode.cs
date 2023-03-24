@@ -20,10 +20,7 @@ internal class CallNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        var toCall = ToCallNode.Evaluate(scope) ?? SValue.Null;
-        var args = EvaluateArgs(scope);
-
-        return toCall.Call(scope, args);
+        return null;
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
