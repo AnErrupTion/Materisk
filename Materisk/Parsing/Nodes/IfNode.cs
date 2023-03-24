@@ -1,5 +1,6 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
+using AsmResolver.PE.DotNet.Cil;
 using Materisk.BuiltinTypes;
 
 namespace Materisk.Parsing.Nodes;
@@ -12,7 +13,7 @@ internal class IfNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        foreach ((var cond, var block) in Conditions)
+        foreach (var (cond, block) in Conditions)
         {
             var condRes = cond.Evaluate(scope);
 
@@ -27,7 +28,19 @@ internal class IfNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
     {
-        throw new NotImplementedException();
+        foreach (var (cond, block) in Conditions)
+        {
+            cond.Emit(variables, module, method, arguments);
+            var label = new CilInstructionLabel();
+            method.CilMethodBody?.Instructions.Add(CilOpCodes.Brfalse, label);
+            var index = (int)method.CilMethodBody?.Instructions.IndexOf(method.CilMethodBody.Instructions.Last());
+            block.Emit(variables, module, method, arguments);
+            method.CilMethodBody?.Instructions.Add(CilOpCodes.Nop);
+            label.Instruction = method.CilMethodBody?.Instructions.Last();
+            method.CilMethodBody.Instructions[index].Operand = label;
+        }
+
+        return null;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
