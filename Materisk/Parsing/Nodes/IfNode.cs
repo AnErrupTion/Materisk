@@ -13,17 +13,7 @@ internal class IfNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        foreach (var (cond, block) in Conditions)
-        {
-            var condRes = cond.Evaluate(scope);
-
-            if (condRes.IsTruthy())
-            {
-                return block.Evaluate(new Scope(scope));
-            }
-        }
-
-        return SValue.Null;
+        return null;
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
