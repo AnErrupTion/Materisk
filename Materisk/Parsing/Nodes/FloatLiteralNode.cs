@@ -1,4 +1,5 @@
-﻿using AsmResolver.DotNet;
+﻿using System.Globalization;
+using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
 using Materisk.BuiltinTypes;
@@ -24,7 +25,7 @@ internal class FloatLiteralNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var value = float.Parse(syntaxToken.Text);
+        var value = float.Parse(syntaxToken.Text, CultureInfo.InvariantCulture);
         method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldc_R4, value);
         return value;
     }
