@@ -24,7 +24,7 @@ internal class IdentifierNode : SyntaxNode
     // TODO: Find a way to not make the names conflict?
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var name = Token.Value.ToString();
+        var name = Token.Text;
 
         if (name is "self" && method.DeclaringType is not null && method.Parameters.ThisParameter is not null)
         {

@@ -61,7 +61,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
 
             newMethod = new MethodDefinition(".ctor",
                 MethodAttributes.Public,
-                MethodSignature.CreateStatic(module.CorLibTypeFactory.Void, parameters));
+                MethodSignature.CreateInstance(module.CorLibTypeFactory.Void, parameters));
         }
         else
         {
@@ -75,11 +75,10 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
 
             newMethod = new MethodDefinition(targetName,
                 attributes,
-                MethodSignature.CreateStatic(Utils.GetTypeSignatureFor(module, returnType.Text), parameters));
+                isStatic
+                    ? MethodSignature.CreateStatic(Utils.GetTypeSignatureFor(module, returnType.Text), parameters)
+                    : MethodSignature.CreateInstance(Utils.GetTypeSignatureFor(module, returnType.Text), parameters));
         }
-
-        if (!isStatic)
-            newMethod.Signature.HasThis = true;
 
         type.Methods.Add(newMethod);
 

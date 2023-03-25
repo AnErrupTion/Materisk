@@ -32,13 +32,13 @@ internal class DotNode : SyntaxNode
                 case IdentifierNode rvn:
                 {
                     var name = rvn.Token.Text;
-                    var typeName = method.DeclaringType?.Name;
+                    var typeName = currentValue is CilLocalVariable variable ? variable.VariableType.ToString() : method.DeclaringType?.ToString();
 
                     FieldDefinition? fieldDef = null;
 
                     foreach (var typeDef in module.TopLevelTypes)
                         foreach (var field in typeDef.Fields)
-                            if (typeDef.Name == typeName && field.Name == name)
+                            if (typeDef.FullName == typeName && field.Name == name)
                             {
                                 fieldDef = field;
                                 break;
@@ -54,7 +54,7 @@ internal class DotNode : SyntaxNode
                 case AssignExpressionNode aen:
                 {
                     var name = aen.Ident.Text;
-                    var typeName = method.DeclaringType?.Name;
+                    var typeName = currentValue is CilLocalVariable variable ? variable.VariableType.ToString() : method.DeclaringType?.ToString();
 
                     aen.Expr.Emit(variables, module, type, method, arguments);
 
@@ -62,7 +62,7 @@ internal class DotNode : SyntaxNode
 
                     foreach (var typeDef in module.TopLevelTypes)
                         foreach (var field in typeDef.Fields)
-                            if (typeDef.Name == typeName && field.Name == name)
+                            if (typeDef.FullName == typeName && field.Name == name)
                             {
                                 fieldDef = field;
                                 break;
@@ -76,9 +76,8 @@ internal class DotNode : SyntaxNode
                 }
                 case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:
                 {
-                    var ident = cnIdentNode.Token;
+                    var name = cnIdentNode.Token.Text;
                     var typeName = currentValue is CilLocalVariable variable ? variable.VariableType.ToString() : currentValue.ToString();
-                    var name = ident.Value.ToString();
 
                     MethodDefinition? newMethod = null;
                     foreach (var typeDef in module.TopLevelTypes)
