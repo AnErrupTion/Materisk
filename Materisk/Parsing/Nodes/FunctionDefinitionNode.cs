@@ -67,6 +67,9 @@ internal class FunctionDefinitionNode : SyntaxNode
 
         newMethod.CilMethodBody.Instructions.Add(CilOpCodes.Ret);
 
+        if (newMethod.Name == "main")
+            module.ManagedEntryPointMethod = newMethod;
+
         Console.WriteLine(newMethod.Name);
         foreach (var inst in newMethod.CilMethodBody.Instructions)
             Console.WriteLine(inst.ToString());

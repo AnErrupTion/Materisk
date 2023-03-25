@@ -37,6 +37,7 @@ public static class Program
         if (showParseOutput)
             PrintTree(ast);
 
+        var assembly = new AssemblyDefinition(name, new Version(1, 0, 0, 0));
         var module = new ModuleDefinition(name, KnownCorLibs.SystemRuntime_v7_0_0_0);
         var mainType = new TypeDefinition(name, "Program", TypeAttributes.Public | TypeAttributes.Class);
         module.TopLevelTypes.Add(mainType);
@@ -45,7 +46,8 @@ public static class Program
 
         ast.Emit(variables, module, null, null, null);
 
-        module.Write($"{name}.dll");
+        assembly.Modules.Add(module);
+        assembly.Write($"{name}.dll");
     }
 
     private static void PrintTree(SyntaxNode node, int ident = 0)
