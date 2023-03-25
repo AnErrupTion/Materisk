@@ -71,11 +71,6 @@ internal class FunctionDefinitionNode : SyntaxNode
         if (newMethod.Name == "main")
             module.ManagedEntryPointMethod = newMethod;
 
-        Console.WriteLine(newMethod.Name);
-        foreach (var inst in newMethod.CilMethodBody.Instructions)
-            Console.WriteLine(inst.ToString());
-        Console.WriteLine("----");
-
         return newMethod;
     }
 
