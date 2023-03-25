@@ -1,6 +1,5 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using AsmResolver.DotNet.Signatures.Types;
 using AsmResolver.PE.DotNet.Cil;
 using Materisk.BuiltinTypes;
 using Materisk.Lexing;
@@ -9,13 +8,13 @@ namespace Materisk.Parsing.Nodes;
 
 internal class ArrayNode : SyntaxNode
 {
-    private readonly SyntaxToken? typeToken;
-    private readonly List<SyntaxNode> list;
+    private readonly SyntaxToken typeToken;
+    private readonly SyntaxNode itemCountNode;
 
-    public ArrayNode(SyntaxToken? typeToken, List<SyntaxNode> list)
+    public ArrayNode(SyntaxToken typeToken, SyntaxNode itemCountNode)
     {
         this.typeToken = typeToken;
-        this.list = list;
+        this.itemCountNode = itemCountNode;
     }
 
     public override NodeType Type => NodeType.List;
@@ -29,25 +28,16 @@ internal class ArrayNode : SyntaxNode
     {
         var arrayType = Utils.GetTypeSignatureFor(module, typeToken.Text).ToTypeDefOrRef();
 
-        method.CilMethodBody?.Instructions.Add(CilInstruction.CreateLdcI4(list.Count));
+        itemCountNode.Emit(variables, module, type, method, arguments);
+
         method.CilMethodBody?.Instructions.Add(CilOpCodes.Newarr, arrayType);
 
-        var items = new object[list.Count];
-        var index = 0;
-
-        /*foreach (var node in list)
-        {
-            method.CilMethodBody?.Instructions.Add(CilInstruction.CreateLdcI4(index));
-            items[index++] = node.Emit(variables, module, type, method, arguments);
-            method.CilMethodBody?.Instructions.Add(CilOpCodes.Stelem, arrayType);
-        }*/
-
-        return items;
+        return null;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        foreach (var n in list) yield return n;
+        yield return itemCountNode;
     }
 
     public override string ToString()

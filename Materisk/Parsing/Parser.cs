@@ -384,29 +384,18 @@ public class Parser {
 
     public SyntaxNode ParseArrayExpression(SyntaxToken? secondTypeToken)
     {
-        MatchToken(SyntaxType.LSqBracket);
-
-        List<SyntaxNode> list = new();
-
-        if (Current.Type == SyntaxType.RSqBracket) {
-            MatchToken(SyntaxType.RSqBracket);
-        } else {
-            var expr = ParseExpression(secondTypeToken);
-            list.Add(expr);
-
-            while (Current.Type == SyntaxType.Comma) {
-                Position++;
-                expr = ParseExpression(secondTypeToken);
-                list.Add(expr);
-            }
-
-            MatchToken(SyntaxType.RSqBracket);
-        }
-
         if (secondTypeToken is null)
             throw new InvalidOperationException("Invalid array type!");
 
-        return new ArrayNode(secondTypeToken, list);
+        MatchToken(SyntaxType.LSqBracket);
+
+        if (Current.Type == SyntaxType.RSqBracket)
+            throw new InvalidOperationException("Array length not specified!");
+
+        var expr = ParseExpression(secondTypeToken);
+        MatchToken(SyntaxType.RSqBracket);
+
+        return new ArrayNode(secondTypeToken, expr);
     }
 
     public SyntaxNode ParseIfExpression(SyntaxToken? secondTypeToken) {
