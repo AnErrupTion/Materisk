@@ -1,7 +1,7 @@
 using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
-using Materisk.Parsing.Nodes;
+using Materisk.Parse.Nodes;
 
 namespace Materisk.Emit;
 

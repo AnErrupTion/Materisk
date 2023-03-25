@@ -1,4 +1,4 @@
-﻿using Materisk.Parsing.Nodes;
+﻿using Materisk.Parse.Nodes;
 
 namespace Materisk.BuiltinTypes;
 

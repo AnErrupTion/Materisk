@@ -1,8 +1,8 @@
 ﻿using System.Text;
 using Materisk.Emit;
-using Materisk.Lexing;
-using Materisk.Parsing;
-using Materisk.Parsing.Nodes;
+using Materisk.Lex;
+using Materisk.Parse;
+using Materisk.Parse.Nodes;
 
 namespace MateriskCLI;
 
