@@ -1,5 +1,6 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
+using AsmResolver.PE.DotNet.Cil;
 using Materisk.BuiltinTypes;
 using Materisk.Lexing;
 
@@ -20,24 +21,20 @@ internal class CastNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        // TODO: maybe improve this
-        switch (ident.Text)
-        {
-            case "int":
-                return node.Evaluate(scope).CastToBuiltin(SBuiltinType.Int);
-            case "float":
-                return node.Evaluate(scope).CastToBuiltin(SBuiltinType.Float);
-            case "string":
-                return node.Evaluate(scope).CastToBuiltin(SBuiltinType.String);
-            case "arr":
-                return node.Evaluate(scope).CastToBuiltin(SBuiltinType.List);
-            default: throw new InvalidOperationException("INTERNAL: Cast was parsed successfully, but cast is not implemented for that!");
-        }
+        return null;
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        throw new NotImplementedException();
+        node.Emit(variables, module, type, method, arguments);
+
+        switch (ident.Text)
+        {
+            case "int": method.CilMethodBody?.Instructions.Add(CilOpCodes.Conv_I4); break;
+            case "float": method.CilMethodBody?.Instructions.Add(CilOpCodes.Conv_R4); break;
+        }
+
+        return null;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

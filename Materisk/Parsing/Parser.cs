@@ -326,7 +326,7 @@ public class Parser {
             MatchToken(SyntaxType.LParen);
             var ident = MatchToken(SyntaxType.Identifier);
 
-            if (ident.Text is not "int" and not "float" and not "string")
+            if (ident.Text is not "int" and not "float")
                 throw new Exception($"Can not cast to: {ident.Text}");
 
             MatchToken(SyntaxType.RParen);
