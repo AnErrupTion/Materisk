@@ -48,10 +48,10 @@ public static class CilNativeFuncImpl
                 var factory = module.CorLibTypeFactory;
                 var importedMethod = factory.CorLibScope
                     .CreateTypeReference("System", "Int32")
-                    .CreateMemberReference("ToString", MethodSignature.CreateStatic(factory.String, factory.Int32))
+                    .CreateMemberReference("ToString", MethodSignature.CreateInstance(factory.String))
                     .ImportWith(module.DefaultImporter);
 
-                method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldarg, method.Parameters[0]);
+                method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldarga, method.Parameters[0]);
                 method.CilMethodBody?.Instructions.Add(CilOpCodes.Call, importedMethod);
             }
         }

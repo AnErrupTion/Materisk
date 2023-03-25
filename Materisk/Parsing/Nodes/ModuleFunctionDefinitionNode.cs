@@ -62,7 +62,11 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
 
             newMethod = new MethodDefinition(".ctor",
                 MethodAttributes.Public,
-                MethodSignature.CreateInstance(module.CorLibTypeFactory.Void, parameters));
+                MethodSignature.CreateInstance(module.CorLibTypeFactory.Void, parameters)) 
+            {
+                IsSpecialName = true,
+                IsRuntimeSpecialName = true
+            };
         }
         else
         {

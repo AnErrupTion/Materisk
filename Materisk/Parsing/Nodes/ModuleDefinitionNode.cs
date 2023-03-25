@@ -33,7 +33,7 @@ internal class ModuleDefinitionNode : SyntaxNode
         if (isPublic)
             attributes |= TypeAttributes.Public;
 
-        var typeDef = new TypeDefinition(module.Name, className.Text, attributes);
+        var typeDef = new TypeDefinition(module.Name, className.Text, attributes, module.CorLibTypeFactory.Object.Type);
 
         module.TopLevelTypes.Add(typeDef);
 

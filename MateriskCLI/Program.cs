@@ -2,7 +2,6 @@
 using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
-using Materisk;
 using Materisk.Lexing;
 using Materisk.Parsing;
 using Materisk.Parsing.Nodes;
@@ -39,15 +38,17 @@ public static class Program
             PrintTree(ast);
 
         var assembly = new AssemblyDefinition(name, new Version(1, 0, 0, 0));
-        var module = new ModuleDefinition(name, KnownCorLibs.SystemRuntime_v7_0_0_0);
-        var mainType = new TypeDefinition(name, "Program", TypeAttributes.Public | TypeAttributes.Class);
+
+        var module = new ModuleDefinition(name);
+
+        assembly.Modules.Add(module);
+
+        var mainType = new TypeDefinition(name, "Program", TypeAttributes.Public | TypeAttributes.Class, module.CorLibTypeFactory.Object.Type);
         module.TopLevelTypes.Add(mainType);
 
         var variables = new Dictionary<string, CilLocalVariable>();
-
         ast.Emit(variables, module, null, null, null);
 
-        assembly.Modules.Add(module);
         assembly.Write($"{name}.dll");
     }
 
