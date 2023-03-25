@@ -19,45 +19,7 @@ internal class DotNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        var currentValue = CallNode.Evaluate(scope);
-
-        foreach (var node in NextNodes)
-        {
-            if (node is IdentifierNode rvn)
-            {
-                var ident = rvn.Token;
-                currentValue = currentValue.Dot(new SString((string)ident.Value));
-            }else if(node is AssignExpressionNode aen) {
-                var ident = aen.Ident;
-                return currentValue.DotAssignment(new SString(ident.Text), aen.Expr.Evaluate(scope));
-            }
-            else if (node is CallNode cn)
-            {
-                if (cn.ToCallNode is IdentifierNode cnIdentNode)
-                {
-                    var ident = cnIdentNode.Token;
-                    var lhs = currentValue.Dot(new SString((string)ident.Value));
-
-                    var args = cn.EvaluateArgs(scope);
-                    if (lhs is SBaseFunction { IsClassInstanceMethod: true } func) {
-                        var idxOfSelf = func.ExpectedArgs.IndexOf("self");
-                        if(idxOfSelf != -1) args.Insert(idxOfSelf, currentValue);
-                    }
-
-                    currentValue = lhs.Call(scope, args);
-                }
-                else
-                {
-                    throw new Exception("Tried to call a non identifier in dot node stack.");
-                }
-            }
-            else
-            {
-                throw new Exception("Unexpected node in dot node stack!");
-            }
-        }
-
-        return currentValue;
+        return null;
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)

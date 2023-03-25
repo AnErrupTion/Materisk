@@ -38,20 +38,11 @@ internal class InstantiateNode : SyntaxNode
     {
         var name = ident.Text;
 
-        TypeDefinition? constructorType = null;
-
-        foreach (var typeDef in module.TopLevelTypes)
-            if (typeDef.Name == name)
-            {
-                constructorType = typeDef;
-                break;
-            }
-
+        var constructorType = module.TopLevelTypes.FirstOrDefault(x => x.Name == name);
         if (constructorType == null)
             throw new InvalidOperationException($"Unable to find type with name: {name}");
 
         var constructor = constructorType.Methods.FirstOrDefault(x => x.Name == ".ctor");
-
         if (constructor is null)
             throw new InvalidOperationException($"Unable to find constructor of type: {name}");
 
