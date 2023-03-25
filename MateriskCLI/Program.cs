@@ -1,7 +1,5 @@
 ﻿using System.Text;
-using AsmResolver.DotNet;
-using AsmResolver.DotNet.Code.Cil;
-using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
+using Materisk.Emit;
 using Materisk.Lexing;
 using Materisk.Parsing;
 using Materisk.Parsing.Nodes;
@@ -18,8 +16,8 @@ public static class Program
             return;
         }
 
-        var showLexOutput = args.Length > 1 && args[1] == "--show-lex-output";
-        var showParseOutput = args.Length > 2 && args[2] == "--show-parse-output";
+        var showLexOutput = args.Length > 1 && args.Contains("--show-lex-output");
+        var showParseOutput = args.Length > 2 && args.Contains("--show-parse-output");
 
         var path = args[0];
         var name = Path.GetFileNameWithoutExtension(path);
@@ -37,19 +35,8 @@ public static class Program
         if (showParseOutput)
             PrintTree(ast);
 
-        var assembly = new AssemblyDefinition(name, new Version(1, 0, 0, 0));
-
-        var module = new ModuleDefinition(name);
-
-        assembly.Modules.Add(module);
-
-        var mainType = new TypeDefinition(name, "Program", TypeAttributes.Public | TypeAttributes.Class, module.CorLibTypeFactory.Object.Type);
-        module.TopLevelTypes.Add(mainType);
-
-        var variables = new Dictionary<string, CilLocalVariable>();
-        ast.Emit(variables, module, null, null, null);
-
-        assembly.Write($"{name}.dll");
+        var emitter = new Emitter(name, $"{name}.dll", ast);
+        emitter.Emit(EmitType.Cil);
     }
 
     private static void PrintTree(SyntaxNode node, int ident = 0)
