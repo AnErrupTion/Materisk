@@ -59,7 +59,7 @@ internal class BinaryExpressionNode : SyntaxNode
                 method.CilMethodBody?.Instructions.Add(CilOpCodes.Ceq);
                 break;
             }
-            default: throw new NotImplementedException();
+            default: throw new InvalidOperationException($"Trying to do a binary expression on: {operatorToken.Type}");
         }
 
         return null;

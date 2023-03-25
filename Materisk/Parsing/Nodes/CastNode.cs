@@ -29,7 +29,7 @@ internal class CastNode : SyntaxNode
                 return node.Evaluate(scope).CastToBuiltin(SBuiltinType.Float);
             case "string":
                 return node.Evaluate(scope).CastToBuiltin(SBuiltinType.String);
-            case "list":
+            case "arr":
                 return node.Evaluate(scope).CastToBuiltin(SBuiltinType.List);
             default: throw new InvalidOperationException("INTERNAL: Cast was parsed successfully, but cast is not implemented for that!");
         }

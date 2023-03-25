@@ -96,6 +96,12 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
 
         newMethod.CilMethodBody?.Instructions.Add(CilOpCodes.Ret);
 
+        newMethod.CilMethodBody?.Instructions.CalculateOffsets();
+        Console.WriteLine(newMethod.Name);
+        foreach (var inst in newMethod.CilMethodBody.Instructions)
+            Console.WriteLine(inst.ToString());
+        Console.WriteLine("----");
+
         return newMethod;
     }
 
