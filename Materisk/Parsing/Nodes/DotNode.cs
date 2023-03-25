@@ -45,7 +45,38 @@ internal class DotNode : SyntaxNode
                             }
 
                     if (fieldDef == null)
-                        throw new InvalidOperationException($"Unable to find field with name: {name}");
+                    {
+                        typeName = currentValue.ToString();
+
+                        var index = 0;
+                        var found = false;
+
+                        foreach (var argument in arguments)
+                        {
+                            if (argument == typeName)
+                            {
+                                typeName = method.Parameters[index].ParameterType.Name;
+                                found = true;
+                                break;
+                            }
+
+                            index++;
+                        }
+
+                        if (!found)
+                            throw new InvalidOperationException($"Unable to find type for argument: {typeName}");
+
+                        foreach (var typeDef in module.TopLevelTypes)
+                            foreach (var field in typeDef.Fields)
+                                if (typeDef.Name == typeName && field.Name == name)
+                                {
+                                    fieldDef = field;
+                                    break;
+                                }
+
+                        if (fieldDef is null)
+                            throw new InvalidOperationException($"Unable to find field with name: {name}");
+                    }
 
                     method.CilMethodBody?.Instructions.Add(fieldDef.IsStatic ? CilOpCodes.Ldsfld : CilOpCodes.Ldfld, fieldDef);
                     currentValue = fieldDef;
@@ -69,7 +100,38 @@ internal class DotNode : SyntaxNode
                             }
 
                     if (fieldDef == null)
-                        throw new InvalidOperationException($"Unable to find field with name: {name}");
+                    {
+                        typeName = currentValue.ToString();
+
+                        var index = 0;
+                        var found = false;
+
+                        foreach (var argument in arguments)
+                        {
+                            if (argument == typeName)
+                            {
+                                typeName = method.Parameters[index].ParameterType.Name;
+                                found = true;
+                                break;
+                            }
+
+                            index++;
+                        }
+
+                        if (!found)
+                            throw new InvalidOperationException($"Unable to find type for argument: {typeName}");
+
+                        foreach (var typeDef in module.TopLevelTypes)
+                            foreach (var field in typeDef.Fields)
+                                if (typeDef.Name == typeName && field.Name == name)
+                                {
+                                    fieldDef = field;
+                                    break;
+                                }
+
+                        if (fieldDef is null)
+                            throw new InvalidOperationException($"Unable to find field with name: {name}");
+                    }
 
                     method.CilMethodBody?.Instructions.Add(fieldDef.IsStatic ? CilOpCodes.Stsfld : CilOpCodes.Stfld, fieldDef);
                     break;
