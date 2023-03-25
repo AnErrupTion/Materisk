@@ -7,14 +7,14 @@ namespace Materisk.Parsing.Nodes;
 
 internal class InitVariableNode : SyntaxNode
 {
-    private readonly SyntaxToken ident;
-    private readonly SyntaxToken type;
+    private readonly SyntaxToken identToken;
+    private readonly SyntaxToken typeToken;
     private readonly SyntaxNode expr;
 
-    public InitVariableNode(SyntaxToken ident, SyntaxToken type, SyntaxNode expr)
+    public InitVariableNode(SyntaxToken identToken, SyntaxToken typeToken, SyntaxNode expr)
     {
-        this.ident = ident;
-        this.type = type;
+        this.identToken = identToken;
+        this.typeToken = typeToken;
         this.expr = expr;
     }
 
@@ -25,9 +25,9 @@ internal class InitVariableNode : SyntaxNode
         return null;
     }
 
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var name = ident.Value.ToString();
+        var name = identToken.Value.ToString();
 
         if (name is null)
             throw new InvalidOperationException("Can not assign to a non-existent identifier!");
@@ -35,8 +35,8 @@ internal class InitVariableNode : SyntaxNode
         if (variables.ContainsKey(name))
             throw new InvalidOperationException("Can not initialize the same variable twice!");
 
-        var value = expr.Emit(variables, module, method, arguments);
-        var variable = new CilLocalVariable(Utils.GetTypeSignatureFor(module, type.Value.ToString()));
+        var value = expr.Emit(variables, module, type, method, arguments);
+        var variable = new CilLocalVariable(Utils.GetTypeSignatureFor(module, typeToken.Text));
         method.CilMethodBody?.LocalVariables.Add(variable);
         method.CilMethodBody?.Instructions.Add(CilOpCodes.Stloc, variable);
         variables.Add(name, variable);
@@ -45,7 +45,7 @@ internal class InitVariableNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(ident);
+        yield return new TokenNode(identToken);
         yield return expr;
     }
 

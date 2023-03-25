@@ -34,45 +34,31 @@ internal class InstantiateNode : SyntaxNode
         return instance;
     }
 
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
         var name = ident.Text;
 
-        MethodDefinition? actualCtor = null;
-        TypeDefinition? actualCtorType = null;
-        MethodDefinition? constructor = null;
+        TypeDefinition? constructorType = null;
 
-        foreach (var type in module.TopLevelTypes)
-            foreach (var meth in type.Methods)
+        foreach (var typeDef in module.TopLevelTypes)
+            if (typeDef.Name == name)
             {
-                if (constructor != null && actualCtor != null)
-                    break;
-
-                if (type.Name == name)
-                {
-                    actualCtorType = type;
-                    if (meth.Name == "cctor")
-                        constructor = meth;
-                    else if (meth.IsConstructor)
-                        actualCtor = meth;
-                }
+                constructorType = typeDef;
+                break;
             }
-        
-        if (actualCtorType == null)
+
+        if (constructorType == null)
             throw new InvalidOperationException($"Unable to find type with name: {name}");
 
-        if (constructor == null)
-            throw new InvalidOperationException($"Unable to find constructor for type: {name}");
+        var constructor = constructorType.GetStaticConstructor();
 
-        actualCtor ??= actualCtorType.GetOrCreateStaticConstructor();
+        if (constructor is null)
+            throw new InvalidOperationException($"Unable to find constructor of type: {name}");
 
         foreach (var arg in argumentNodes)
-            arg.Emit(variables, module, method, arguments);
+            arg.Emit(variables, module, type, method, arguments);
 
-        // TODO: Improve performance by setting "cctor" to the default CIL constructor
-        method.CilMethodBody?.Instructions.Add(CilOpCodes.Newobj, actualCtor);
-        method.CilMethodBody?.Instructions.Add(CilOpCodes.Dup);
-        method.CilMethodBody?.Instructions.Add(CilOpCodes.Call, constructor);
+        method.CilMethodBody?.Instructions.Add(CilOpCodes.Newobj, constructor);
         return null;
     }
 

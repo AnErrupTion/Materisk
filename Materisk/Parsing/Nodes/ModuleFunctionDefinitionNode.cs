@@ -39,41 +39,50 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
         return null;
     }
 
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
         var targetName = name.Text;
 
-        if (targetName is "cctor" or "toString" && args.Count(v => v.Value.Text == "self") != 1) 
-            throw new Exception($"Special module method \"{targetName}\" must contain the argument 'self' exactly once.");
-
-        MethodAttributes attributes = 0;
-
-        if (isPublic)
-            attributes |= MethodAttributes.Public;
-
-        if (isStatic || targetName is "cctor")
-            attributes |= MethodAttributes.Static;
-
-        var parameters = new List<TypeSignature>();
+        MethodDefinition newMethod;
         var argts = new List<string>();
 
-        foreach (var arg in args)
+        if (targetName is "ctor")
         {
-            parameters.Add(Utils.GetTypeSignatureFor(module, arg.Key.Value.ToString()));
-            argts.Add(arg.Value.Text);
+            newMethod = type.GetOrCreateStaticConstructor();
+        }
+        else
+        {
+            MethodAttributes attributes = 0;
+
+            if (isPublic)
+                attributes |= MethodAttributes.Public;
+
+            if (isStatic)
+                attributes |= MethodAttributes.Static;
+
+            var parameters = new List<TypeSignature>();
+
+            foreach (var arg in args)
+            {
+                parameters.Add(Utils.GetTypeSignatureFor(module, arg.Key.Text));
+                argts.Add(arg.Value.Text);
+            }
+
+            newMethod = new MethodDefinition(targetName,
+                attributes,
+                MethodSignature.CreateStatic(Utils.GetTypeSignatureFor(module, returnType.Text), parameters));
+
+            type.Methods.Add(newMethod);
         }
 
-        var newMethod = new MethodDefinition(targetName,
-            attributes,
-            MethodSignature.CreateStatic(Utils.GetTypeSignatureFor(module, returnType.Value.ToString()), parameters));
         newMethod.CilMethodBody = new(newMethod);
 
         if (isNative)
             CilNativeFuncImpl.Emit(module, moduleName.Text, newMethod);
         else
-            body.Emit(variables, module, newMethod, argts);
+            body.Emit(variables, module, type, newMethod, argts);
 
-        newMethod.CilMethodBody.Instructions.Add(CilOpCodes.Ret);
+        newMethod.CilMethodBody?.Instructions.Add(CilOpCodes.Ret);
 
         Console.WriteLine(newMethod.Name);
         foreach (var inst in newMethod.CilMethodBody.Instructions)

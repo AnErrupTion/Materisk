@@ -18,7 +18,7 @@ public class ImportNode : SyntaxNode
         return null;
     }
 
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
         if (!File.Exists(path.Text))
             throw new Exception($"Failed to import \"{path.Text}\": File not found");
@@ -29,7 +29,7 @@ public class ImportNode : SyntaxNode
         var parser = new Parser(lexedTokens);
         var ast = parser.Parse();
 
-        return ast.Emit(variables, module, method, arguments);
+        return ast.Emit(variables, module, type, method, arguments);
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

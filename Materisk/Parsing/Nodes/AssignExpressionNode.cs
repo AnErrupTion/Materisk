@@ -24,7 +24,7 @@ internal class AssignExpressionNode : SyntaxNode
         return null;
     }
 
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
         var name = Ident.Value.ToString();
 
@@ -35,8 +35,11 @@ internal class AssignExpressionNode : SyntaxNode
                 foreach (var field in method.DeclaringType.Fields)
                     if (field.Name == name)
                     {
-                        var fieldValue = Expr.Emit(variables, module, method, arguments);
-                        method.CilMethodBody?.Instructions.Add(field.IsStatic ? CilOpCodes.Stsfld : CilOpCodes.Stfld, field);
+                        if (!field.IsStatic)
+                            throw new InvalidOperationException($"Field \"{name}\" is not static.");
+
+                        var fieldValue = Expr.Emit(variables, module, type, method, arguments);
+                        method.CilMethodBody?.Instructions.Add(CilOpCodes.Stsfld, field);
                         return fieldValue;
                     }
             }
@@ -44,7 +47,7 @@ internal class AssignExpressionNode : SyntaxNode
             throw new InvalidOperationException("Can not assign to a non-existent identifier!");
         }
 
-        var varValue = Expr.Emit(variables, module, method, arguments);
+        var varValue = Expr.Emit(variables, module, type, method, arguments);
         var variable = variables[name];
         method.CilMethodBody?.Instructions.Add(CilOpCodes.Stloc, variable);
         return varValue;

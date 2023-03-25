@@ -43,7 +43,7 @@ public static class Program
 
         var variables = new Dictionary<string, CilLocalVariable>();
 
-        ast.Emit(variables, module, null, null);
+        ast.Emit(variables, module, null, null, null);
 
         module.Write($"{name}.dll");
     }

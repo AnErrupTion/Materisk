@@ -25,10 +25,10 @@ internal class BinaryExpressionNode : SyntaxNode
         return null;
     }
 
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        left.Emit(variables, module, method, arguments);
-        right.Emit(variables, module, method, arguments);
+        left.Emit(variables, module, type, method, arguments);
+        right.Emit(variables, module, type, method, arguments);
 
         switch (operatorToken.Type)
         {

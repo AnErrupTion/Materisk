@@ -10,14 +10,14 @@ internal class FieldDefinitionNode : SyntaxNode
 {
     private readonly bool isPublic;
     private readonly SyntaxToken nameToken;
-    private readonly SyntaxToken type;
+    private readonly SyntaxToken typeToken;
     private readonly SyntaxNode? statement;
 
-    public FieldDefinitionNode(bool isPublic, SyntaxToken nameToken, SyntaxToken type, SyntaxNode? statement = null)
+    public FieldDefinitionNode(bool isPublic, SyntaxToken nameToken, SyntaxToken typeToken, SyntaxNode? statement = null)
     {
         this.isPublic = isPublic;
         this.nameToken = nameToken;
-        this.type = type;
+        this.typeToken = typeToken;
         this.statement = statement;
     }
 
@@ -28,7 +28,7 @@ internal class FieldDefinitionNode : SyntaxNode
         return null;
     }
 
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
         var attributes = FieldAttributes.Static;
 
@@ -37,11 +37,11 @@ internal class FieldDefinitionNode : SyntaxNode
 
         var newField = new FieldDefinition(nameToken.Text,
             attributes,
-            Utils.GetTypeSignatureFor(module, type.Text));
+            Utils.GetTypeSignatureFor(module, typeToken.Text));
 
         if (statement != null)
         {
-            statement.Emit(variables, module, method, arguments);
+            statement.Emit(variables, module, type, method, arguments);
             method.CilMethodBody?.Instructions.Add(CilOpCodes.Stsfld, newField);
         }
 

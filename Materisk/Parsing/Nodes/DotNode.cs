@@ -60,9 +60,9 @@ internal class DotNode : SyntaxNode
         return currentValue;
     }
 
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var currentValue = CallNode.Emit(variables, module, method, arguments);
+        var currentValue = CallNode.Emit(variables, module, type, method, arguments);
 
         foreach (var node in NextNodes)
             switch (node)
@@ -70,13 +70,13 @@ internal class DotNode : SyntaxNode
                 case IdentifierNode rvn:
                 {
                     var name = rvn.Token.Text;
-                    var typeName = method.Parameters[0].ParameterType.Name;
+                    var typeName = method.DeclaringType?.Name;
 
                     FieldDefinition? fieldDef = null;
 
-                    foreach (var type in module.TopLevelTypes)
-                        foreach (var field in type.Fields)
-                            if (type.Name == typeName && field.Name == name)
+                    foreach (var typeDef in module.TopLevelTypes)
+                        foreach (var field in typeDef.Fields)
+                            if (typeDef.Name == typeName && field.Name == name)
                             {
                                 fieldDef = field;
                                 break;
@@ -85,22 +85,26 @@ internal class DotNode : SyntaxNode
                     if (fieldDef == null)
                         throw new InvalidOperationException($"Unable to find field with name: {name}");
 
-                    method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldfld, fieldDef);
+                    // TODO: Get object reference
+                    if (!fieldDef.IsStatic)
+                    {
+                        method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldfld, fieldDef);
+                    } else method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldsfld, fieldDef);
                     currentValue = fieldDef;
                     break;
                 }
                 case AssignExpressionNode aen:
                 {
                     var name = aen.Ident.Text;
-                    var typeName = method.Parameters[0].ParameterType.Name;
+                    var typeName = method.DeclaringType?.Name;
 
-                    aen.Expr.Emit(variables, module, method, arguments);
+                    aen.Expr.Emit(variables, module, type, method, arguments);
 
                     FieldDefinition? fieldDef = null;
 
-                    foreach (var type in module.TopLevelTypes)
-                        foreach (var field in type.Fields)
-                            if (type.Name == typeName && field.Name == name)
+                    foreach (var typeDef in module.TopLevelTypes)
+                        foreach (var field in typeDef.Fields)
+                            if (typeDef.Name == typeName && field.Name == name)
                             {
                                 fieldDef = field;
                                 break;
@@ -109,7 +113,11 @@ internal class DotNode : SyntaxNode
                     if (fieldDef == null)
                         throw new InvalidOperationException($"Unable to find field with name: {name}");
 
-                    method.CilMethodBody?.Instructions.Add(CilOpCodes.Stfld, fieldDef);
+                    // TODO: Get object reference
+                    if (!fieldDef.IsStatic)
+                    {
+                        method.CilMethodBody?.Instructions.Add(CilOpCodes.Stfld, fieldDef);
+                    } else method.CilMethodBody?.Instructions.Add(CilOpCodes.Stsfld, fieldDef);
                     break;
                 }
                 case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:
@@ -118,10 +126,10 @@ internal class DotNode : SyntaxNode
                     var typeName = currentValue.ToString();
                     var name = ident.Value.ToString();
 
-                    MethodDefinition newMethod = null;
-                    foreach (var type in module.TopLevelTypes)
-                        foreach (var meth in type.Methods)
-                            if (type.FullName == typeName && meth.Name == name)
+                    MethodDefinition? newMethod = null;
+                    foreach (var typeDef in module.TopLevelTypes)
+                        foreach (var meth in typeDef.Methods)
+                            if (typeDef.FullName == typeName && meth.Name == name)
                             {
                                 newMethod = meth;
                                 break;
@@ -130,7 +138,7 @@ internal class DotNode : SyntaxNode
                     if (newMethod == null)
                         throw new InvalidOperationException($"Unable to find method with name: {name}");
 
-                    cn.EmitArgs(variables, module, method, arguments);
+                    cn.EmitArgs(variables, module, type, method, arguments);
 
                     method.CilMethodBody?.Instructions.Add(CilOpCodes.Call, newMethod);
                     break;

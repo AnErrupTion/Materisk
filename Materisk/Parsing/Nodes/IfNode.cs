@@ -16,15 +16,15 @@ internal class IfNode : SyntaxNode
         return null;
     }
 
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
         foreach (var (cond, block) in Conditions)
         {
-            cond.Emit(variables, module, method, arguments);
+            cond.Emit(variables, module, type, method, arguments);
             var label = new CilInstructionLabel();
             method.CilMethodBody?.Instructions.Add(CilOpCodes.Brfalse, label);
             var index = (int)method.CilMethodBody?.Instructions.IndexOf(method.CilMethodBody.Instructions.Last());
-            block.Emit(variables, module, method, arguments);
+            block.Emit(variables, module, type, method, arguments);
             method.CilMethodBody?.Instructions.Add(CilOpCodes.Nop);
             label.Instruction = method.CilMethodBody?.Instructions.Last();
             method.CilMethodBody.Instructions[index].Operand = label;

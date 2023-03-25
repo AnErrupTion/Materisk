@@ -25,32 +25,26 @@ internal class ModuleDefinitionNode : SyntaxNode
         return null;
     }
 
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
         var attributes = TypeAttributes.Class;
 
         if (isPublic)
             attributes |= TypeAttributes.Public;
 
-        var type = new TypeDefinition(module.Name, className.Text, attributes);
+        var typeDef = new TypeDefinition(module.Name, className.Text, attributes);
 
-        module.TopLevelTypes.Add(type);
+        module.TopLevelTypes.Add(typeDef);
 
         foreach (var bodyNode in body)
         {
             if (bodyNode is not ModuleFunctionDefinitionNode and not ModuleFieldDefinitionNode)
                 throw new Exception($"Unexpected node in module definition: {bodyNode.GetType()}");
 
-            var value = bodyNode.Emit(variables, module, method, arguments);
-
-            switch (value)
-            {
-                case MethodDefinition methodDef: type.Methods.Add(methodDef); break;
-                case FieldDefinition fieldDef: type.Fields.Add(fieldDef); break;
-            }
+            bodyNode.Emit(variables, module, typeDef, method, arguments);
         }
 
-        return type;
+        return typeDef;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

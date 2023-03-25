@@ -23,13 +23,13 @@ internal class BlockNode : SyntaxNode
         return null;
     }
 
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
         object lastVal = null;
 
         foreach (var node in nodes)
         {
-            var res = node.Emit(variables, module, method, arguments);
+            var res = node.Emit(variables, module, type, method, arguments);
 
             if (res != null)
                 lastVal = res;

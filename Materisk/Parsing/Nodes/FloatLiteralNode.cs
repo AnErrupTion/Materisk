@@ -21,7 +21,7 @@ internal class FloatLiteralNode : SyntaxNode
         return null;
     }
 
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
         var value = (float)syntaxToken.Value;
         method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldc_R4, value);

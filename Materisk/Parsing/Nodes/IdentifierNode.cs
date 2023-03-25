@@ -22,13 +22,16 @@ internal class IdentifierNode : SyntaxNode
     }
 
     // TODO: Find a way to not make the names conflict?
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
         var name = Token.Value.ToString();
 
-        foreach (var type in module.TopLevelTypes)
-            if (type.Name == name)
-                return type;
+        if (name is "self" && method.DeclaringType is not null)
+            return method.DeclaringType;
+
+        foreach (var typeDef in module.TopLevelTypes)
+            if (typeDef.Name == name)
+                return typeDef;
 
         foreach (var meth in module.TopLevelTypes[1].Methods)
             if (meth.Name == name)

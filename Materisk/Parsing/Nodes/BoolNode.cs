@@ -21,7 +21,7 @@ public class BoolNode : SyntaxNode
         return null;
     }
 
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
         var value = Value ? 1 : 0;
         method.CilMethodBody?.Instructions.Add(CilInstruction.CreateLdcI4(value));

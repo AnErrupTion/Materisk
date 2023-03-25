@@ -35,7 +35,7 @@ internal class FunctionDefinitionNode : SyntaxNode
         return null;
     }
 
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
         var attributes = MethodAttributes.Static;
 
@@ -58,10 +58,12 @@ internal class FunctionDefinitionNode : SyntaxNode
 
         module.TopLevelTypes[1].Methods.Add(newMethod);
 
+        var typeDef = module.TopLevelTypes[1];
+
         if (isNative)
-            CilNativeFuncImpl.Emit(module, module.TopLevelTypes[1].Name, newMethod);
+            CilNativeFuncImpl.Emit(module, typeDef.Name, newMethod);
         else
-            block.Emit(variables, module, newMethod, argts);
+            block.Emit(variables, module, typeDef, newMethod, argts);
 
         newMethod.CilMethodBody.Instructions.Add(CilOpCodes.Ret);
 

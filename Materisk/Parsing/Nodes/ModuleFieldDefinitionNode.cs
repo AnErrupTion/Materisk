@@ -10,14 +10,14 @@ internal class ModuleFieldDefinitionNode : SyntaxNode
     private readonly bool isPublic;
     private readonly bool isStatic;
     private readonly SyntaxToken nameToken;
-    private readonly SyntaxToken type;
+    private readonly SyntaxToken typeToken;
 
-    public ModuleFieldDefinitionNode(bool isPublic, bool isStatic, SyntaxToken nameToken, SyntaxToken type)
+    public ModuleFieldDefinitionNode(bool isPublic, bool isStatic, SyntaxToken nameToken, SyntaxToken typeToken)
     {
         this.isPublic = isPublic;
         this.isStatic = isStatic;
         this.nameToken = nameToken;
-        this.type = type;
+        this.typeToken = typeToken;
     }
 
     public override NodeType Type => NodeType.ModuleFieldDefinition;
@@ -27,7 +27,7 @@ internal class ModuleFieldDefinitionNode : SyntaxNode
         return null;
     }
 
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
         FieldAttributes attributes = 0;
 
@@ -39,7 +39,9 @@ internal class ModuleFieldDefinitionNode : SyntaxNode
 
         var newField = new FieldDefinition(nameToken.Text,
             attributes,
-            Utils.GetTypeSignatureFor(module, type.Text));
+            Utils.GetTypeSignatureFor(module, typeToken.Text));
+
+        type.Fields.Add(newField);
 
         return newField;
     }
@@ -47,6 +49,6 @@ internal class ModuleFieldDefinitionNode : SyntaxNode
     public override IEnumerable<SyntaxNode> GetChildren()
     {
         yield return new TokenNode(nameToken);
-        yield return new TokenNode(type);
+        yield return new TokenNode(typeToken);
     }
 }

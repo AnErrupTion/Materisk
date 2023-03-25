@@ -23,11 +23,11 @@ internal class CallNode : SyntaxNode
         return null;
     }
 
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var toCall = ToCallNode.Emit(variables, module, method, arguments) as MethodDefinition;
+        var toCall = ToCallNode.Emit(variables, module, type, method, arguments) as MethodDefinition;
 
-        EmitArgs(variables, module, method, arguments);
+        EmitArgs(variables, module, type, method, arguments);
         method.CilMethodBody?.Instructions.Add(CilOpCodes.Call, toCall);
         return null;
     }
@@ -40,10 +40,10 @@ internal class CallNode : SyntaxNode
         return args;
     }
 
-    public void EmitArgs(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, MethodDefinition method, List<string> arguments)
+    public void EmitArgs(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
         foreach (var n in argumentNodes)
-            n.Emit(variables, module, method, arguments);
+            n.Emit(variables, module, type, method, arguments);
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
