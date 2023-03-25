@@ -69,10 +69,25 @@ internal class DotNode : SyntaxNode
             {
                 case IdentifierNode rvn:
                 {
-                    /*var ident = rvn.Token;
-                    currentValue = currentValue.Dot(new SString((string)ident.Value));
-                    break;*/
-                    throw new NotImplementedException();
+                    var name = rvn.Token.Text;
+                    var typeName = method.Parameters[0].ParameterType.Name;
+
+                    FieldDefinition? fieldDef = null;
+
+                    foreach (var type in module.TopLevelTypes)
+                        foreach (var field in type.Fields)
+                            if (type.Name == typeName && field.Name == name)
+                            {
+                                fieldDef = field;
+                                break;
+                            }
+
+                    if (fieldDef == null)
+                        throw new InvalidOperationException($"Unable to find field with name: {name}");
+
+                    method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldfld, fieldDef);
+                    currentValue = fieldDef;
+                    break;
                 }
                 case AssignExpressionNode aen:
                 {
