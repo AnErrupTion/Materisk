@@ -43,12 +43,25 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
     {
         var targetName = name.Text;
 
-        MethodDefinition newMethod;
         var argts = new List<string>();
+        var parameters = new List<TypeSignature>();
+
+        foreach (var arg in args)
+        {
+            parameters.Add(Utils.GetTypeSignatureFor(module, arg.Key.Text));
+            argts.Add(arg.Value.Text);
+        }
+
+        MethodDefinition newMethod;
 
         if (targetName is "ctor")
         {
-            newMethod = type.GetOrCreateStaticConstructor();
+            if (returnType.Text is not "void")
+                throw new InvalidOperationException("Return type for constructor must be void!");
+
+            newMethod = new MethodDefinition(".ctor",
+                MethodAttributes.Public,
+                MethodSignature.CreateStatic(module.CorLibTypeFactory.Void, parameters));
         }
         else
         {
@@ -60,20 +73,12 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
             if (isStatic)
                 attributes |= MethodAttributes.Static;
 
-            var parameters = new List<TypeSignature>();
-
-            foreach (var arg in args)
-            {
-                parameters.Add(Utils.GetTypeSignatureFor(module, arg.Key.Text));
-                argts.Add(arg.Value.Text);
-            }
-
             newMethod = new MethodDefinition(targetName,
                 attributes,
                 MethodSignature.CreateStatic(Utils.GetTypeSignatureFor(module, returnType.Text), parameters));
-
-            type.Methods.Add(newMethod);
         }
+
+        type.Methods.Add(newMethod);
 
         newMethod.CilMethodBody = new(newMethod);
 

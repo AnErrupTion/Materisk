@@ -85,11 +85,7 @@ internal class DotNode : SyntaxNode
                     if (fieldDef == null)
                         throw new InvalidOperationException($"Unable to find field with name: {name}");
 
-                    // TODO: Get object reference
-                    if (!fieldDef.IsStatic)
-                    {
-                        method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldfld, fieldDef);
-                    } else method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldsfld, fieldDef);
+                    method.CilMethodBody?.Instructions.Add(fieldDef.IsStatic ? CilOpCodes.Ldsfld : CilOpCodes.Ldfld, fieldDef);
                     currentValue = fieldDef;
                     break;
                 }
@@ -113,11 +109,7 @@ internal class DotNode : SyntaxNode
                     if (fieldDef == null)
                         throw new InvalidOperationException($"Unable to find field with name: {name}");
 
-                    // TODO: Get object reference
-                    if (!fieldDef.IsStatic)
-                    {
-                        method.CilMethodBody?.Instructions.Add(CilOpCodes.Stfld, fieldDef);
-                    } else method.CilMethodBody?.Instructions.Add(CilOpCodes.Stsfld, fieldDef);
+                    method.CilMethodBody?.Instructions.Add(fieldDef.IsStatic ? CilOpCodes.Stsfld : CilOpCodes.Stfld, fieldDef);
                     break;
                 }
                 case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:

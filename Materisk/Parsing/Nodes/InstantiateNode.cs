@@ -50,7 +50,7 @@ internal class InstantiateNode : SyntaxNode
         if (constructorType == null)
             throw new InvalidOperationException($"Unable to find type with name: {name}");
 
-        var constructor = constructorType.GetStaticConstructor();
+        var constructor = constructorType.Methods.FirstOrDefault(x => x.Name == ".ctor");
 
         if (constructor is null)
             throw new InvalidOperationException($"Unable to find constructor of type: {name}");

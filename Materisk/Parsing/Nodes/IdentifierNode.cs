@@ -27,7 +27,10 @@ internal class IdentifierNode : SyntaxNode
         var name = Token.Value.ToString();
 
         if (name is "self" && method.DeclaringType is not null)
+        {
+            method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldarg_0); // "this" reference
             return method.DeclaringType;
+        }
 
         foreach (var typeDef in module.TopLevelTypes)
             if (typeDef.Name == name)
