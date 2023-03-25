@@ -247,7 +247,7 @@ public class Parser {
     }
 
     public SyntaxNode ParseTermExpression(SyntaxToken? secondTypeToken) {
-        return BinaryOperation(() => ParseFactorExpression(secondTypeToken), new() { SyntaxType.Mul, SyntaxType.Div, SyntaxType.Mod, SyntaxType.Idx });
+        return BinaryOperation(() => ParseFactorExpression(secondTypeToken), new() { SyntaxType.Mul, SyntaxType.Div, SyntaxType.Mod });
     }
 
     public SyntaxNode ParseFactorExpression(SyntaxToken? secondTypeToken) {
@@ -321,13 +321,15 @@ public class Parser {
 
     public SyntaxNode ParseCastExpression(SyntaxToken? secondTypeToken)
     {
-        if(Current.Type is SyntaxType.LessThan) {
-            MatchToken(SyntaxType.LessThan);
+        if (Current.Type is SyntaxType.LParen)
+        {
+            MatchToken(SyntaxType.LParen);
             var ident = MatchToken(SyntaxType.Identifier);
 
-            if (ident.Text is not "int" and not "float" and not "arr" and not "string") throw new Exception("Can not cast to " + ident.Text);
+            if (ident.Text is not "int" and not "float" and not "string")
+                throw new Exception($"Can not cast to: {ident.Text}");
 
-            MatchToken(SyntaxType.GreaterThan);
+            MatchToken(SyntaxType.RParen);
 
             var node = ParseCastExpression(secondTypeToken);
             return new CastNode(ident, node);
@@ -337,49 +339,63 @@ public class Parser {
 
     public SyntaxNode ParseAtomExpression(SyntaxToken? secondTypeToken)
     {
-        if (Current.Type is SyntaxType.Int) {
-            Position++;
-            return new IntLiteralNode(Peek(-1));
+        switch (Current.Type)
+        {
+            case SyntaxType.Int:
+                Position++;
+                return new IntLiteralNode(Peek(-1));
+            case SyntaxType.Float:
+                Position++;
+                return new FloatLiteralNode(Peek(-1));
+            case SyntaxType.String:
+                Position++;
+                return new StringLiteralNode(Peek(-1));
+            case SyntaxType.Identifier when Peek(1).Type is SyntaxType.LSqBracket:
+                return ParseArrayIndexExpression(secondTypeToken);
+            case SyntaxType.Identifier:
+                Position++;
+                return new IdentifierNode(Peek(-1));
+            case SyntaxType.LParen:
+            {
+                Position++;
+                var expr = ParseExpression(secondTypeToken);
+                MatchToken(SyntaxType.RParen);
+                return expr; // TODO: Do we have to create a ParenthisizedExpr? (probably not, but what if we do?)
+            }
+            case SyntaxType.LSqBracket:
+                return ParseArrayExpression(secondTypeToken);
+            case SyntaxType.Keyword when Current.Text == "if":
+                return ParseIfExpression(secondTypeToken);
         }
-        if (Current.Type is SyntaxType.Float) {
-            Position++;
-            return new FloatLiteralNode(Peek(-1));
-        }
-        if (Current.Type is SyntaxType.String) {
-            Position++;
-            return new StringLiteralNode(Peek(-1));
-        }
-        if (Current.Type is SyntaxType.Identifier) {
-            Position++;
-            return new IdentifierNode(Peek(-1));
-        }
-        if (Current.Type is SyntaxType.LParen) {
-            Position++;
-            var expr = ParseExpression(secondTypeToken);
 
-            MatchToken(SyntaxType.RParen);
-
-            return expr; // TODO: Do we have to create a ParenthisizedExpr? (probably not, but what if we do?)
-        }
-        if (Current.Type is SyntaxType.LSqBracket) {
-            return ParseArrayExpression(secondTypeToken);
-        }
-        if (Current.Type is SyntaxType.Keyword && Current.Text == "if") {
-            return ParseIfExpression(secondTypeToken);
-        }
-        if (Current.Type is SyntaxType.Keyword && Current.Text == "for") {
+        if (Current.Type is SyntaxType.Keyword && Current.Text == "for")
             return ParseForExpression(secondTypeToken);
-        }
-        if (Current.Type is SyntaxType.Keyword && Current.Text == "while") {
+        if (Current.Type is SyntaxType.Keyword && Current.Text == "while")
             return ParseWhileExpression(secondTypeToken);
-        }
-        if (Current.Type is SyntaxType.Keyword && Current.Text == "fld") {
+        if (Current.Type is SyntaxType.Keyword && Current.Text == "fld")
             return ParseFieldExpression();
-        }
-        if (Current.Type is SyntaxType.Keyword && Current.Text == "new") {
+        if (Current.Type is SyntaxType.Keyword && Current.Text == "new")
             return ParseInstantiateExpression(secondTypeToken);
-        }
+
         throw new Exception($"Unexpected token {Current.Type} at pos {Current.Position} in atom expression!");
+    }
+
+    public SyntaxNode ParseArrayIndexExpression(SyntaxToken? secondTypeToken)
+    {
+        var ident = MatchToken(SyntaxType.Identifier);
+        MatchToken(SyntaxType.LSqBracket);
+        var expr = ParseExpression(secondTypeToken);
+        MatchToken(SyntaxType.RSqBracket);
+
+        SyntaxNode? setNode = null;
+
+        if (Current.Type is SyntaxType.Equals)
+        {
+            Position++;
+            setNode = ParseExpression(secondTypeToken);
+        }
+
+        return new ArrayIndexNode(new IdentifierNode(ident), expr, setNode);
     }
 
     public SyntaxNode ParseArrayExpression(SyntaxToken? secondTypeToken)
@@ -556,11 +572,10 @@ public class Parser {
     }
     public SyntaxNode BinaryOperation(Func<SyntaxNode> leftParse, List<SyntaxType> allowedTypes, Func<SyntaxNode> rightParse = null) {
         var left = leftParse();
-        SyntaxNode right;
         while (allowedTypes.Contains(Current.Type)) {
             var operatorToken = Current;
             Position++;
-            right = (rightParse ?? leftParse)();
+            var right = (rightParse ?? leftParse)();
 
             left = new BinaryExpressionNode(left, operatorToken, right);
         }

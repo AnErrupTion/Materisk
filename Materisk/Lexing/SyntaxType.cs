@@ -14,7 +14,7 @@ public enum SyntaxType
     GreaterThanEqu,
     LessThanEqu,
     Plus, Minus,
-    Mod, Mul, Div, Idx,
+    Mod, Mul, Div,
     Pow,
     Dot,
     LParen,

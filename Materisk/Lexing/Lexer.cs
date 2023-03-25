@@ -96,9 +96,6 @@ public class Lexer
                     }
                     insertToken = new(SyntaxType.Div, Position, Current.ToString());
                     break;
-                case '#':
-                    insertToken = new(SyntaxType.Idx, Position, Current.ToString());
-                    break;
                 case '.':
                     insertToken = new(SyntaxType.Dot, Position, Current.ToString());
                     break;

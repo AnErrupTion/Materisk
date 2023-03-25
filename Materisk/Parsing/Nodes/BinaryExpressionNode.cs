@@ -39,10 +39,6 @@ internal class BinaryExpressionNode : SyntaxNode
             case SyntaxType.Mul: method.CilMethodBody?.Instructions.Add(CilOpCodes.Mul); break;
             case SyntaxType.Mod: method.CilMethodBody?.Instructions.Add(CilOpCodes.Rem); break;
             case SyntaxType.EqualsEquals: method.CilMethodBody?.Instructions.Add(CilOpCodes.Ceq); break;
-            case SyntaxType.Idx:
-            {
-                throw new NotImplementedException();
-            }
             case SyntaxType.LessThan: method.CilMethodBody?.Instructions.Add(CilOpCodes.Clt); break;
             case SyntaxType.LessThanEqu:
             {

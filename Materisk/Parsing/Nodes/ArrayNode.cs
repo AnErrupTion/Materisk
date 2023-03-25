@@ -17,7 +17,7 @@ internal class ArrayNode : SyntaxNode
         this.itemCountNode = itemCountNode;
     }
 
-    public override NodeType Type => NodeType.List;
+    public override NodeType Type => NodeType.Array;
 
     public override SValue Evaluate(Scope scope)
     {
@@ -42,6 +42,6 @@ internal class ArrayNode : SyntaxNode
 
     public override string ToString()
     {
-        return "ListNode:";
+        return "ArrayNode:";
     }
 }
