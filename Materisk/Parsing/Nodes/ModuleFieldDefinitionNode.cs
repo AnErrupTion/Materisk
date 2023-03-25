@@ -2,6 +2,7 @@
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
 using Materisk.BuiltinTypes;
+using Materisk.Lexing;
 
 namespace Materisk.Parsing.Nodes;
 

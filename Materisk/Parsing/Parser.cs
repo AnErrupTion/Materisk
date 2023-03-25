@@ -1,4 +1,5 @@
-﻿using Materisk.Parsing.Nodes;
+﻿using Materisk.Lexing;
+using Materisk.Parsing.Nodes;
 
 namespace Materisk.Parsing;
 
@@ -9,7 +10,7 @@ public class Parser {
     public SyntaxToken Current => Peek();
 
     public SyntaxToken Peek(int off = 0) {
-        if (Position + off >= Tokens.Count || Position + off < 0) return new(SyntaxType.BadToken, 0, null, string.Empty);
+        if (Position + off >= Tokens.Count || Position + off < 0) return new(SyntaxType.BadToken, 0, string.Empty);
         return Tokens[Position + off];
     }
 
@@ -22,14 +23,14 @@ public class Parser {
         throw new Exception("Unexpected token " + Current.Type + "; expected " + type);
     }
 
-    public SyntaxToken MatchTokenWithValue(SyntaxType type, object value)
+    public SyntaxToken MatchTokenWithText(SyntaxType type, string text)
     {
-        if (Current.Type == type && Current.Value == value) {
+        if (Current.Type == type && Current.Text == text) {
             Position++;
             return Peek(-1);
         }
 
-        throw new Exception("Unexpected token " + Current.Type + "; expected " + type + " with value " + value);
+        throw new Exception("Unexpected token " + Current.Type + "; expected " + type + " with text " + text);
     }
 
     public SyntaxToken MatchKeyword(string value) {
@@ -413,7 +414,7 @@ public class Parser {
 
         node.AddCase(initialCond, initialBlock);
 
-        while (Current.Type == SyntaxType.Keyword && (string)Current.Value == "elif") {
+        while (Current is { Type: SyntaxType.Keyword, Text: "elif" }) {
             Position++;
 
             MatchToken(SyntaxType.LParen);

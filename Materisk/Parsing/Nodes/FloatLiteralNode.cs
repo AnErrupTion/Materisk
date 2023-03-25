@@ -2,6 +2,7 @@
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
 using Materisk.BuiltinTypes;
+using Materisk.Lexing;
 
 namespace Materisk.Parsing.Nodes;
 
@@ -23,7 +24,7 @@ internal class FloatLiteralNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var value = (float)syntaxToken.Value;
+        var value = float.Parse(syntaxToken.Text);
         method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldc_R4, value);
         return value;
     }

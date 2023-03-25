@@ -1,6 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using Materisk.BuiltinTypes;
+using Materisk.Lexing;
 
 namespace Materisk.Parsing.Nodes;
 
@@ -34,6 +35,6 @@ public class TokenNode : SyntaxNode
 
     public override string ToString()
     {
-        return "TokenNode: " + Token.Type + " val=" + Token.Value + " text=" + Token.Text;
+        return "TokenNode: " + Token.Type + " text=" + Token.Text;
     }
 }

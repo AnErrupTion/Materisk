@@ -2,6 +2,7 @@
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
 using Materisk.BuiltinTypes;
+using Materisk.Lexing;
 
 namespace Materisk.Parsing.Nodes;
 
@@ -26,7 +27,7 @@ internal class AssignExpressionNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var name = Ident.Value.ToString();
+        var name = Ident.Text;
 
         if (name is null || !variables.ContainsKey(name))
         {

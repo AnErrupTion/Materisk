@@ -5,6 +5,7 @@ using AsmResolver.DotNet.Signatures.Types;
 using AsmResolver.PE.DotNet.Cil;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
 using Materisk.BuiltinTypes;
+using Materisk.Lexing;
 using Materisk.Native;
 
 namespace Materisk.Parsing.Nodes;

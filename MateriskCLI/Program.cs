@@ -3,6 +3,7 @@ using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
 using Materisk;
+using Materisk.Lexing;
 using Materisk.Parsing;
 using Materisk.Parsing.Nodes;
 

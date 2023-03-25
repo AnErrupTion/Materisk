@@ -2,6 +2,7 @@
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
 using Materisk.BuiltinTypes;
+using Materisk.Lexing;
 
 namespace Materisk.Parsing.Nodes;
 
@@ -23,7 +24,7 @@ internal class StringLiteralNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var value = syntaxToken.Value.ToString();
+        var value = syntaxToken.Text;
         method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldstr, value);
         return value;
     }

@@ -5,6 +5,7 @@ using AsmResolver.DotNet.Signatures.Types;
 using AsmResolver.PE.DotNet.Cil;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
 using Materisk.BuiltinTypes;
+using Materisk.Lexing;
 using Materisk.Native;
 
 namespace Materisk.Parsing.Nodes;
@@ -47,13 +48,13 @@ internal class FunctionDefinitionNode : SyntaxNode
 
         foreach (var arg in args)
         {
-            parameters.Add(Utils.GetTypeSignatureFor(module, arg.Key.Value.ToString()));
+            parameters.Add(Utils.GetTypeSignatureFor(module, arg.Key.Text));
             argts.Add(arg.Value.Text);
         }
 
         var newMethod = new MethodDefinition(nameToken.Text,
             attributes,
-            MethodSignature.CreateStatic(Utils.GetTypeSignatureFor(module, returnType.Value.ToString()), parameters));
+            MethodSignature.CreateStatic(Utils.GetTypeSignatureFor(module, returnType.Text), parameters));
         newMethod.CilMethodBody = new(newMethod);
 
         module.TopLevelTypes[1].Methods.Add(newMethod);

@@ -1,6 +1,7 @@
 using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using Materisk.BuiltinTypes;
+using Materisk.Lexing;
 
 namespace Materisk.Parsing.Nodes;
 

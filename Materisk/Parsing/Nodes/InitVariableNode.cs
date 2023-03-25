@@ -2,6 +2,7 @@
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
 using Materisk.BuiltinTypes;
+using Materisk.Lexing;
 
 namespace Materisk.Parsing.Nodes;
 
@@ -27,7 +28,7 @@ internal class InitVariableNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var name = identToken.Value.ToString();
+        var name = identToken.Text;
 
         if (name is null)
             throw new InvalidOperationException("Can not assign to a non-existent identifier!");
