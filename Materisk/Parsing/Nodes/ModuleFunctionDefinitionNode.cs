@@ -78,6 +78,9 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
                 MethodSignature.CreateStatic(Utils.GetTypeSignatureFor(module, returnType.Text), parameters));
         }
 
+        if (!isStatic)
+            newMethod.Signature.HasThis = true;
+
         type.Methods.Add(newMethod);
 
         newMethod.CilMethodBody = new(newMethod);

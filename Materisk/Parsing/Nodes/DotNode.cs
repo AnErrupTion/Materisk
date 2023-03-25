@@ -77,7 +77,7 @@ internal class DotNode : SyntaxNode
                 case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:
                 {
                     var ident = cnIdentNode.Token;
-                    var typeName = currentValue.ToString();
+                    var typeName = currentValue is CilLocalVariable variable ? variable.VariableType.ToString() : currentValue.ToString();
                     var name = ident.Value.ToString();
 
                     MethodDefinition? newMethod = null;

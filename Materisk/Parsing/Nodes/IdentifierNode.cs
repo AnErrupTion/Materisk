@@ -26,9 +26,9 @@ internal class IdentifierNode : SyntaxNode
     {
         var name = Token.Value.ToString();
 
-        if (name is "self" && method.DeclaringType is not null)
+        if (name is "self" && method.DeclaringType is not null && method.Parameters.ThisParameter is not null)
         {
-            method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldarg_0); // "this" reference
+            method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldarg, method.Parameters.ThisParameter);
             return method.DeclaringType;
         }
 
