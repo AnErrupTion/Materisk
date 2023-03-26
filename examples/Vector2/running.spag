@@ -1,3 +1,0 @@
-import "vector2test.spag";
-
-runVectorTests();
