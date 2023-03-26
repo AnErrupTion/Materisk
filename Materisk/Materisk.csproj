@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="AsmResolver.DotNet" Version="5.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
 </Project>

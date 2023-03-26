@@ -27,7 +27,7 @@ internal class ArrayNode : SyntaxNode
 
         method.CilMethodBody!.Instructions.Add(CilOpCodes.Newarr, arrayType);
 
-        return null;
+        return null!;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

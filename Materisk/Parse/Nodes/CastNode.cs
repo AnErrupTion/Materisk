@@ -28,7 +28,7 @@ internal class CastNode : SyntaxNode
             case "float": method.CilMethodBody!.Instructions.Add(CilOpCodes.Conv_R4); break;
         }
 
-        return null;
+        return null!;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

@@ -33,7 +33,7 @@ internal class WhileNode : SyntaxNode
         condLabel.Instruction = method.CilMethodBody!.Instructions[index];
 
         method.CilMethodBody!.Instructions.Add(CilOpCodes.Brtrue, blockStartLabel);
-        return null;
+        return null!;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

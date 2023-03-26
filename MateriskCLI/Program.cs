@@ -35,7 +35,7 @@ public static class Program
         if (showParseOutput)
             PrintTree(ast);
 
-        var emitter = new Emitter(name, $"{name}.dll", ast);
+        var emitter = new Emitter(name, ast);
         emitter.Emit(EmitType.Cil);
     }
 

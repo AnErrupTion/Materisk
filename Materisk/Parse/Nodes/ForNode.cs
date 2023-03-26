@@ -42,7 +42,7 @@ internal class ForNode : SyntaxNode
 
         method.CilMethodBody!.Instructions.Add(CilOpCodes.Brtrue, stepLabel);
 
-        return null;
+        return null!;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

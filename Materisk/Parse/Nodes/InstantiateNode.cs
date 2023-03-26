@@ -34,7 +34,7 @@ internal class InstantiateNode : SyntaxNode
             arg.Emit(variables, module, type, method, arguments);
 
         method.CilMethodBody!.Instructions.Add(CilOpCodes.Newobj, constructor);
-        return null;
+        return null!;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

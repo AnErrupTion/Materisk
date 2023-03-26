@@ -52,7 +52,7 @@ internal class BinaryExpressionNode : SyntaxNode
             default: throw new InvalidOperationException($"Trying to do a binary expression on: {_operatorToken.Type}");
         }
 
-        return null;
+        return null!;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

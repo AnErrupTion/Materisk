@@ -23,7 +23,7 @@ internal class CallNode : SyntaxNode
 
         EmitArgs(variables, module, type, method, arguments);
         method.CilMethodBody!.Instructions.Add(CilOpCodes.Call, toCall);
-        return null;
+        return null!;
     }
 
     public void EmitArgs(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)

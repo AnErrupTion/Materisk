@@ -37,7 +37,7 @@ internal class UnaryExpressionNode : SyntaxNode
                 throw new InvalidOperationException($"Trying to do a unary expression on: {_token.Type}");
         }
 
-        return null;
+        return null!;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

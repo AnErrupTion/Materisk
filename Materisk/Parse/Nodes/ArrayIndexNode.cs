@@ -39,7 +39,7 @@ internal class ArrayIndexNode : SyntaxNode
             method.CilMethodBody!.Instructions.Add(CilOpCodes.Stelem, underlyingType);
         } else method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldelem, underlyingType);
 
-        return null;
+        return null!;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

@@ -23,7 +23,7 @@ internal class IfNode : SyntaxNode
             label.Instruction = method.CilMethodBody!.Instructions.Last();
         }
 
-        return null;
+        return null!;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
