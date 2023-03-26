@@ -1,5 +1,6 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
+using AsmResolver.PE.DotNet.Cil;
 
 namespace Materisk.Parse.Nodes;
 
@@ -9,7 +10,9 @@ internal class ContinueNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        throw new NotImplementedException();
+        // Dummy instruction for "for" and "while" nodes
+        method.CilMethodBody!.Instructions.Add(CilOpCodes.Leave);
+        return null!;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

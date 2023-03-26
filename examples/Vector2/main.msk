@@ -6,4 +6,14 @@ fn pub main() void
 	var toAdd Vector2 = new Vector2(5, 10);
 	var result Vector2 = vector.add(toAdd);
 	result.print();
+
+	for (var i int = 0; i < 5; i = i + 1)
+	{
+		if (i == 3)
+		{
+			break;
+		};
+
+		Console.println(Int.toString(i));
+	};
 }
