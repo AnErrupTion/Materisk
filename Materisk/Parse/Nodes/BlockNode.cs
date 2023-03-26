@@ -6,13 +6,13 @@ namespace Materisk.Parse.Nodes;
 
 internal class BlockNode : SyntaxNode
 {
-    private readonly List<SyntaxNode> nodes;
-    private readonly bool createNewScope;
+    private readonly List<SyntaxNode> _nodes;
+    private readonly bool _createNewScope;
 
     public BlockNode(List<SyntaxNode> nodes, bool createNewScope = true)
     {
-        this.nodes = nodes;
-        this.createNewScope = createNewScope;
+        _nodes = nodes;
+        _createNewScope = createNewScope;
     }
 
     public override NodeType Type => NodeType.Block;
@@ -26,7 +26,7 @@ internal class BlockNode : SyntaxNode
     {
         object lastVal = null;
 
-        foreach (var node in nodes)
+        foreach (var node in _nodes)
         {
             var res = node.Emit(variables, module, type, method, arguments);
 
@@ -39,7 +39,7 @@ internal class BlockNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        foreach (var node in nodes) yield return node;
+        foreach (var node in _nodes) yield return node;
     }
 
     public override string ToString()

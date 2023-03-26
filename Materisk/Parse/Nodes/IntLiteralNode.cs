@@ -9,11 +9,11 @@ namespace Materisk.Parse.Nodes;
 
 internal class IntLiteralNode : SyntaxNode
 {
-    private readonly SyntaxToken syntaxToken;
+    private readonly SyntaxToken _syntaxToken;
 
     public IntLiteralNode(SyntaxToken syntaxToken)
     {
-        this.syntaxToken = syntaxToken;
+        _syntaxToken = syntaxToken;
     }
 
     public override NodeType Type => NodeType.IntLiteral;
@@ -25,14 +25,14 @@ internal class IntLiteralNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var value = int.Parse(syntaxToken.Text, CultureInfo.InvariantCulture);
+        var value = int.Parse(_syntaxToken.Text, CultureInfo.InvariantCulture);
         method.CilMethodBody.Instructions.Add(CilInstruction.CreateLdcI4(value));
         return value;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(syntaxToken);
+        yield return new TokenNode(_syntaxToken);
     }
 
     public override string ToString()

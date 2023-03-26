@@ -8,17 +8,17 @@ namespace Materisk.Parse.Nodes;
 
 internal class InitVariableNode : SyntaxNode
 {
-    private readonly SyntaxToken identToken;
-    private readonly SyntaxToken typeToken;
-    private readonly SyntaxToken? secondTypeToken;
-    private readonly SyntaxNode expr;
+    private readonly SyntaxToken _identToken;
+    private readonly SyntaxToken _typeToken;
+    private readonly SyntaxToken? _secondTypeToken;
+    private readonly SyntaxNode _expr;
 
     public InitVariableNode(SyntaxToken identToken, SyntaxToken typeToken, SyntaxToken? secondTypeToken, SyntaxNode expr)
     {
-        this.identToken = identToken;
-        this.typeToken = typeToken;
-        this.secondTypeToken = secondTypeToken;
-        this.expr = expr;
+        _identToken = identToken;
+        _typeToken = typeToken;
+        _secondTypeToken = secondTypeToken;
+        _expr = expr;
     }
 
     public override NodeType Type => NodeType.InitVariable;
@@ -30,7 +30,7 @@ internal class InitVariableNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var name = identToken.Text;
+        var name = _identToken.Text;
 
         if (name is null)
             throw new InvalidOperationException("Can not assign to a non-existent identifier!");
@@ -38,8 +38,8 @@ internal class InitVariableNode : SyntaxNode
         if (variables.ContainsKey(name))
             throw new InvalidOperationException("Can not initialize the same variable twice!");
 
-        var value = expr.Emit(variables, module, type, method, arguments);
-        var variable = new CilLocalVariable(typeToken.Text is "arr" && secondTypeToken is not null ? Utils.GetTypeSignatureFor(module, secondTypeToken.Text, true) : Utils.GetTypeSignatureFor(module, typeToken.Text));
+        var value = _expr.Emit(variables, module, type, method, arguments);
+        var variable = new CilLocalVariable(_typeToken.Text is "arr" && _secondTypeToken is not null ? Utils.GetTypeSignatureFor(module, _secondTypeToken.Text, true) : Utils.GetTypeSignatureFor(module, _typeToken.Text));
         method.CilMethodBody.LocalVariables.Add(variable);
         method.CilMethodBody.Instructions.Add(CilOpCodes.Stloc, variable);
         variables.Add(name, variable);
@@ -48,8 +48,8 @@ internal class InitVariableNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(identToken);
-        yield return expr;
+        yield return new TokenNode(_identToken);
+        yield return _expr;
     }
 
     public override string ToString()

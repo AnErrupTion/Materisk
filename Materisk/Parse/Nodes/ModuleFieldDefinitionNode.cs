@@ -8,17 +8,17 @@ namespace Materisk.Parse.Nodes;
 
 internal class ModuleFieldDefinitionNode : SyntaxNode
 {
-    private readonly bool isPublic;
-    private readonly bool isStatic;
-    private readonly SyntaxToken nameToken;
-    private readonly SyntaxToken typeToken;
+    private readonly bool _isPublic;
+    private readonly bool _isStatic;
+    private readonly SyntaxToken _nameToken;
+    private readonly SyntaxToken _typeToken;
 
     public ModuleFieldDefinitionNode(bool isPublic, bool isStatic, SyntaxToken nameToken, SyntaxToken typeToken)
     {
-        this.isPublic = isPublic;
-        this.isStatic = isStatic;
-        this.nameToken = nameToken;
-        this.typeToken = typeToken;
+        _isPublic = isPublic;
+        _isStatic = isStatic;
+        _nameToken = nameToken;
+        _typeToken = typeToken;
     }
 
     public override NodeType Type => NodeType.ModuleFieldDefinition;
@@ -32,15 +32,15 @@ internal class ModuleFieldDefinitionNode : SyntaxNode
     {
         FieldAttributes attributes = 0;
 
-        if (isPublic)
+        if (_isPublic)
             attributes |= FieldAttributes.Public;
 
-        if (isStatic)
+        if (_isStatic)
             attributes |= FieldAttributes.Static;
 
-        var newField = new FieldDefinition(nameToken.Text,
+        var newField = new FieldDefinition(_nameToken.Text,
             attributes,
-            Utils.GetTypeSignatureFor(module, typeToken.Text));
+            Utils.GetTypeSignatureFor(module, _typeToken.Text));
 
         type.Fields.Add(newField);
 
@@ -49,7 +49,7 @@ internal class ModuleFieldDefinitionNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(nameToken);
-        yield return new TokenNode(typeToken);
+        yield return new TokenNode(_nameToken);
+        yield return new TokenNode(_typeToken);
     }
 }

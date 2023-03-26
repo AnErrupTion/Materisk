@@ -8,13 +8,13 @@ namespace Materisk.Parse.Nodes;
 
 internal class UnaryExpressionNode : SyntaxNode
 {
-    private readonly SyntaxToken token;
-    private readonly SyntaxNode rhs;
+    private readonly SyntaxToken _token;
+    private readonly SyntaxNode _rhs;
 
     public UnaryExpressionNode(SyntaxToken token, SyntaxNode rhs)
     {
-        this.token = token;
-        this.rhs = rhs;
+        _token = token;
+        _rhs = rhs;
     }
 
     public override NodeType Type => NodeType.UnaryExpression;
@@ -26,9 +26,9 @@ internal class UnaryExpressionNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        rhs.Emit(variables, module, type, method, arguments);
+        _rhs.Emit(variables, module, type, method, arguments);
 
-        switch (token.Type)
+        switch (_token.Type)
         {
             case SyntaxType.Bang:
                 method.CilMethodBody.Instructions.Add(CilOpCodes.Ldc_I4_0);
@@ -40,7 +40,7 @@ internal class UnaryExpressionNode : SyntaxNode
             case SyntaxType.Plus:
                 break;
             default:
-                throw new InvalidOperationException($"Trying to do a unary expression on: {token.Type}");
+                throw new InvalidOperationException($"Trying to do a unary expression on: {_token.Type}");
         }
 
         return null;
@@ -48,8 +48,8 @@ internal class UnaryExpressionNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(token);
-        yield return rhs;
+        yield return new TokenNode(_token);
+        yield return _rhs;
     }
 
     public override string ToString()

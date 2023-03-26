@@ -8,12 +8,12 @@ namespace Materisk.Parse.Nodes;
 internal class CallNode : SyntaxNode
 {
     public SyntaxNode ToCallNode { get; }
-    private readonly List<SyntaxNode> argumentNodes;
+    private readonly List<SyntaxNode> _argumentNodes;
 
     public CallNode(SyntaxNode atomNode, List<SyntaxNode> argumentNodes)
     {
         ToCallNode = atomNode;
-        this.argumentNodes = argumentNodes;
+        _argumentNodes = argumentNodes;
     }
 
     public override NodeType Type => NodeType.Call;
@@ -36,20 +36,20 @@ internal class CallNode : SyntaxNode
     {
         var args = new List<SValue>();
 
-        foreach (var n in argumentNodes) args.Add(n.Evaluate(scope));
+        foreach (var n in _argumentNodes) args.Add(n.Evaluate(scope));
         return args;
     }
 
     public void EmitArgs(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        foreach (var n in argumentNodes)
+        foreach (var n in _argumentNodes)
             n.Emit(variables, module, type, method, arguments);
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
         yield return ToCallNode;
-        foreach (var n in argumentNodes) yield return n;
+        foreach (var n in _argumentNodes) yield return n;
     }
 
     public override string ToString()

@@ -6,13 +6,13 @@ namespace Materisk.Parse.Nodes;
 
 internal class WhileNode : SyntaxNode
 {
-    private readonly SyntaxNode condNode;
-    private readonly SyntaxNode block;
+    private readonly SyntaxNode _condNode;
+    private readonly SyntaxNode _block;
 
     public WhileNode(SyntaxNode condNode, SyntaxNode block)
     {
-        this.condNode = condNode;
-        this.block = block;
+        _condNode = condNode;
+        _block = block;
     }
 
     public override NodeType Type => NodeType.While;
@@ -24,8 +24,8 @@ internal class WhileNode : SyntaxNode
 
         while (true)
         {
-            if (!condNode.Evaluate(whileScope).IsTruthy()) break;
-            var whileBlockRes = block.Evaluate(whileScope);
+            if (!_condNode.Evaluate(whileScope).IsTruthy()) break;
+            var whileBlockRes = _block.Evaluate(whileScope);
             if (!whileBlockRes.IsNull()) lastVal = whileBlockRes;
 
             if (whileScope.State == ScopeState.ShouldBreak) break;
@@ -42,7 +42,7 @@ internal class WhileNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return condNode;
-        yield return block;
+        yield return _condNode;
+        yield return _block;
     }
 }

@@ -12,25 +12,25 @@ namespace Materisk.Parse.Nodes;
 
 internal class ModuleFunctionDefinitionNode : SyntaxNode
 {
-    private readonly SyntaxToken moduleName;
-    private readonly SyntaxToken name;
-    private readonly Dictionary<SyntaxToken, SyntaxToken> args;
-    private readonly SyntaxToken returnType;
-    private readonly SyntaxNode body;
-    private readonly bool isStatic;
-    private readonly bool isPublic;
-    private readonly bool isNative;
+    private readonly SyntaxToken _moduleName;
+    private readonly SyntaxToken _name;
+    private readonly Dictionary<SyntaxToken, SyntaxToken> _args;
+    private readonly SyntaxToken _returnType;
+    private readonly SyntaxNode _body;
+    private readonly bool _isStatic;
+    private readonly bool _isPublic;
+    private readonly bool _isNative;
 
     public ModuleFunctionDefinitionNode(SyntaxToken moduleName, SyntaxToken name, Dictionary<SyntaxToken, SyntaxToken> args, SyntaxToken returnType, SyntaxNode body, bool isStatic, bool isPublic, bool isNative)
     {
-        this.moduleName = moduleName;
-        this.name = name;
-        this.args = args;
-        this.returnType = returnType;
-        this.body = body;
-        this.isStatic = isStatic;
-        this.isPublic = isPublic;
-        this.isNative = isNative;
+        _moduleName = moduleName;
+        _name = name;
+        _args = args;
+        _returnType = returnType;
+        _body = body;
+        _isStatic = isStatic;
+        _isPublic = isPublic;
+        _isNative = isNative;
     }
 
     public override NodeType Type => NodeType.ModuleFunctionDefinition;
@@ -42,12 +42,12 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var targetName = name.Text;
+        var targetName = _name.Text;
 
         var argts = new List<string>();
         var parameters = new List<TypeSignature>();
 
-        foreach (var arg in args)
+        foreach (var arg in _args)
         {
             parameters.Add(Utils.GetTypeSignatureFor(module, arg.Key.Text));
             argts.Add(arg.Value.Text);
@@ -57,7 +57,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
 
         if (targetName is "ctor")
         {
-            if (returnType.Text is not "void")
+            if (_returnType.Text is not "void")
                 throw new InvalidOperationException("Return type for constructor must be void!");
 
             newMethod = new MethodDefinition(".ctor",
@@ -72,27 +72,27 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
         {
             MethodAttributes attributes = 0;
 
-            if (isPublic)
+            if (_isPublic)
                 attributes |= MethodAttributes.Public;
 
-            if (isStatic)
+            if (_isStatic)
                 attributes |= MethodAttributes.Static;
 
             newMethod = new MethodDefinition(targetName,
                 attributes,
-                isStatic
-                    ? MethodSignature.CreateStatic(Utils.GetTypeSignatureFor(module, returnType.Text), parameters)
-                    : MethodSignature.CreateInstance(Utils.GetTypeSignatureFor(module, returnType.Text), parameters));
+                _isStatic
+                    ? MethodSignature.CreateStatic(Utils.GetTypeSignatureFor(module, _returnType.Text), parameters)
+                    : MethodSignature.CreateInstance(Utils.GetTypeSignatureFor(module, _returnType.Text), parameters));
         }
 
         type.Methods.Add(newMethod);
 
         newMethod.CilMethodBody = new(newMethod);
 
-        if (isNative)
-            CilNativeFuncImpl.Emit(module, moduleName.Text, newMethod);
+        if (_isNative)
+            CilNativeFuncImpl.Emit(module, _moduleName.Text, newMethod);
         else
-            body.Emit(variables, module, type, newMethod, argts);
+            _body.Emit(variables, module, type, newMethod, argts);
 
         newMethod.CilMethodBody?.Instructions.Add(CilOpCodes.Ret);
 
@@ -107,8 +107,8 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(name);
-        foreach (var tok in args) yield return new TokenNode(tok.Value);
-        yield return body;
+        yield return new TokenNode(_name);
+        foreach (var tok in _args) yield return new TokenNode(tok.Value);
+        yield return _body;
     }
 }

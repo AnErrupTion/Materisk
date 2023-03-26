@@ -7,10 +7,10 @@ namespace Materisk.Parse.Nodes;
 
 public class ImportNode : SyntaxNode
 {
-    private readonly SyntaxToken path;
+    private readonly SyntaxToken _path;
 
     public ImportNode(SyntaxToken path) {
-        this.path = path;
+        _path = path;
     }
 
     public override NodeType Type => NodeType.Import;
@@ -21,10 +21,10 @@ public class ImportNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        if (!File.Exists(path.Text))
-            throw new Exception($"Failed to import \"{path.Text}\": File not found");
+        if (!File.Exists(_path.Text))
+            throw new Exception($"Failed to import \"{_path.Text}\": File not found");
 
-        var lexer = new Lexer(File.ReadAllText(path.Text));
+        var lexer = new Lexer(File.ReadAllText(_path.Text));
         var lexedTokens = lexer.Lex();
 
         var parser = new Parser(lexedTokens);

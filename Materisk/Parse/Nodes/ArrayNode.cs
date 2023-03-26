@@ -8,13 +8,13 @@ namespace Materisk.Parse.Nodes;
 
 internal class ArrayNode : SyntaxNode
 {
-    private readonly SyntaxToken typeToken;
-    private readonly SyntaxNode itemCountNode;
+    private readonly SyntaxToken _typeToken;
+    private readonly SyntaxNode _itemCountNode;
 
     public ArrayNode(SyntaxToken typeToken, SyntaxNode itemCountNode)
     {
-        this.typeToken = typeToken;
-        this.itemCountNode = itemCountNode;
+        _typeToken = typeToken;
+        _itemCountNode = itemCountNode;
     }
 
     public override NodeType Type => NodeType.Array;
@@ -26,9 +26,9 @@ internal class ArrayNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var arrayType = Utils.GetTypeSignatureFor(module, typeToken.Text).ToTypeDefOrRef();
+        var arrayType = Utils.GetTypeSignatureFor(module, _typeToken.Text).ToTypeDefOrRef();
 
-        itemCountNode.Emit(variables, module, type, method, arguments);
+        _itemCountNode.Emit(variables, module, type, method, arguments);
 
         method.CilMethodBody.Instructions.Add(CilOpCodes.Newarr, arrayType);
 
@@ -37,7 +37,7 @@ internal class ArrayNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return itemCountNode;
+        yield return _itemCountNode;
     }
 
     public override string ToString()

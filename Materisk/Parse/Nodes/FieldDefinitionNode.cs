@@ -9,17 +9,17 @@ namespace Materisk.Parse.Nodes;
 
 internal class FieldDefinitionNode : SyntaxNode
 {
-    private readonly bool isPublic;
-    private readonly SyntaxToken nameToken;
-    private readonly SyntaxToken typeToken;
-    private readonly SyntaxNode? statement;
+    private readonly bool _isPublic;
+    private readonly SyntaxToken _nameToken;
+    private readonly SyntaxToken _typeToken;
+    private readonly SyntaxNode? _statement;
 
     public FieldDefinitionNode(bool isPublic, SyntaxToken nameToken, SyntaxToken typeToken, SyntaxNode? statement = null)
     {
-        this.isPublic = isPublic;
-        this.nameToken = nameToken;
-        this.typeToken = typeToken;
-        this.statement = statement;
+        _isPublic = isPublic;
+        _nameToken = nameToken;
+        _typeToken = typeToken;
+        _statement = statement;
     }
 
     public override NodeType Type => NodeType.FieldDefinition;
@@ -33,16 +33,16 @@ internal class FieldDefinitionNode : SyntaxNode
     {
         var attributes = FieldAttributes.Static;
 
-        if (isPublic)
+        if (_isPublic)
             attributes |= FieldAttributes.Public;
 
-        var newField = new FieldDefinition(nameToken.Text,
+        var newField = new FieldDefinition(_nameToken.Text,
             attributes,
-            Utils.GetTypeSignatureFor(module, typeToken.Text));
+            Utils.GetTypeSignatureFor(module, _typeToken.Text));
 
-        if (statement != null)
+        if (_statement != null)
         {
-            statement.Emit(variables, module, type, method, arguments);
+            _statement.Emit(variables, module, type, method, arguments);
             method.CilMethodBody.Instructions.Add(CilOpCodes.Stsfld, newField);
         }
 
@@ -53,7 +53,7 @@ internal class FieldDefinitionNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(nameToken);
-        yield return statement;
+        yield return new TokenNode(_nameToken);
+        yield return _statement;
     }
 }

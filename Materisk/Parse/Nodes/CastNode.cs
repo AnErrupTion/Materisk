@@ -8,13 +8,13 @@ namespace Materisk.Parse.Nodes;
 
 internal class CastNode : SyntaxNode
 {
-    private readonly SyntaxToken ident;
-    private readonly SyntaxNode node;
+    private readonly SyntaxToken _ident;
+    private readonly SyntaxNode _node;
 
     public CastNode(SyntaxToken ident, SyntaxNode node)
     {
-        this.ident = ident;
-        this.node = node;
+        _ident = ident;
+        _node = node;
     }
 
     public override NodeType Type => NodeType.Cast;
@@ -26,9 +26,9 @@ internal class CastNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        node.Emit(variables, module, type, method, arguments);
+        _node.Emit(variables, module, type, method, arguments);
 
-        switch (ident.Text)
+        switch (_ident.Text)
         {
             case "int": method.CilMethodBody.Instructions.Add(CilOpCodes.Conv_I4); break;
             case "float": method.CilMethodBody.Instructions.Add(CilOpCodes.Conv_R4); break;
@@ -39,7 +39,7 @@ internal class CastNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(ident);
-        yield return node;
+        yield return new TokenNode(_ident);
+        yield return _node;
     }
 }

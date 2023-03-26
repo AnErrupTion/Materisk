@@ -8,15 +8,15 @@ namespace Materisk.Parse.Nodes;
 
 internal class BinaryExpressionNode : SyntaxNode
 {
-    private readonly SyntaxNode left;
-    private readonly SyntaxToken operatorToken;
-    private readonly SyntaxNode right;
+    private readonly SyntaxNode _left;
+    private readonly SyntaxToken _operatorToken;
+    private readonly SyntaxNode _right;
 
     public BinaryExpressionNode(SyntaxNode left, SyntaxToken operatorToken, SyntaxNode right)
     {
-        this.left = left;
-        this.operatorToken = operatorToken;
-        this.right = right;
+        _left = left;
+        _operatorToken = operatorToken;
+        _right = right;
     }
 
     public override NodeType Type => NodeType.BinaryExpression;
@@ -28,10 +28,10 @@ internal class BinaryExpressionNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        left.Emit(variables, module, type, method, arguments);
-        right.Emit(variables, module, type, method, arguments);
+        _left.Emit(variables, module, type, method, arguments);
+        _right.Emit(variables, module, type, method, arguments);
 
-        switch (operatorToken.Type)
+        switch (_operatorToken.Type)
         {
             case SyntaxType.Plus: method.CilMethodBody.Instructions.Add(CilOpCodes.Add); break;
             case SyntaxType.Minus: method.CilMethodBody.Instructions.Add(CilOpCodes.Sub); break;
@@ -55,7 +55,7 @@ internal class BinaryExpressionNode : SyntaxNode
                 method.CilMethodBody.Instructions.Add(CilOpCodes.Ceq);
                 break;
             }
-            default: throw new InvalidOperationException($"Trying to do a binary expression on: {operatorToken.Type}");
+            default: throw new InvalidOperationException($"Trying to do a binary expression on: {_operatorToken.Type}");
         }
 
         return null;
@@ -63,13 +63,13 @@ internal class BinaryExpressionNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return left;
-        yield return new TokenNode(operatorToken);
-        yield return right;
+        yield return _left;
+        yield return new TokenNode(_operatorToken);
+        yield return _right;
     }
 
     public override string ToString()
     {
-        return "BinaryExprNode: op=" + operatorToken.Type;
+        return "BinaryExprNode: op=" + _operatorToken.Type;
     }
 }

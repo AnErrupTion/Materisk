@@ -53,7 +53,7 @@ public class Parser {
     public SyntaxNode ParseStatements() {
         List<SyntaxNode> nodes = new();
 
-        while(Current.Type != SyntaxType.EOF) {
+        while(Current.Type != SyntaxType.Eof) {
             nodes.Add(ParseStatement());
         }
 
@@ -65,7 +65,7 @@ public class Parser {
         List<SyntaxNode> nodes = new();
 
         while(Current.Type != SyntaxType.RBraces) {
-            if (Current.Type == SyntaxType.EOF) throw new Exception("Unclosed block at " + Current.Position);
+            if (Current.Type == SyntaxType.Eof) throw new Exception("Unclosed block at " + Current.Position);
 
             nodes.Add(ParseStatement());
         }

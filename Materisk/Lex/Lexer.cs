@@ -142,7 +142,7 @@ public class Lexer
             }
         }
 
-        tokens.Add(new SyntaxToken(SyntaxType.EOF, Position, "<EOF>"));
+        tokens.Add(new SyntaxToken(SyntaxType.Eof, Position, "<EOF>"));
         return tokens;
     }
 

@@ -7,17 +7,17 @@ namespace Materisk.Parse.Nodes;
 
 internal class ForNode : SyntaxNode
 {
-    private readonly SyntaxNode initialExpressionNode;
-    private readonly SyntaxNode condNode;
-    private readonly SyntaxNode stepNode;
-    private readonly SyntaxNode block;
+    private readonly SyntaxNode _initialExpressionNode;
+    private readonly SyntaxNode _condNode;
+    private readonly SyntaxNode _stepNode;
+    private readonly SyntaxNode _block;
 
     public ForNode(SyntaxNode initialExpressionNode, SyntaxNode condNode, SyntaxNode stepNode, SyntaxNode block)
     {
-        this.initialExpressionNode = initialExpressionNode;
-        this.condNode = condNode;
-        this.stepNode = stepNode;
-        this.block = block;
+        _initialExpressionNode = initialExpressionNode;
+        _condNode = condNode;
+        _stepNode = stepNode;
+        _block = block;
     }
 
     public override NodeType Type => NodeType.For;
@@ -29,7 +29,7 @@ internal class ForNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        initialExpressionNode.Emit(variables, module, type, method, arguments);
+        _initialExpressionNode.Emit(variables, module, type, method, arguments);
 
         var index = method.CilMethodBody.Instructions.Count;
         var condLabel = new CilInstructionLabel();
@@ -37,14 +37,14 @@ internal class ForNode : SyntaxNode
 
         method.CilMethodBody.Instructions.Add(CilOpCodes.Br, condLabel);
 
-        stepNode.Emit(variables, module, type, method, arguments);
+        _stepNode.Emit(variables, module, type, method, arguments);
         stepLabel.Instruction = method.CilMethodBody.Instructions[index + 1];
 
-        block.Emit(variables, module, type, method, arguments);
+        _block.Emit(variables, module, type, method, arguments);
 
         index = method.CilMethodBody.Instructions.Count;
 
-        condNode.Emit(variables, module, type, method, arguments);
+        _condNode.Emit(variables, module, type, method, arguments);
         condLabel.Instruction = method.CilMethodBody.Instructions[index + 1];
 
         method.CilMethodBody.Instructions.Add(CilOpCodes.Brtrue, stepLabel);
@@ -54,9 +54,9 @@ internal class ForNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return initialExpressionNode;
-        yield return condNode;
-        yield return stepNode;
-        yield return block;
+        yield return _initialExpressionNode;
+        yield return _condNode;
+        yield return _stepNode;
+        yield return _block;
     }
 }

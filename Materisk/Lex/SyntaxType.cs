@@ -27,7 +27,7 @@ public enum SyntaxType
     LBraces,
     RBraces,
     Bang,
-    EOF,
+    Eof,
     BadToken,
     Comma
 }

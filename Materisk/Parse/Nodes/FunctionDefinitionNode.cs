@@ -12,21 +12,21 @@ namespace Materisk.Parse.Nodes;
 
 internal class FunctionDefinitionNode : SyntaxNode
 {
-    private readonly SyntaxToken nameToken;
-    private readonly Dictionary<SyntaxToken, SyntaxToken> args;
-    private readonly SyntaxToken returnType;
-    private readonly SyntaxNode block;
-    private readonly bool isPublic;
-    private readonly bool isNative;
+    private readonly SyntaxToken _nameToken;
+    private readonly Dictionary<SyntaxToken, SyntaxToken> _args;
+    private readonly SyntaxToken _returnType;
+    private readonly SyntaxNode _block;
+    private readonly bool _isPublic;
+    private readonly bool _isNative;
 
     public FunctionDefinitionNode(SyntaxToken nameToken, Dictionary<SyntaxToken, SyntaxToken> args, SyntaxToken returnType, SyntaxNode block, bool isPublic, bool isNative)
     {
-        this.nameToken = nameToken;
-        this.args = args;
-        this.returnType = returnType;
-        this.block = block;
-        this.isPublic = isPublic;
-        this.isNative = isNative;
+        _nameToken = nameToken;
+        _args = args;
+        _returnType = returnType;
+        _block = block;
+        _isPublic = isPublic;
+        _isNative = isNative;
     }
 
     public override NodeType Type => NodeType.FunctionDefinition;
@@ -40,31 +40,31 @@ internal class FunctionDefinitionNode : SyntaxNode
     {
         var attributes = MethodAttributes.Static;
 
-        if (isPublic)
+        if (_isPublic)
             attributes |= MethodAttributes.Public;
 
         var parameters = new List<TypeSignature>();
         var argts = new List<string>();
 
-        foreach (var arg in args)
+        foreach (var arg in _args)
         {
             parameters.Add(Utils.GetTypeSignatureFor(module, arg.Key.Text));
             argts.Add(arg.Value.Text);
         }
 
-        var newMethod = new MethodDefinition(nameToken.Text,
+        var newMethod = new MethodDefinition(_nameToken.Text,
             attributes,
-            MethodSignature.CreateStatic(Utils.GetTypeSignatureFor(module, returnType.Text), parameters));
+            MethodSignature.CreateStatic(Utils.GetTypeSignatureFor(module, _returnType.Text), parameters));
         newMethod.CilMethodBody = new(newMethod);
 
         module.TopLevelTypes[1].Methods.Add(newMethod);
 
         var typeDef = module.TopLevelTypes[1];
 
-        if (isNative)
+        if (_isNative)
             CilNativeFuncImpl.Emit(module, typeDef.Name, newMethod);
         else
-            block.Emit(variables, module, typeDef, newMethod, argts);
+            _block.Emit(variables, module, typeDef, newMethod, argts);
 
         newMethod.CilMethodBody.Instructions.Add(CilOpCodes.Ret);
 
@@ -82,8 +82,8 @@ internal class FunctionDefinitionNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(nameToken);
-        foreach (var t in args) yield return new TokenNode(t.Value);
-        yield return block;
+        yield return new TokenNode(_nameToken);
+        foreach (var t in _args) yield return new TokenNode(t.Value);
+        yield return _block;
     }
 }
