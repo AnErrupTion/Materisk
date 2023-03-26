@@ -45,7 +45,7 @@ internal class ForNode : SyntaxNode
         index = method.CilMethodBody!.Instructions.Count;
 
         _condNode.Emit(variables, module, type, method, arguments);
-        condLabel.Instruction = method.CilMethodBody!.Instructions[index + 1];
+        condLabel.Instruction = method.CilMethodBody!.Instructions[index];
 
         method.CilMethodBody!.Instructions.Add(CilOpCodes.Brtrue, stepLabel);
 
