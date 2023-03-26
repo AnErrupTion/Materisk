@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using Materisk.Emit;
 using Materisk.Lex;
 using Materisk.Parse;
@@ -21,22 +22,38 @@ public static class Program
 
         var path = args[0];
         var name = Path.GetFileNameWithoutExtension(path);
+        var watch = new Stopwatch();
 
         var lexer = new Lexer(File.ReadAllText(path));
+
+        watch.Start();
         var lexedTokens = lexer.Lex();
+        watch.Stop();
+
+        Console.WriteLine($"Lexed tokens in {watch.Elapsed.Milliseconds} ms ({watch.Elapsed.Seconds} s).");
 
         if (showLexOutput)
             foreach (var tok in lexedTokens)
                 Console.WriteLine($"  {tok}");
 
         var parser = new Parser(lexedTokens);
+
+        watch.Restart();
         var ast = parser.Parse();
+        watch.Stop();
+
+        Console.WriteLine($"Parsed nodes in {watch.Elapsed.Milliseconds} ms ({watch.Elapsed.Seconds} s).");
 
         if (showParseOutput)
             PrintTree(ast);
 
         var emitter = new Emitter(name, ast);
+
+        watch.Restart();
         emitter.Emit(EmitType.Cil);
+        watch.Stop();
+
+        Console.WriteLine($"Emitted code in {watch.Elapsed.Milliseconds} ms ({watch.Elapsed.Seconds} s).");
     }
 
     private static void PrintTree(SyntaxNode node, int ident = 0)
