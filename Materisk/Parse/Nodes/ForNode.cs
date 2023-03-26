@@ -29,9 +29,7 @@ internal class ForNode : SyntaxNode
         var condLabel = new CilInstructionLabel();
         var stepLabel = new CilInstructionLabel();
         var shouldBreak = false;
-        var shouldContinue = false;
         var breakIndex = 0;
-        var continueIndex = 0;
 
         method.CilMethodBody!.Instructions.Add(CilOpCodes.Br, condLabel);
 
@@ -52,8 +50,7 @@ internal class ForNode : SyntaxNode
             }
             else if (instruction.OpCode == CilOpCodes.Leave) // Continue
             {
-                shouldContinue = true;
-                continueIndex = i;
+                method.CilMethodBody!.Instructions[i] = new(CilOpCodes.Br, stepLabel);
             }
         }
 
@@ -66,9 +63,8 @@ internal class ForNode : SyntaxNode
         if (shouldBreak)
         {
             method.CilMethodBody!.Instructions.Add(CilOpCodes.Nop);
-            var lastInstruction = method.CilMethodBody!.Instructions.Last();
-            var label = new CilInstructionLabel(lastInstruction);
-            method.CilMethodBody!.Instructions[breakIndex] = new(CilOpCodes.Br, label);
+            var breakLabel = new CilInstructionLabel(method.CilMethodBody!.Instructions.Last());
+            method.CilMethodBody!.Instructions[breakIndex] = new(CilOpCodes.Br, breakLabel);
         }
 
         return null!;

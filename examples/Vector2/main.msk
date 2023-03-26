@@ -9,7 +9,12 @@ fn pub main() void
 
 	for (var i int = 0; i < 5; i = i + 1)
 	{
-		if (i == 3)
+		if (i == 2)
+		{
+			continue;
+		};
+
+		if (i == 4)
 		{
 			break;
 		};

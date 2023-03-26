@@ -11,7 +11,7 @@ internal class ContinueNode : SyntaxNode
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
         // Dummy instruction for "for" and "while" nodes
-        method.CilMethodBody!.Instructions.Add(CilOpCodes.Leave);
+        method.CilMethodBody!.Instructions.Add(CilOpCodes.Leave, new CilInstructionLabel());
         return null!;
     }
 
