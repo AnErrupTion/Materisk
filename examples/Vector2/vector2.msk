@@ -1,0 +1,27 @@
+import "stdlib.msk";
+
+mod pub dyn Vector2
+{
+	fld pub x int
+	fld pub y int
+
+	fn pub ctor(int x, int y) void
+	{
+		self.x = x;
+		self.y = y;
+	}
+
+	fn pub print() void
+	{
+		Console.print("<Vector2 x=");
+		Console.print(Int.toString(self.x));
+		Console.print(" y=");
+		Console.print(Int.toString(self.y));
+		Console.println(">");
+	}
+
+	fn pub add(Vector2 other) Vector2
+	{
+		return new Vector2(self.x + other.x, self.y + other.y);
+	}
+}

@@ -1,0 +1,9 @@
+import "vector2.msk";
+
+fn pub main() void
+{
+	var vector Vector2 = new Vector2(5, 5);
+	var toAdd Vector2 = new Vector2(5, 10);
+	var result Vector2 = vector.add(toAdd);
+	result.print();
+}

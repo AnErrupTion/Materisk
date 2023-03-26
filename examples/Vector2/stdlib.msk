@@ -1,0 +1,21 @@
+mod pub File
+{
+	fn native pub readText(string file) string {}
+	fn native pub writeText(string file, string contents) void {}
+}
+
+mod pub Console
+{
+	fn native pub print(string text) void {}
+
+	fn pub println(string text) void
+	{
+		Console.print(text);
+		Console.print("\n");
+	}
+}
+
+mod pub Int
+{
+	fn native pub toString(int num) string {}
+}
