@@ -33,26 +33,26 @@ internal class BinaryExpressionNode : SyntaxNode
 
         switch (_operatorToken.Type)
         {
-            case SyntaxType.Plus: method.CilMethodBody.Instructions.Add(CilOpCodes.Add); break;
-            case SyntaxType.Minus: method.CilMethodBody.Instructions.Add(CilOpCodes.Sub); break;
-            case SyntaxType.Div: method.CilMethodBody.Instructions.Add(CilOpCodes.Div); break;
-            case SyntaxType.Mul: method.CilMethodBody.Instructions.Add(CilOpCodes.Mul); break;
-            case SyntaxType.Mod: method.CilMethodBody.Instructions.Add(CilOpCodes.Rem); break;
-            case SyntaxType.EqualsEquals: method.CilMethodBody.Instructions.Add(CilOpCodes.Ceq); break;
-            case SyntaxType.LessThan: method.CilMethodBody.Instructions.Add(CilOpCodes.Clt); break;
+            case SyntaxType.Plus: method.CilMethodBody!.Instructions.Add(CilOpCodes.Add); break;
+            case SyntaxType.Minus: method.CilMethodBody!.Instructions.Add(CilOpCodes.Sub); break;
+            case SyntaxType.Div: method.CilMethodBody!.Instructions.Add(CilOpCodes.Div); break;
+            case SyntaxType.Mul: method.CilMethodBody!.Instructions.Add(CilOpCodes.Mul); break;
+            case SyntaxType.Mod: method.CilMethodBody!.Instructions.Add(CilOpCodes.Rem); break;
+            case SyntaxType.EqualsEquals: method.CilMethodBody!.Instructions.Add(CilOpCodes.Ceq); break;
+            case SyntaxType.LessThan: method.CilMethodBody!.Instructions.Add(CilOpCodes.Clt); break;
             case SyntaxType.LessThanEqu:
             {
-                method.CilMethodBody.Instructions.Add(CilOpCodes.Cgt);
-                method.CilMethodBody.Instructions.Add(CilOpCodes.Ldc_I4_0);
-                method.CilMethodBody.Instructions.Add(CilOpCodes.Ceq);
+                method.CilMethodBody!.Instructions.Add(CilOpCodes.Cgt);
+                method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldc_I4_0);
+                method.CilMethodBody!.Instructions.Add(CilOpCodes.Ceq);
                 break;
             }
-            case SyntaxType.GreaterThan: method.CilMethodBody.Instructions.Add(CilOpCodes.Cgt); break;
+            case SyntaxType.GreaterThan: method.CilMethodBody!.Instructions.Add(CilOpCodes.Cgt); break;
             case SyntaxType.GreaterThanEqu:
             {
-                method.CilMethodBody.Instructions.Add(CilOpCodes.Clt);
-                method.CilMethodBody.Instructions.Add(CilOpCodes.Ldc_I4_0);
-                method.CilMethodBody.Instructions.Add(CilOpCodes.Ceq);
+                method.CilMethodBody!.Instructions.Add(CilOpCodes.Clt);
+                method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldc_I4_0);
+                method.CilMethodBody!.Instructions.Add(CilOpCodes.Ceq);
                 break;
             }
             default: throw new InvalidOperationException($"Trying to do a binary expression on: {_operatorToken.Type}");

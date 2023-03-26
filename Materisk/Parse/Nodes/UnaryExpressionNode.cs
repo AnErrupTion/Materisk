@@ -31,11 +31,11 @@ internal class UnaryExpressionNode : SyntaxNode
         switch (_token.Type)
         {
             case SyntaxType.Bang:
-                method.CilMethodBody.Instructions.Add(CilOpCodes.Ldc_I4_0);
-                method.CilMethodBody.Instructions.Add(CilOpCodes.Ceq);
+                method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldc_I4_0);
+                method.CilMethodBody!.Instructions.Add(CilOpCodes.Ceq);
                 break;
             case SyntaxType.Minus:
-                method.CilMethodBody.Instructions.Add(CilOpCodes.Neg);
+                method.CilMethodBody!.Instructions.Add(CilOpCodes.Neg);
                 break;
             case SyntaxType.Plus:
                 break;

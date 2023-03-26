@@ -31,23 +31,23 @@ internal class ForNode : SyntaxNode
     {
         _initialExpressionNode.Emit(variables, module, type, method, arguments);
 
-        var index = method.CilMethodBody.Instructions.Count;
+        var index = method.CilMethodBody!.Instructions.Count;
         var condLabel = new CilInstructionLabel();
         var stepLabel = new CilInstructionLabel();
 
-        method.CilMethodBody.Instructions.Add(CilOpCodes.Br, condLabel);
+        method.CilMethodBody!.Instructions.Add(CilOpCodes.Br, condLabel);
 
         _stepNode.Emit(variables, module, type, method, arguments);
-        stepLabel.Instruction = method.CilMethodBody.Instructions[index + 1];
+        stepLabel.Instruction = method.CilMethodBody!.Instructions[index + 1];
 
         _block.Emit(variables, module, type, method, arguments);
 
-        index = method.CilMethodBody.Instructions.Count;
+        index = method.CilMethodBody!.Instructions.Count;
 
         _condNode.Emit(variables, module, type, method, arguments);
-        condLabel.Instruction = method.CilMethodBody.Instructions[index + 1];
+        condLabel.Instruction = method.CilMethodBody!.Instructions[index + 1];
 
-        method.CilMethodBody.Instructions.Add(CilOpCodes.Brtrue, stepLabel);
+        method.CilMethodBody!.Instructions.Add(CilOpCodes.Brtrue, stepLabel);
 
         return null;
     }

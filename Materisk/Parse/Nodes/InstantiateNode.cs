@@ -50,7 +50,7 @@ internal class InstantiateNode : SyntaxNode
         foreach (var arg in _argumentNodes)
             arg.Emit(variables, module, type, method, arguments);
 
-        method.CilMethodBody.Instructions.Add(CilOpCodes.Newobj, constructor);
+        method.CilMethodBody!.Instructions.Add(CilOpCodes.Newobj, constructor);
         return null;
     }
 

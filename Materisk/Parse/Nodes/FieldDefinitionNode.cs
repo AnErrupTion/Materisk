@@ -43,7 +43,7 @@ internal class FieldDefinitionNode : SyntaxNode
         if (_statement != null)
         {
             _statement.Emit(variables, module, type, method, arguments);
-            method.CilMethodBody.Instructions.Add(CilOpCodes.Stsfld, newField);
+            method.CilMethodBody!.Instructions.Add(CilOpCodes.Stsfld, newField);
         }
 
         module.TopLevelTypes[1].Fields.Add(newField);

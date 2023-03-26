@@ -42,8 +42,8 @@ internal class ArrayIndexNode : SyntaxNode
         if (_setNode != null)
         {
             _setNode.Emit(variables, module, type, method, arguments);
-            method.CilMethodBody.Instructions.Add(CilOpCodes.Stelem, underlyingType);
-        } else method.CilMethodBody.Instructions.Add(CilOpCodes.Ldelem, underlyingType);
+            method.CilMethodBody!.Instructions.Add(CilOpCodes.Stelem, underlyingType);
+        } else method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldelem, underlyingType);
 
         return null;
     }
