@@ -21,13 +21,12 @@ internal class IfNode : SyntaxNode
         foreach (var (cond, block) in Conditions)
         {
             cond.Emit(variables, module, type, method, arguments);
+
             var label = new CilInstructionLabel();
             method.CilMethodBody!.Instructions.Add(CilOpCodes.Brfalse, label);
-            var index = method.CilMethodBody!.Instructions.IndexOf(method.CilMethodBody!.Instructions.Last());
             block.Emit(variables, module, type, method, arguments);
             method.CilMethodBody!.Instructions.Add(CilOpCodes.Nop);
             label.Instruction = method.CilMethodBody!.Instructions.Last();
-            method.CilMethodBody!.Instructions[index].Operand = label;
         }
 
         return null;
