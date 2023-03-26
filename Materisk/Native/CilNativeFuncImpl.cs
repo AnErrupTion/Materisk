@@ -16,8 +16,8 @@ public static class CilNativeFuncImpl
                 .CreateMemberReference("ReadAllText", MethodSignature.CreateStatic(factory.String, factory.String))
                 .ImportWith(module.DefaultImporter);
 
-            method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldarg, method.Parameters[0]);
-            method.CilMethodBody?.Instructions.Add(CilOpCodes.Call, importedMethod);
+            method.CilMethodBody.Instructions.Add(CilOpCodes.Ldarg, method.Parameters[0]);
+            method.CilMethodBody.Instructions.Add(CilOpCodes.Call, importedMethod);
         }
         else if (typeName == "Console" && method.Name == "print")
         {
@@ -27,8 +27,8 @@ public static class CilNativeFuncImpl
                 .CreateMemberReference("Write", MethodSignature.CreateStatic(factory.Void, factory.String))
                 .ImportWith(module.DefaultImporter);
 
-            method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldarg, method.Parameters[0]);
-            method.CilMethodBody?.Instructions.Add(CilOpCodes.Call, importedMethod);
+            method.CilMethodBody.Instructions.Add(CilOpCodes.Ldarg, method.Parameters[0]);
+            method.CilMethodBody.Instructions.Add(CilOpCodes.Call, importedMethod);
         }
         else if (typeName == "Console" && method.Name == "println")
         {
@@ -38,8 +38,8 @@ public static class CilNativeFuncImpl
                 .CreateMemberReference("WriteLine", MethodSignature.CreateStatic(factory.Void, factory.String))
                 .ImportWith(module.DefaultImporter);
 
-            method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldarg, method.Parameters[0]);
-            method.CilMethodBody?.Instructions.Add(CilOpCodes.Call, importedMethod);
+            method.CilMethodBody.Instructions.Add(CilOpCodes.Ldarg, method.Parameters[0]);
+            method.CilMethodBody.Instructions.Add(CilOpCodes.Call, importedMethod);
         }
         else if (typeName == "String" && method.Name == "toString")
         {
@@ -51,8 +51,8 @@ public static class CilNativeFuncImpl
                     .CreateMemberReference("ToString", MethodSignature.CreateInstance(factory.String))
                     .ImportWith(module.DefaultImporter);
 
-                method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldarga, method.Parameters[0]);
-                method.CilMethodBody?.Instructions.Add(CilOpCodes.Call, importedMethod);
+                method.CilMethodBody.Instructions.Add(CilOpCodes.Ldarga, method.Parameters[0]);
+                method.CilMethodBody.Instructions.Add(CilOpCodes.Call, importedMethod);
             }
         }
     }

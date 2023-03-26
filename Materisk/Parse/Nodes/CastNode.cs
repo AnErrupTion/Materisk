@@ -30,8 +30,8 @@ internal class CastNode : SyntaxNode
 
         switch (ident.Text)
         {
-            case "int": method.CilMethodBody?.Instructions.Add(CilOpCodes.Conv_I4); break;
-            case "float": method.CilMethodBody?.Instructions.Add(CilOpCodes.Conv_R4); break;
+            case "int": method.CilMethodBody.Instructions.Add(CilOpCodes.Conv_I4); break;
+            case "float": method.CilMethodBody.Instructions.Add(CilOpCodes.Conv_R4); break;
         }
 
         return null;

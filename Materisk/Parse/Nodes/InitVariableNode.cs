@@ -40,8 +40,8 @@ internal class InitVariableNode : SyntaxNode
 
         var value = expr.Emit(variables, module, type, method, arguments);
         var variable = new CilLocalVariable(typeToken.Text is "arr" && secondTypeToken is not null ? Utils.GetTypeSignatureFor(module, secondTypeToken.Text, true) : Utils.GetTypeSignatureFor(module, typeToken.Text));
-        method.CilMethodBody?.LocalVariables.Add(variable);
-        method.CilMethodBody?.Instructions.Add(CilOpCodes.Stloc, variable);
+        method.CilMethodBody.LocalVariables.Add(variable);
+        method.CilMethodBody.Instructions.Add(CilOpCodes.Stloc, variable);
         variables.Add(name, variable);
         return value;
     }

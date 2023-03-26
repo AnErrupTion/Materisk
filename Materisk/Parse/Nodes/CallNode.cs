@@ -28,7 +28,7 @@ internal class CallNode : SyntaxNode
         var toCall = ToCallNode.Emit(variables, module, type, method, arguments) as MethodDefinition;
 
         EmitArgs(variables, module, type, method, arguments);
-        method.CilMethodBody?.Instructions.Add(CilOpCodes.Call, toCall);
+        method.CilMethodBody.Instructions.Add(CilOpCodes.Call, toCall);
         return null;
     }
 

@@ -29,7 +29,7 @@ internal class IdentifierNode : SyntaxNode
 
         if (name is "self" && method.DeclaringType is not null && method.Parameters.ThisParameter is not null)
         {
-            method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldarg, method.Parameters.ThisParameter);
+            method.CilMethodBody.Instructions.Add(CilOpCodes.Ldarg, method.Parameters.ThisParameter);
             return method.DeclaringType;
         }
 
@@ -47,7 +47,7 @@ internal class IdentifierNode : SyntaxNode
         {
             if (argument == name)
             {
-                method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldarg, method.Parameters[index]);
+                method.CilMethodBody.Instructions.Add(CilOpCodes.Ldarg, method.Parameters[index]);
                 return argument;
             }
 
@@ -57,7 +57,7 @@ internal class IdentifierNode : SyntaxNode
         foreach (var variable in variables)
             if (variable.Key == name)
             {
-                method.CilMethodBody?.Instructions.Add(CilOpCodes.Ldloc, variable.Value);
+                method.CilMethodBody.Instructions.Add(CilOpCodes.Ldloc, variable.Value);
                 return variable.Value;
             }
 

@@ -1,5 +1,6 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
+using AsmResolver.PE.DotNet.Cil;
 using Materisk.BuiltinTypes;
 
 namespace Materisk.Parse.Nodes;
@@ -23,28 +24,32 @@ internal class ForNode : SyntaxNode
 
     public override SValue Evaluate(Scope scope)
     {
-        Scope forScope = new(scope);
-        var lastVal = SValue.Null;
-        initialExpressionNode.Evaluate(forScope);
-
-        while (true)
-        {
-            if (!condNode.Evaluate(forScope).IsTruthy()) break;
-            var forBlockRes = block.Evaluate(forScope);
-            if (!forBlockRes.IsNull()) lastVal = forBlockRes;
-
-            if (forScope.State == ScopeState.ShouldBreak) break;
-            if (forScope.State != ScopeState.None) forScope.SetState(ScopeState.None);
-
-            stepNode.Evaluate(forScope);
-        }
-
-        return lastVal;
+        return null;
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        throw new NotImplementedException();
+        initialExpressionNode.Emit(variables, module, type, method, arguments);
+
+        var index = method.CilMethodBody.Instructions.Count;
+        var condLabel = new CilInstructionLabel();
+        var stepLabel = new CilInstructionLabel();
+
+        method.CilMethodBody.Instructions.Add(CilOpCodes.Br, condLabel);
+
+        stepNode.Emit(variables, module, type, method, arguments);
+        stepLabel.Instruction = method.CilMethodBody.Instructions[index + 1];
+
+        block.Emit(variables, module, type, method, arguments);
+
+        index = method.CilMethodBody.Instructions.Count;
+
+        condNode.Emit(variables, module, type, method, arguments);
+        condLabel.Instruction = method.CilMethodBody.Instructions[index + 1];
+
+        method.CilMethodBody.Instructions.Add(CilOpCodes.Brtrue, stepLabel);
+
+        return null;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

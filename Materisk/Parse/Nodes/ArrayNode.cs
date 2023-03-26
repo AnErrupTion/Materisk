@@ -30,7 +30,7 @@ internal class ArrayNode : SyntaxNode
 
         itemCountNode.Emit(variables, module, type, method, arguments);
 
-        method.CilMethodBody?.Instructions.Add(CilOpCodes.Newarr, arrayType);
+        method.CilMethodBody.Instructions.Add(CilOpCodes.Newarr, arrayType);
 
         return null;
     }

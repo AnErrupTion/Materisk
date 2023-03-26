@@ -40,7 +40,7 @@ internal class AssignExpressionNode : SyntaxNode
                             throw new InvalidOperationException($"Field \"{name}\" is not static.");
 
                         var fieldValue = Expr.Emit(variables, module, type, method, arguments);
-                        method.CilMethodBody?.Instructions.Add(CilOpCodes.Stsfld, field);
+                        method.CilMethodBody.Instructions.Add(CilOpCodes.Stsfld, field);
                         return fieldValue;
                     }
             }
@@ -50,7 +50,7 @@ internal class AssignExpressionNode : SyntaxNode
 
         var varValue = Expr.Emit(variables, module, type, method, arguments);
         var variable = variables[name];
-        method.CilMethodBody?.Instructions.Add(CilOpCodes.Stloc, variable);
+        method.CilMethodBody.Instructions.Add(CilOpCodes.Stloc, variable);
         return varValue;
     }
 

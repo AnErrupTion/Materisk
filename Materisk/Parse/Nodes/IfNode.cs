@@ -22,11 +22,11 @@ internal class IfNode : SyntaxNode
         {
             cond.Emit(variables, module, type, method, arguments);
             var label = new CilInstructionLabel();
-            method.CilMethodBody?.Instructions.Add(CilOpCodes.Brfalse, label);
-            var index = (int)method.CilMethodBody?.Instructions.IndexOf(method.CilMethodBody.Instructions.Last());
+            method.CilMethodBody.Instructions.Add(CilOpCodes.Brfalse, label);
+            var index = (int)method.CilMethodBody.Instructions.IndexOf(method.CilMethodBody.Instructions.Last());
             block.Emit(variables, module, type, method, arguments);
-            method.CilMethodBody?.Instructions.Add(CilOpCodes.Nop);
-            label.Instruction = method.CilMethodBody?.Instructions.Last();
+            method.CilMethodBody.Instructions.Add(CilOpCodes.Nop);
+            label.Instruction = method.CilMethodBody.Instructions.Last();
             method.CilMethodBody.Instructions[index].Operand = label;
         }
 
