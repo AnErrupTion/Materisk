@@ -313,20 +313,14 @@ public class Lexer
     {
         char current;
 
-        var isDecimal = false;
-
         _builder.Clear();
 
         while ((char.IsDigit(current = Peek()) || current == '.') && current != '\0')
         {
             _builder.Append(current);
-
-            if (current == '.')
-                isDecimal = true;
-
             _position++;
         }
 
-        return new(isDecimal ? SyntaxType.Float : SyntaxType.Int, _position - 1, _builder.ToString());
+        return new(SyntaxType.Number, _position - 1, _builder.ToString());
     }
 }

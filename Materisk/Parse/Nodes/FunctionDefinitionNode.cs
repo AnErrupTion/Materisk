@@ -57,11 +57,11 @@ internal class FunctionDefinitionNode : SyntaxNode
         var typeDef = module.TopLevelTypes[1];
 
         if (_isNative)
-            CilNativeFuncImpl.Emit(module, typeDef.Name, newMethod);
+            CilNativeFuncImpl.Emit(module, typeDef.Name!, newMethod);
         else
             _block.Emit(variables, module, typeDef, newMethod, argts);
 
-        newMethod.CilMethodBody.Instructions.Add(CilOpCodes.Ret);
+        newMethod.CilMethodBody!.Instructions.Add(CilOpCodes.Ret);
 
         if (newMethod.Name == "main")
             module.ManagedEntryPointMethod = newMethod;

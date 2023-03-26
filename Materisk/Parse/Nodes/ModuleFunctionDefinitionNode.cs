@@ -89,7 +89,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
         else
             _body.Emit(variables, module, type, newMethod, argts);
 
-        newMethod.CilMethodBody?.Instructions.Add(CilOpCodes.Ret);
+        newMethod.CilMethodBody!.Instructions.Add(CilOpCodes.Ret);
 
         return newMethod;
     }

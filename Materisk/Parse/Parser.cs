@@ -192,7 +192,7 @@ public class Parser
             var type = MatchToken(SyntaxType.Identifier);
             var current = Peek();
 
-            SyntaxToken? secondType = null;
+            var secondType = type;
 
             if (current.Type is SyntaxType.Identifier)
                 secondType = MatchToken(SyntaxType.Identifier);
@@ -234,7 +234,7 @@ public class Parser
                 {
                     var identifier = new IdentifierNode(ident);
                     var operatorToken = MatchToken(current.Type);
-                    var expression = new IntLiteralNode(new SyntaxToken(SyntaxType.Int, -1, "1"));
+                    var expression = new IntLiteralNode(new SyntaxToken(SyntaxType.Number, -1, "1"));
                     return new AssignExpressionNode(ident, new BinaryExpressionNode(identifier, operatorToken, expression));
                 }
             }
@@ -378,15 +378,14 @@ public class Parser
 
         switch (current.Type)
         {
-            case SyntaxType.Int:
+            case SyntaxType.Number:
             {
                 _position++;
-                return new IntLiteralNode(current);
-            }
-            case SyntaxType.Float:
-            {
-                _position++;
-                return new FloatLiteralNode(current);
+                return secondTypeToken!.Text switch
+                {
+                    "float" => new FloatLiteralNode(current),
+                    _ => new IntLiteralNode(current)
+                };
             }
             case SyntaxType.String:
             {
