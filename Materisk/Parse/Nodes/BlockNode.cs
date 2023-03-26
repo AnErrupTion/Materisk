@@ -1,17 +1,16 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
+using Materisk.Lex;
 
 namespace Materisk.Parse.Nodes;
 
 internal class BlockNode : SyntaxNode
 {
     private readonly List<SyntaxNode> _nodes;
-    private readonly bool _createNewScope;
 
-    public BlockNode(List<SyntaxNode> nodes, bool createNewScope = true)
+    public BlockNode(List<SyntaxNode> nodes)
     {
         _nodes = nodes;
-        _createNewScope = createNewScope;
     }
 
     public override NodeType Type => NodeType.Block;

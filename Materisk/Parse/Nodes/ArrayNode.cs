@@ -2,6 +2,7 @@
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
 using Materisk.Lex;
+using Materisk.Utils;
 
 namespace Materisk.Parse.Nodes;
 
@@ -20,7 +21,7 @@ internal class ArrayNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var arrayType = Utils.GetTypeSignatureFor(module, _typeToken.Text).ToTypeDefOrRef();
+        var arrayType = TypeSigUtils.GetTypeSignatureFor(module, _typeToken.Text).ToTypeDefOrRef();
 
         _itemCountNode.Emit(variables, module, type, method, arguments);
 

@@ -1,9 +1,9 @@
 using AsmResolver.DotNet;
 using AsmResolver.DotNet.Signatures.Types;
 
-namespace Materisk;
+namespace Materisk.Utils;
 
-public static class Utils
+internal static class TypeSigUtils
 {
     public static TypeSignature GetTypeSignatureFor(ModuleDefinition module, string name, bool isArray = false)
     {

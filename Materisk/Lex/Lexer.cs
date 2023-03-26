@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Materisk.Utils;
 
 namespace Materisk.Lex;
 
@@ -16,7 +17,7 @@ public class Lexer
         _position = 0;
     }
 
-    public SyntaxToken[] Lex()
+    public List<SyntaxToken> Lex()
     {
         char current;
 
@@ -189,14 +190,15 @@ public class Lexer
         }
 
         tokens.Add(new SyntaxToken(SyntaxType.Eof, _position, "<EOF>"));
-        return tokens.ToArray();
+        return tokens;
     }
 
     private char Peek(int off = 0)
     {
-        if (_position + off >= _code.Length || _position + off < 0)
-            return '\0';
-        return _code[_position + off];
+        var offset = _position + off;
+        if (offset >= 0 && offset < _code.Length)
+            return _code[offset];
+        return '\0';
     }
 
     private void SkipComment()
@@ -217,8 +219,8 @@ public class Lexer
             _position++;
         }
 
-        var token = new SyntaxToken(SyntaxType.Identifier, _position, _builder.ToString());
-        SyntaxFacts.ClassifyIdentifier(ref token);
+        var text = _builder.ToString();
+        var token = new SyntaxToken(SyntaxFacts.IsKeyword(text) ? SyntaxType.Keyword : SyntaxType.Identifier, _position, text);
 
         return token;
     }

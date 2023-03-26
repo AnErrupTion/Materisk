@@ -2,11 +2,9 @@ namespace Materisk.Lex;
 
 public sealed class SyntaxToken
 {
-    public SyntaxType Type { get; set; }
-
-    public int Position { get; }
-
-    public string Text { get; }
+    public readonly SyntaxType Type;
+    public readonly int Position;
+    public readonly string Text;
 
     public SyntaxToken(SyntaxType type, int pos, string txt)
     {
@@ -15,6 +13,5 @@ public sealed class SyntaxToken
         Text = txt;
     }
 
-    public override string ToString()
-        => Type.ToString().PadRight(16) + " at " + Position.ToString().PadRight(3) + " with text: " + Text.PadRight(16);
+    public override string ToString() => $"{Type} at position {Position} with text: {Text}";
 }

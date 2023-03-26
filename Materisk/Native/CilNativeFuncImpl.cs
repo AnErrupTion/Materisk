@@ -30,17 +30,6 @@ public static class CilNativeFuncImpl
             method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldarg, method.Parameters[0]);
             method.CilMethodBody!.Instructions.Add(CilOpCodes.Call, importedMethod);
         }
-        else if (typeName == "Console" && method.Name == "println")
-        {
-            var factory = module.CorLibTypeFactory;
-            var importedMethod = factory.CorLibScope
-                .CreateTypeReference("System", "Console")
-                .CreateMemberReference("WriteLine", MethodSignature.CreateStatic(factory.Void, factory.String))
-                .ImportWith(module.DefaultImporter);
-
-            method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldarg, method.Parameters[0]);
-            method.CilMethodBody!.Instructions.Add(CilOpCodes.Call, importedMethod);
-        }
         else if (typeName == "String" && method.Name == "toString")
         {
             if (method.Parameters[0].ParameterType.Name is "Int32")

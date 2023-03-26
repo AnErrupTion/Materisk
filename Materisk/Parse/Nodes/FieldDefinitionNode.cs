@@ -3,6 +3,7 @@ using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
 using Materisk.Lex;
+using Materisk.Utils;
 
 namespace Materisk.Parse.Nodes;
 
@@ -32,7 +33,7 @@ internal class FieldDefinitionNode : SyntaxNode
 
         var newField = new FieldDefinition(_nameToken.Text,
             attributes,
-            Utils.GetTypeSignatureFor(module, _typeToken.Text));
+            TypeSigUtils.GetTypeSignatureFor(module, _typeToken.Text));
 
         if (_statement != null)
         {

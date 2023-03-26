@@ -2,6 +2,7 @@
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
 using Materisk.Lex;
+using Materisk.Utils;
 
 namespace Materisk.Parse.Nodes;
 
@@ -33,7 +34,7 @@ internal class InitVariableNode : SyntaxNode
             throw new InvalidOperationException("Can not initialize the same variable twice!");
 
         var value = _expr.Emit(variables, module, type, method, arguments);
-        var variable = new CilLocalVariable(_typeToken.Text is "arr" && _secondTypeToken is not null ? Utils.GetTypeSignatureFor(module, _secondTypeToken.Text, true) : Utils.GetTypeSignatureFor(module, _typeToken.Text));
+        var variable = new CilLocalVariable(_typeToken.Text is "arr" && _secondTypeToken is not null ? TypeSigUtils.GetTypeSignatureFor(module, _secondTypeToken.Text, true) : TypeSigUtils.GetTypeSignatureFor(module, _typeToken.Text));
         method.CilMethodBody!.LocalVariables.Add(variable);
         method.CilMethodBody!.Instructions.Add(CilOpCodes.Stloc, variable);
         variables.Add(name, variable);
