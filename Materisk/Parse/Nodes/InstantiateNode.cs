@@ -1,7 +1,6 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
-using Materisk.BuiltinTypes;
 using Materisk.Lex;
 
 namespace Materisk.Parse.Nodes;
@@ -18,22 +17,6 @@ internal class InstantiateNode : SyntaxNode
     }
 
     public override NodeType Type => NodeType.Instantiate;
-
-    public override SValue Evaluate(Scope scope)
-    {
-        var @class = scope.Get(_ident.Text);
-        if (@class is not SClass sclass) throw new Exception("Module not found!");
-
-
-        var instance = new SClassInstance(sclass);
-
-        List<SValue> args = new() { instance };
-        foreach (var n in _argumentNodes) args.Add(n.Evaluate(scope));
-
-        instance.CallConstructor(scope, args);
-
-        return instance;
-    }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
@@ -56,6 +39,7 @@ internal class InstantiateNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield break;
+        yield return new TokenNode(_ident);
+        foreach (var node in _argumentNodes) yield return node;
     }
 }

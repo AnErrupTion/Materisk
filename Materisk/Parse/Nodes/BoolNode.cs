@@ -1,7 +1,6 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
-using Materisk.BuiltinTypes;
 
 namespace Materisk.Parse.Nodes;
 
@@ -14,11 +13,6 @@ public class BoolNode : SyntaxNode
     public BoolNode(bool value)
     {
         Value = value;
-    }
-
-    public override SValue Evaluate(Scope scope)
-    {
-        return null;
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)

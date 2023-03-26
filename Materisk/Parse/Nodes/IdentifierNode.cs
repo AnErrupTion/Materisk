@@ -1,7 +1,6 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
-using Materisk.BuiltinTypes;
 using Materisk.Lex;
 
 namespace Materisk.Parse.Nodes;
@@ -16,11 +15,6 @@ internal class IdentifierNode : SyntaxNode
     }
 
     public override NodeType Type => NodeType.Identifier;
-
-    public override SValue Evaluate(Scope scope)
-    {
-        return null;
-    }
 
     // TODO: Find a way to not make the names conflict?
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)

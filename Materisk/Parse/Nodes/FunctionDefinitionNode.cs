@@ -4,7 +4,6 @@ using AsmResolver.DotNet.Signatures;
 using AsmResolver.DotNet.Signatures.Types;
 using AsmResolver.PE.DotNet.Cil;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
-using Materisk.BuiltinTypes;
 using Materisk.Lex;
 using Materisk.Native;
 
@@ -30,11 +29,6 @@ internal class FunctionDefinitionNode : SyntaxNode
     }
 
     public override NodeType Type => NodeType.FunctionDefinition;
-
-    public override SValue Evaluate(Scope scope)
-    {
-        return null;
-    }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {

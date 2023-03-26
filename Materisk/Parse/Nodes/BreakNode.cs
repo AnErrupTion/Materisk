@@ -1,6 +1,5 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using Materisk.BuiltinTypes;
 
 namespace Materisk.Parse.Nodes;
 
@@ -8,11 +7,6 @@ internal class BreakNode : SyntaxNode
 {
     public override NodeType Type => NodeType.Break;
 
-    public override SValue Evaluate(Scope scope)
-    {
-        scope.SetState(ScopeState.ShouldBreak);
-        return SValue.Null;
-    }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {

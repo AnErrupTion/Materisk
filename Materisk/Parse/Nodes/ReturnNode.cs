@@ -1,28 +1,18 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using Materisk.BuiltinTypes;
 
 namespace Materisk.Parse.Nodes;
 
 internal class ReturnNode : SyntaxNode
 {
-    public ReturnNode()
-    {
-    }
-
-    public ReturnNode(SyntaxNode returnValueNode)
+    public ReturnNode(SyntaxNode? returnValueNode = null)
     {
         ReturnValueNode = returnValueNode;
     }
 
-    public SyntaxNode ReturnValueNode { get; }
+    public SyntaxNode? ReturnValueNode { get; }
 
     public override NodeType Type => NodeType.Return;
-
-    public override SValue Evaluate(Scope scope)
-    {
-        return null;
-    }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {

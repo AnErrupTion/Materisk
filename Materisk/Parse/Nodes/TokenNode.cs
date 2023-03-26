@@ -1,6 +1,5 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using Materisk.BuiltinTypes;
 using Materisk.Lex;
 
 namespace Materisk.Parse.Nodes;
@@ -16,11 +15,6 @@ public class TokenNode : SyntaxNode
     public TokenNode(SyntaxToken token)
     {
         Token = token;
-    }
-
-    public override SValue Evaluate(Scope scope)
-    {
-        throw new NotSupportedException();
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)

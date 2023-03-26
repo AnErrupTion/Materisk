@@ -1,7 +1,6 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
-using Materisk.BuiltinTypes;
 using Materisk.Lex;
 
 namespace Materisk.Parse.Nodes;
@@ -20,11 +19,6 @@ internal class BinaryExpressionNode : SyntaxNode
     }
 
     public override NodeType Type => NodeType.BinaryExpression;
-
-    public override SValue Evaluate(Scope scope)
-    {
-        return null;
-    }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
