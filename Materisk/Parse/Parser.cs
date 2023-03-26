@@ -204,9 +204,41 @@ public class Parser
             return new InitVariableNode(ident, type, secondType, expr);
         }
 
-        if (Peek().Type == SyntaxType.Identifier && Peek(1).Type == SyntaxType.Equals)
+        if (Peek().Type == SyntaxType.Identifier && Peek(1).Type
+                is SyntaxType.Equals
+                or SyntaxType.PlusEquals or SyntaxType.PlusPlus
+                or SyntaxType.MinusEquals or SyntaxType.MinusMinus
+                or SyntaxType.MulEquals
+                or SyntaxType.DivEquals
+                or SyntaxType.ModEquals
+                )
         {
             var ident = MatchToken(SyntaxType.Identifier);
+            var current = Peek();
+
+            switch (current.Type)
+            {
+                case SyntaxType.PlusEquals:
+                case SyntaxType.MinusEquals:
+                case SyntaxType.MulEquals:
+                case SyntaxType.DivEquals:
+                case SyntaxType.ModEquals:
+                {
+                    var identifier = new IdentifierNode(ident);
+                    var operatorToken = MatchToken(current.Type);
+                    var expression = ParseExpression(secondTypeToken);
+                    return new AssignExpressionNode(ident, new BinaryExpressionNode(identifier, operatorToken, expression));
+                }
+                case SyntaxType.PlusPlus:
+                case SyntaxType.MinusMinus:
+                {
+                    var identifier = new IdentifierNode(ident);
+                    var operatorToken = MatchToken(current.Type);
+                    var expression = new IntLiteralNode(new SyntaxToken(SyntaxType.Int, -1, "1"));
+                    return new AssignExpressionNode(ident, new BinaryExpressionNode(identifier, operatorToken, expression));
+                }
+            }
+
             MatchToken(SyntaxType.Equals);
             var expr = ParseExpression(secondTypeToken);
             return new AssignExpressionNode(ident, expr);

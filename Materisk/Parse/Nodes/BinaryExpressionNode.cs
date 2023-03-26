@@ -26,11 +26,18 @@ internal class BinaryExpressionNode : SyntaxNode
         _right.Emit(variables, module, type, method, arguments);
 
         switch (_operatorToken.Type)
-        {
+        { 
+            case SyntaxType.PlusEquals:
+            case SyntaxType.PlusPlus:
             case SyntaxType.Plus: method.CilMethodBody!.Instructions.Add(CilOpCodes.Add); break;
+            case SyntaxType.MinusEquals:
+            case SyntaxType.MinusMinus:
             case SyntaxType.Minus: method.CilMethodBody!.Instructions.Add(CilOpCodes.Sub); break;
+            case SyntaxType.DivEquals:
             case SyntaxType.Div: method.CilMethodBody!.Instructions.Add(CilOpCodes.Div); break;
+            case SyntaxType.MulEquals:
             case SyntaxType.Mul: method.CilMethodBody!.Instructions.Add(CilOpCodes.Mul); break;
+            case SyntaxType.ModEquals:
             case SyntaxType.Mod: method.CilMethodBody!.Instructions.Add(CilOpCodes.Rem); break;
             case SyntaxType.EqualsEquals: method.CilMethodBody!.Instructions.Add(CilOpCodes.Ceq); break;
             case SyntaxType.LessThan: method.CilMethodBody!.Instructions.Add(CilOpCodes.Clt); break;
