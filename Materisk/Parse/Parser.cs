@@ -217,10 +217,12 @@ public class Parser
 
     private SyntaxNode ParseCompExpression(SyntaxToken? secondTypeToken)
     {
-        if (Peek().Type == SyntaxType.Bang)
+        var current = Peek();
+
+        if (current.Type == SyntaxType.Bang)
         {
             _position++;
-            return new UnaryExpressionNode(Peek(-1), ParseCompExpression(secondTypeToken));
+            return new UnaryExpressionNode(current, ParseCompExpression(secondTypeToken));
         }
 
         return BinaryOperation(() => ParseArithmeticExpression(secondTypeToken),
