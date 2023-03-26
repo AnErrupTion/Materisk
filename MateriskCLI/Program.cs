@@ -21,8 +21,15 @@ public static class Program
         var showParseOutput = args.Length > 2 && args.Contains("--show-parse-output");
 
         var path = args[0];
+        var directory = Path.GetDirectoryName(path);
         var name = Path.GetFileNameWithoutExtension(path);
         var watch = new Stopwatch();
+
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.SetCurrentDirectory(directory);
+            path = Path.GetFileName(path);
+        }
 
         var lexer = new Lexer(File.ReadAllText(path));
 

@@ -12,11 +12,23 @@ public static class CilNativeFuncImpl
         {
             var factory = module.CorLibTypeFactory;
             var importedMethod = factory.CorLibScope
-                .CreateTypeReference("System", "File")
+                .CreateTypeReference("System.IO", "File")
                 .CreateMemberReference("ReadAllText", MethodSignature.CreateStatic(factory.String, factory.String))
                 .ImportWith(module.DefaultImporter);
 
             method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldarg, method.Parameters[0]);
+            method.CilMethodBody!.Instructions.Add(CilOpCodes.Call, importedMethod);
+        }
+        else if (typeName == "File" && method.Name == "writeText")
+        {
+            var factory = module.CorLibTypeFactory;
+            var importedMethod = factory.CorLibScope
+                .CreateTypeReference("System.IO", "File")
+                .CreateMemberReference("WriteAllText", MethodSignature.CreateStatic(factory.Void, factory.String, factory.String))
+                .ImportWith(module.DefaultImporter);
+
+            method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldarg, method.Parameters[0]);
+            method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldarg, method.Parameters[1]);
             method.CilMethodBody!.Instructions.Add(CilOpCodes.Call, importedMethod);
         }
         else if (typeName == "Console" && method.Name == "print")
