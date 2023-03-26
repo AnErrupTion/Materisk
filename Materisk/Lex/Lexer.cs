@@ -1,20 +1,26 @@
-﻿namespace Materisk.Lex;
+﻿using System.Text;
+
+namespace Materisk.Lex;
 
 public class Lexer
 {
+    private readonly StringBuilder _builder;
     private readonly string _code;
+
     private int _position;
 
     public Lexer(string code)
     {
+        _builder = new();
         _code = code;
         _position = 0;
     }
 
     public SyntaxToken[] Lex()
     {
-        var tokens = new List<SyntaxToken>();
         char current;
+
+        var tokens = new List<SyntaxToken>();
 
         while ((current = Peek()) != '\0')
         {
@@ -201,15 +207,17 @@ public class Lexer
 
     private SyntaxToken ParseIdentifierOrKeyword()
     {
-        var str = string.Empty;
+        char current;
 
-        while (Peek() != '\0' && Peek() != ' ' && (char.IsLetterOrDigit(Peek()) || Peek() == '_'))
+        _builder.Clear();
+
+        while ((current = Peek()) != '\0' && current != ' ' && (char.IsLetterOrDigit(current) || current == '_'))
         {
-            str += Peek();
+            _builder.Append(current);
             _position++;
         }
 
-        var token = new SyntaxToken(SyntaxType.Identifier, _position, str);
+        var token = new SyntaxToken(SyntaxType.Identifier, _position, _builder.ToString());
         SyntaxFacts.ClassifyIdentifier(ref token);
 
         return token;
@@ -219,7 +227,7 @@ public class Lexer
     {
         char current;
 
-        var str = string.Empty;
+        _builder.Clear();
 
         _position++;
         while (!((current = Peek()) == '"' && Peek(-1) != '\\') && current != '\0')
@@ -228,37 +236,38 @@ public class Lexer
             {
                 _position++;
 
-                str += Peek() switch
+                _builder.Append(Peek() switch
                 {
                     '"' => "\"",
                     'n' => "\n",
                     '\\' => "\\",
                     _ => throw new Exception("Invalid escape sequence")
-                };
+                });
 
                 _position++;
             }
             else
             {
-                str += current;
+                _builder.Append(current);
                 _position++;
             }
         }
 
         _position++;
-        return new(SyntaxType.String, _position - 1, str);
+        return new(SyntaxType.String, _position - 1, _builder.ToString());
     }
 
     private SyntaxToken ParseNumber()
     {
         char current;
 
-        var numStr = string.Empty;
         var isDecimal = false;
+
+        _builder.Clear();
 
         while ((char.IsDigit(current = Peek()) || current == '.') && current != '\0')
         {
-            numStr += current;
+            _builder.Append(current);
 
             if (current == '.')
                 isDecimal = true;
@@ -266,6 +275,6 @@ public class Lexer
             _position++;
         }
 
-        return new(isDecimal ? SyntaxType.Float : SyntaxType.Int, _position - 1, numStr);
+        return new(isDecimal ? SyntaxType.Float : SyntaxType.Int, _position - 1, _builder.ToString());
     }
 }
