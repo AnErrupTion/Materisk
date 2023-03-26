@@ -30,7 +30,7 @@ public static class CilNativeFuncImpl
             method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldarg, method.Parameters[0]);
             method.CilMethodBody!.Instructions.Add(CilOpCodes.Call, importedMethod);
         }
-        else if (typeName == "String" && method.Name == "toString")
+        else if (typeName == "Int" && method.Name == "toString")
         {
             if (method.Parameters[0].ParameterType.Name is "Int32")
             {
