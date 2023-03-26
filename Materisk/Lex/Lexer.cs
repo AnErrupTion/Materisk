@@ -93,33 +93,83 @@ public class Lexer
                 }
                 case '+':
                 {
-                    insertToken = new(SyntaxType.Plus, _position, "+");
+                    var lookAhead = Peek(1);
+
+                    if (lookAhead == '+')
+                    {
+                        _position++;
+                        insertToken = new(SyntaxType.PlusPlus, _position, "++");
+                    }
+                    else if (lookAhead == '=')
+                    {
+                        _position++;
+                        insertToken = new(SyntaxType.PlusEquals, _position, "+=");
+                    }
+                    else insertToken = new(SyntaxType.Plus, _position, "+");
+
                     break;
                 }
                 case '-':
                 {
-                    insertToken = new(SyntaxType.Minus, _position, "-");
+                    var lookAhead = Peek(1);
+
+                    if (lookAhead == '-')
+                    {
+                        _position++;
+                        insertToken = new(SyntaxType.MinusMinus, _position, "--");
+                    }
+                    else if (lookAhead == '=')
+                    {
+                        _position++;
+                        insertToken = new(SyntaxType.MinusEquals, _position, "-=");
+                    }
+                    else insertToken = new(SyntaxType.Minus, _position, "-");
+
                     break;
                 }
                 case '%':
                 {
-                    insertToken = new(SyntaxType.Mod, _position, "%");
+                    var lookAhead = Peek(1);
+
+                    if (lookAhead == '=')
+                    {
+                        _position++;
+                        insertToken = new(SyntaxType.ModEquals, _position, "%=");
+                    }
+                    else insertToken = new(SyntaxType.Mod, _position, "%");
+
                     break;
                 }
                 case '*':
                 {
-                    insertToken = new(SyntaxType.Mul, _position, "*");
+                    var lookAhead = Peek(1);
+
+                    if (lookAhead == '=')
+                    {
+                        _position++;
+                        insertToken = new(SyntaxType.MulEquals, _position, "*=");
+                    }
+                    else insertToken = new(SyntaxType.Mul, _position, "*");
+
                     break;
                 }
                 case '/':
                 {
-                    if (Peek(1) == '/')
+                    var lookAhead = Peek(1);
+
+                    if (lookAhead == '/')
                     {
                         SkipComment();
                         continue;
                     }
 
-                    insertToken = new(SyntaxType.Div, _position, "/");
+                    if (lookAhead == '=')
+                    {
+                        _position++;
+                        insertToken = new(SyntaxType.DivEquals, _position, "/=");
+                    }
+                    else insertToken = new(SyntaxType.Div, _position, "/");
+
                     break;
                 }
                 case '.':
