@@ -27,7 +27,7 @@ public static class Program
 
         if (showLexOutput)
             foreach (var tok in lexedTokens)
-                Console.WriteLine("  " + tok);
+                Console.WriteLine($"  {tok}");
 
         var parser = new Parser(lexedTokens);
         var ast = parser.Parse();
@@ -41,9 +41,9 @@ public static class Program
 
     private static void PrintTree(SyntaxNode node, int ident = 0)
     {
-        Console.WriteLine(Ident(ident) + node);
+        Console.WriteLine($"{Ident(ident)}{node}");
 
-        foreach(var n in node.GetChildren())
+        foreach (var n in node.GetChildren())
             PrintTree(n, ident + 2);
     }
 

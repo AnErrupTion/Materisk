@@ -1,6 +1,5 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using Materisk.Lex;
 
 namespace Materisk.Parse.Nodes;
 
@@ -17,7 +16,7 @@ internal class BlockNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        object lastVal = null;
+        object? lastVal = null;
 
         foreach (var node in _nodes)
         {
@@ -27,7 +26,7 @@ internal class BlockNode : SyntaxNode
                 lastVal = res;
         }
 
-        return lastVal;
+        return lastVal!;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

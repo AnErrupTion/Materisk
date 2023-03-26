@@ -1,6 +1,5 @@
 ﻿using Materisk.Lex;
 using Materisk.Parse.Nodes;
-using Materisk.Utils;
 
 namespace Materisk.Parse;
 
