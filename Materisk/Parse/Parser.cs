@@ -4,13 +4,13 @@ using Materisk.Parse.Nodes;
 namespace Materisk.Parse;
 
 public class Parser {
-    public List<SyntaxToken> Tokens { get; }
+    public SyntaxToken[] Tokens { get; }
     public int Position;
 
     public SyntaxToken Current => Peek();
 
     public SyntaxToken Peek(int off = 0) {
-        if (Position + off >= Tokens.Count || Position + off < 0) return new(SyntaxType.BadToken, 0, string.Empty);
+        if (Position + off >= Tokens.Length || Position + off < 0) return new(SyntaxType.BadToken, 0, string.Empty);
         return Tokens[Position + off];
     }
 
@@ -42,7 +42,7 @@ public class Parser {
         throw new Exception("Unexpected token " + Current.Type + "; expected Keyword with value " + value);
     }
 
-    public Parser(List<SyntaxToken> tokens) {
+    public Parser(SyntaxToken[] tokens) {
         Tokens = tokens;
     }
 
