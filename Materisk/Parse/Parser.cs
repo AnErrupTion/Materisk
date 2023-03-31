@@ -58,7 +58,7 @@ public class Parser
             case { Type: SyntaxType.Keyword, Text: "return" }:
             {
                 _position++;
-                var ret = new ReturnNode(ParseExpression(null!, null));
+                var ret = new ReturnNode(ParseExpression(null, null));
                 MatchToken(SyntaxType.Semicolon);
                 return ret;
             }
@@ -93,7 +93,7 @@ public class Parser
             }
         }
 
-        var exprNode = ParseExpression(null!, null);
+        var exprNode = ParseExpression(null, null);
         MatchToken(SyntaxType.Semicolon);
 
         return exprNode;
@@ -182,7 +182,7 @@ public class Parser
         return nodes.ToArray();
     }
 
-    private SyntaxNode ParseExpression(SyntaxToken typeToken, SyntaxToken? secondTypeToken)
+    private SyntaxNode ParseExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)
     {
         if (Peek() is { Type: SyntaxType.Keyword, Text: "var" })
         {
@@ -247,7 +247,7 @@ public class Parser
         return ParseCompExpression(typeToken, secondTypeToken);
     }
 
-    private SyntaxNode ParseCompExpression(SyntaxToken typeToken, SyntaxToken? secondTypeToken)
+    private SyntaxNode ParseCompExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)
     {
         var current = Peek();
 
@@ -264,17 +264,17 @@ public class Parser
             });
     }
 
-    private SyntaxNode ParseArithmeticExpression(SyntaxToken typeToken, SyntaxToken? secondTypeToken)
+    private SyntaxNode ParseArithmeticExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)
     {
         return BinaryOperation(() => ParseTermExpression(typeToken, secondTypeToken), new[] { SyntaxType.Plus, SyntaxType.Minus });
     }
 
-    private SyntaxNode ParseTermExpression(SyntaxToken typeToken, SyntaxToken? secondTypeToken)
+    private SyntaxNode ParseTermExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)
     {
         return BinaryOperation(() => ParseFactorExpression(typeToken, secondTypeToken), new[] { SyntaxType.Mul, SyntaxType.Div, SyntaxType.Mod });
     }
 
-    private SyntaxNode ParseFactorExpression(SyntaxToken typeToken, SyntaxToken? secondTypeToken)
+    private SyntaxNode ParseFactorExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)
     {
         var current = Peek();
 
@@ -288,12 +288,12 @@ public class Parser
         return ParsePowerExpression(typeToken, secondTypeToken);
     }
 
-    private SyntaxNode ParsePowerExpression(SyntaxToken typeToken, SyntaxToken? secondTypeToken)
+    private SyntaxNode ParsePowerExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)
     {
         return BinaryOperation(() => ParseDotExpression(typeToken, secondTypeToken), new[] { SyntaxType.Pow }, () => ParseFactorExpression(typeToken, secondTypeToken));
     }
 
-    private SyntaxNode ParseDotExpression(SyntaxToken typeToken, SyntaxToken? secondTypeToken)
+    private SyntaxNode ParseDotExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)
     {
         var callNode = ParseCallExpression(typeToken, secondTypeToken);
         var accessStack = new DotNode(callNode);
@@ -324,7 +324,7 @@ public class Parser
         return accessStack;
     }
 
-    private SyntaxNode ParseCallExpression(SyntaxToken typeToken, SyntaxToken? secondTypeToken)
+    private SyntaxNode ParseCallExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)
     {
         var atomNode = ParseCastExpression(typeToken, secondTypeToken);
 
@@ -353,7 +353,7 @@ public class Parser
         return atomNode;
     }
 
-    private SyntaxNode ParseCastExpression(SyntaxToken typeToken, SyntaxToken? secondTypeToken)
+    private SyntaxNode ParseCastExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)
     {
         if (Peek().Type is SyntaxType.LParen)
         {
@@ -372,7 +372,7 @@ public class Parser
         return ParseAtomExpression(typeToken, secondTypeToken);
     }
 
-    private SyntaxNode ParseAtomExpression(SyntaxToken typeToken, SyntaxToken? secondTypeToken)
+    private SyntaxNode ParseAtomExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)
     {
         var current = Peek();
 
@@ -382,10 +382,13 @@ public class Parser
             {
                 _position++;
 
-                if (typeToken.Text is "ptr")
+                if (typeToken?.Text is "ptr")
                     return new IntLiteralNode(current); // TODO: UInt
+                
+                if (secondTypeToken is null)
+                    return new IntLiteralNode(current);
 
-                return secondTypeToken!.Text switch
+                return secondTypeToken.Text switch
                 {
                     "int" => new IntLiteralNode(current),
                     "float" => new FloatLiteralNode(current),
@@ -400,7 +403,7 @@ public class Parser
             }
             case SyntaxType.Identifier when Peek(1).Type is SyntaxType.LSqBracket:
             {
-                return ParseArrayIndexExpression(typeToken, secondTypeToken);
+                return ParseIndexExpression(typeToken, secondTypeToken);
             }
             case SyntaxType.Identifier:
             {
@@ -434,7 +437,7 @@ public class Parser
         };
     }
 
-    private SyntaxNode ParseArrayIndexExpression(SyntaxToken typeToken, SyntaxToken? secondTypeToken)
+    private SyntaxNode ParseIndexExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)
     {
         var ident = MatchToken(SyntaxType.Identifier);
         MatchToken(SyntaxType.LSqBracket);
@@ -449,10 +452,10 @@ public class Parser
             setNode = ParseExpression(typeToken, secondTypeToken);
         }
 
-        return new ArrayIndexNode(new IdentifierNode(ident), expr, setNode);
+        return new IndexNode(new IdentifierNode(ident), expr, setNode);
     }
 
-    private SyntaxNode ParseArrayExpression(SyntaxToken typeToken, SyntaxToken? secondTypeToken)
+    private SyntaxNode ParseArrayExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)
     {
         if (secondTypeToken is null)
             throw new InvalidOperationException("Invalid array type!");
@@ -468,7 +471,7 @@ public class Parser
         return new ArrayNode(secondTypeToken, expr);
     }
 
-    private SyntaxNode ParseIfExpression(SyntaxToken typeToken, SyntaxToken? secondTypeToken)
+    private SyntaxNode ParseIfExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)
     {
         MatchKeyword("if");
 
@@ -505,7 +508,7 @@ public class Parser
         return node;
     }
 
-    private SyntaxNode ParseForExpression(SyntaxToken typeToken, SyntaxToken? secondTypeToken)
+    private SyntaxNode ParseForExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)
     {
         MatchKeyword("for");
 
@@ -521,7 +524,7 @@ public class Parser
         return new ForNode(initialExpressionNode, condNode, stepNode, block);
     }
 
-    private SyntaxNode ParseWhileExpression(SyntaxToken typeToken, SyntaxToken? secondTypeToken)
+    private SyntaxNode ParseWhileExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)
     {
         MatchKeyword("while");
 
@@ -581,7 +584,7 @@ public class Parser
         return new FieldDefinitionNode(isPublic, nameToken, type);
     }
 
-    private SyntaxNode ParseInstantiateExpression(SyntaxToken typeToken, SyntaxToken? secondTypeToken)
+    private SyntaxNode ParseInstantiateExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)
     {
         _position++;
         var ident = MatchToken(SyntaxType.Identifier);

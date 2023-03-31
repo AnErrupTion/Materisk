@@ -1,4 +1,7 @@
 fn pub main() void
 {
-	var pointer ptr byte = 789456;
+	var pointer ptr byte = 753664;
+	pointer[0] = 65;
+	pointer[1] = 15;
+	var value byte = pointer[0];
 }

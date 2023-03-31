@@ -20,7 +20,7 @@ public enum NodeType
     StringLiteral,
     Identifier,
     Array,
-    ArrayIndex,
+    Index,
     If,
     For,
     Cast,
