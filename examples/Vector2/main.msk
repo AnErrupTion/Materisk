@@ -1,9 +1,9 @@
-fn test(float x) float
+fn test(float x) int
 {
-	return x;
+	return (int)x;
 }
 
 fn pub main() void
 {
-	var value float = test(1);
+	var value int = test(float 1);
 }

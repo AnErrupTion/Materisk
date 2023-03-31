@@ -192,7 +192,7 @@ public class Parser
             var type = MatchToken(SyntaxType.Identifier);
             var current = Peek();
 
-            var secondType = type;
+            SyntaxToken? secondType = null;
 
             if (current.Type is SyntaxType.Identifier)
                 secondType = MatchToken(SyntaxType.Identifier);
@@ -336,12 +336,12 @@ public class Parser
 
             if (Peek().Type is not SyntaxType.RParen)
             {
-                argumentNodes.Add(ParseExpression(secondTypeToken));
+                argumentNodes.Add(ParseExpression(MatchToken(SyntaxType.Identifier)));
 
                 while (Peek().Type is SyntaxType.Comma)
                 {
                     _position++;
-                    argumentNodes.Add(ParseExpression(secondTypeToken));
+                    argumentNodes.Add(ParseExpression(MatchToken(SyntaxType.Identifier)));
                 }
 
                 MatchToken(SyntaxType.RParen);
