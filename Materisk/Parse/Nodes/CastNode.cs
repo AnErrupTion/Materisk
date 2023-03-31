@@ -26,6 +26,7 @@ internal class CastNode : SyntaxNode
         {
             case "int": method.CilMethodBody!.Instructions.Add(CilOpCodes.Conv_I4); break;
             case "float": method.CilMethodBody!.Instructions.Add(CilOpCodes.Conv_R4); break;
+            case "byte": method.CilMethodBody!.Instructions.Add(CilOpCodes.Conv_I1); break;
         }
 
         return null!;

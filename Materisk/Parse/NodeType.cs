@@ -16,6 +16,7 @@ public enum NodeType
     Call,
     IntLiteral,
     FloatLiteral,
+    ByteLiteral,
     StringLiteral,
     Identifier,
     Array,

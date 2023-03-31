@@ -34,7 +34,7 @@ internal class InitVariableNode : SyntaxNode
             throw new InvalidOperationException("Can not initialize the same variable twice!");
 
         var value = _expr.Emit(variables, module, type, method, arguments);
-        var variable = new CilLocalVariable(_typeToken.Text is "arr" && _secondTypeToken is not null ? TypeSigUtils.GetTypeSignatureFor(module, _secondTypeToken.Text, true) : TypeSigUtils.GetTypeSignatureFor(module, _typeToken.Text));
+        var variable = new CilLocalVariable(TypeSigUtils.GetTypeSignatureFor(module, _typeToken.Text, _secondTypeToken?.Text));
         method.CilMethodBody!.LocalVariables.Add(variable);
         method.CilMethodBody!.Instructions.Add(CilOpCodes.Stloc, variable);
         variables.Add(name, variable);
@@ -44,6 +44,8 @@ internal class InitVariableNode : SyntaxNode
     public override IEnumerable<SyntaxNode> GetChildren()
     {
         yield return new TokenNode(_identToken);
+        yield return new TokenNode(_typeToken);
+        if (_secondTypeToken is not null) yield return new TokenNode(_secondTypeToken);
         yield return _expr;
     }
 
