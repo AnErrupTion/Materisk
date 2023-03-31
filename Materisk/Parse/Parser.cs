@@ -384,7 +384,8 @@ public class Parser
                 return secondTypeToken!.Text switch
                 {
                     "float" => new FloatLiteralNode(current),
-                    _ => new IntLiteralNode(current)
+                    "int" => new IntLiteralNode(current),
+                    _ => throw new NotImplementedException($"Unimplemented number type: {secondTypeToken.Text}")
                 };
             }
             case SyntaxType.String:
