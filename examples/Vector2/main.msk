@@ -4,5 +4,12 @@ fld x int = 6;
 
 fn pub main() void
 {
-	x = 9;
+	if (x == 6)
+	{
+		Console.println(string "x == 6");
+	}
+	else
+	{
+		Console.println(string "x != 6");
+	};
 }

@@ -68,6 +68,10 @@ internal class IdentifierNode : SyntaxNode
             if (typeDef.Name == name)
                 return typeDef;
 
+        foreach (var field in module.Types[0].Fields)
+            if (field.Name == name)
+                return field.LlvmField;
+
         foreach (var meth in module.Types[0].Methods)
             if (meth.Name == name)
                 return meth.LlvmMethod;
