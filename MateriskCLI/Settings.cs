@@ -2,11 +2,14 @@ namespace NativeCIL;
 
 public class Settings
 {
-    public readonly string InputFile;
+    public readonly string InputFile, CustomCoreLib;
     public readonly bool ShowLexOutput, ShowParseOutput;
+    public readonly List<string> References;
 
     public Settings(ref string[] args)
     {
+        References = new();
+
         for (var i = 0; i < args.Length; i++)
         {
             var arg = args[i];
@@ -16,28 +19,25 @@ public class Settings
                 continue;
             }
 
-            string param, argument;
-            if (arg.StartsWith("--"))
-            {
-                param = arg[2..];
-                argument = args[i++];
-            }
-            else
-            {
-                param = arg[1].ToString();
-                argument = arg[2..];
-            }
+            var param = arg[1].ToString();
+            var argument = args[++i];
 
             switch (param)
             {
-                case "show-lex-output":
                 case "l":
                     ShowLexOutput = true;
                     break;
 
-                case "show-parse-output":
                 case "p":
                     ShowParseOutput = true;
+                    break;
+
+                case "c":
+                    CustomCoreLib = argument;
+                    break;
+                
+                case "a":
+                    References.Add(argument);
                     break;
             }
         }

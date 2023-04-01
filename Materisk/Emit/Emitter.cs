@@ -3,6 +3,7 @@ using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
 using Materisk.Parse.Nodes;
 using Newtonsoft.Json;
+using FileAttributes = AsmResolver.PE.DotNet.Metadata.Tables.Rows.FileAttributes;
 
 namespace Materisk.Emit;
 
@@ -17,14 +18,20 @@ public class Emitter
         _rootNode = rootNode;
     }
 
-    public void Emit(EmitType emitType)
+    public void Emit(EmitType emitType, string customCoreLib, List<string> references)
     {
         if (emitType is EmitType.Cil)
         {
             // Generate assembly
             var assembly = new AssemblyDefinition(_moduleName, new Version(1, 0, 0, 0));
+            var module = new ModuleDefinition(_moduleName,
+                string.IsNullOrEmpty(customCoreLib)
+                ? KnownCorLibs.MsCorLib_v4_0_0_0
+                : new AssemblyReference(AssemblyDefinition.FromFile(customCoreLib)));
 
-            var module = new ModuleDefinition(_moduleName);
+            foreach (var reference in references)
+                module.FileReferences.Add(new(reference, FileAttributes.ContainsMetadata));
+
             assembly.Modules.Add(module);
 
             var mainType = new TypeDefinition(_moduleName, "Program", TypeAttributes.Public | TypeAttributes.Class, module.CorLibTypeFactory.Object.Type);

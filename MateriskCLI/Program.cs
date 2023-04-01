@@ -14,7 +14,7 @@ public static class Program
     {
         if (args.Length == 0)
         {
-            Console.WriteLine("MateriskCLI <file> [--show-lex-output/-l] [--show-parse-output/-p]");
+            Console.WriteLine("MateriskCLI <file> [-l] [-p] [-c <file>] [-a <file>]");
             return;
         }
 
@@ -56,7 +56,7 @@ public static class Program
         var emitter = new Emitter(name, ast);
 
         watch.Restart();
-        emitter.Emit(EmitType.Cil);
+        emitter.Emit(EmitType.Cil, settings.CustomCoreLib, settings.References);
         watch.Stop();
 
         Console.WriteLine($"Emitted code in {watch.Elapsed.Milliseconds} ms ({watch.Elapsed.Seconds} s).");
