@@ -2,6 +2,15 @@ import "stdlib.msk";
 
 fn pub main() void
 {
-	var string str = "Hello, World!";
+	var string str = "hi";
 	var length i32 = lenof(str string);
+
+	if (length == 2)
+	{
+		Console.println(str "length == 2");
+	}
+	else
+	{
+		Console.println(str "length != 2");
+	};
 }

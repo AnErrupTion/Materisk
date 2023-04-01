@@ -13,7 +13,7 @@ public sealed class MateriskField
     public MateriskField(MateriskType type, string name, LLVMTypeRef fieldType)
     {
         LlvmField = type.ParentModule.LlvmModule.AddGlobal(fieldType, name);
-        unsafe { LLVM.SetInitializer(LlvmField, LLVM.ConstNull(fieldType)); }
+        LlvmField.Initializer = LLVMValueRef.CreateConstNull(fieldType);
 
         ParentType = type;
         Name = name;

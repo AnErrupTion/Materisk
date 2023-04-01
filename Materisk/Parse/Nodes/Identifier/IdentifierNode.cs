@@ -76,15 +76,9 @@ internal class IdentifierNode : SyntaxNode
             if (meth.Name == name)
                 return meth.LlvmMethod;
 
-        var index = 0;
-
-        foreach (var argument in method.Arguments)
-        {
-            if (argument.Name == name)
-                return method.LlvmMethod.Params[index];
-
-            index++;
-        }
+        for (var i = 0; i < method.Arguments.Length; i++)
+            if (method.Arguments[i].Name == name)
+                return method.LlvmMethod.Params[i];
 
         foreach (var variable in method.Variables)
             if (variable.Name == name)
