@@ -10,8 +10,8 @@ mod pub Console
 
 	fn pub println(string text) void
 	{
-		Console.print(text);
-		Console.print("\n");
+		Console.print(string text);
+		Console.print(string "\n");
 	}
 }
 
