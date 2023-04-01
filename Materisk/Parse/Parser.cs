@@ -156,6 +156,7 @@ public class Parser
             if (Peek().Type == SyntaxType.Equals)
                 throw new InvalidOperationException("Can not initialize a field directly!");
 
+            MatchToken(SyntaxType.Semicolon);
             nodes.Add(new ModuleFieldDefinitionNode(isPublic, isStatic, nameToken, type));
         }
 

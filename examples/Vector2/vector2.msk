@@ -2,8 +2,8 @@ import "stdlib.msk";
 
 mod pub dyn Vector2
 {
-	fld pub x int
-	fld pub y int
+	fld pub x int;
+	fld pub y int;
 
 	fn pub ctor(int x, int y) void
 	{
