@@ -1,9 +1,3 @@
-mod pub File
-{
-	fn native pub readText(string file) string {}
-	fn native pub writeText(string file, string contents) void {}
-}
-
 mod pub Console
 {
 	fn native pub print(string text) void {}
@@ -13,9 +7,4 @@ mod pub Console
 		Console.print(string text);
 		Console.print(string "\n");
 	}
-}
-
-mod pub Int
-{
-	fn native pub toString(int num) string {}
 }

@@ -52,12 +52,7 @@ internal class UnaryExpressionNode : SyntaxNode
         switch (_token.Type)
         {
             // TODO: Float compare and negation
-            case SyntaxType.Bang:
-            {
-                var zeroValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, 0, true);
-                resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, value, zeroValue);
-                break;
-            }
+            case SyntaxType.Bang: resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, value, LlvmUtils.IntZero); break;
             case SyntaxType.Minus: resultValue = module.LlvmBuilder.BuildNeg(value); break;
             case SyntaxType.Plus: return value;
             default: throw new InvalidOperationException($"Trying to do a unary expression on: {_token.Type}");

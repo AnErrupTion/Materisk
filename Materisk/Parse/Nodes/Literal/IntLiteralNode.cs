@@ -32,9 +32,8 @@ internal class IntLiteralNode : SyntaxNode
         var value = int.Parse(_syntaxToken.Text, CultureInfo.InvariantCulture);
         if (value < 0)
         {
-            var zeroValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, 0, true);
             var llvmValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, Convert.ToUInt64(Math.Abs(value)), true);
-            var sub = LLVMValueRef.CreateConstSub(zeroValue, llvmValue);
+            var sub = LLVMValueRef.CreateConstSub(LlvmUtils.IntZero, llvmValue);
             return sub;
         }
         else

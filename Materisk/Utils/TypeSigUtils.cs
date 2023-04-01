@@ -51,22 +51,11 @@ internal static class TypeSigUtils
     }
 
     // TODO: Structs as types
-    public static LLVMTypeRef GetTypeSignatureFor(string name, uint arrayElementCount = 0, string? secondName = null)
+    public static LLVMTypeRef GetTypeSignatureFor(string name, string? secondName = null)
     {
         switch (name)
         {
             case "arr" when secondName is not null:
-            {
-                return secondName switch
-                {
-                    "int" => LLVMTypeRef.CreateArray(LLVMTypeRef.Int32, arrayElementCount),
-                    "float" => LLVMTypeRef.CreateArray(LLVMTypeRef.Float, arrayElementCount),
-                    "byte" => LLVMTypeRef.CreateArray(LLVMTypeRef.Int8, arrayElementCount),
-                    "string" => throw new InvalidOperationException("Unable to make a string array!"), // TODO: String array?
-                    "void" => LLVMTypeRef.CreateArray(LLVMTypeRef.Void, arrayElementCount),
-                    _ => throw new InvalidOperationException("Unable to make a pointer for a custom type!")
-                };
-            }
             case "ptr" when secondName is not null:
             {
                 return secondName switch
@@ -82,7 +71,7 @@ internal static class TypeSigUtils
             case "int": return LLVMTypeRef.Int32;
             case "float": return LLVMTypeRef.Float;
             case "byte": return LLVMTypeRef.Int8;
-            case "string": return LLVMTypeRef.CreateArray(LLVMTypeRef.Int8, arrayElementCount);
+            case "string": return LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0);
             case "void": return LLVMTypeRef.Void;
             default:
             {

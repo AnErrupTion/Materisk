@@ -1,3 +1,4 @@
+using LLVMSharp.Interop;
 using MateriskLLVM;
 
 namespace Materisk.Native;
@@ -20,6 +21,12 @@ public static class LlvmNativeFuncImpl
             }
             case "Console" when method.Name == "print":
             {
+                var printf = module.LlvmModule.AddFunction("printf",
+                    LLVMTypeRef.CreateFunction(LLVMTypeRef.Void,
+                        new[] { LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0) }));
+                printf.Linkage = LLVMLinkage.LLVMExternalLinkage;
+
+                module.LlvmBuilder.BuildCall(printf, method.LlvmMethod.Params);
                 module.LlvmBuilder.BuildRetVoid();
                 break;
             }

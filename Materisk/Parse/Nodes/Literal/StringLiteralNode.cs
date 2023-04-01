@@ -28,9 +28,10 @@ internal class StringLiteralNode : SyntaxNode
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        // TODO: Is this right?
         var value = _syntaxToken.Text;
-        var llvmValue = module.LlvmBuilder.BuildArrayAlloca(LLVMTypeRef.Int8, LLVMValueRef.CreateConstInt(LLVMTypeRef.Int8, Convert.ToUInt64(value.Length), true));
+        var llvmValue = module.LlvmBuilder.BuildArrayAlloca(LLVMTypeRef.Int8, LLVMValueRef.CreateConstInt(LLVMTypeRef.Int8, Convert.ToUInt64(value.Length + 1), true));
+
+        // Store items
         for (var i = 0; i < value.Length; i++)
         {
             var llvmChar = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int8, Convert.ToUInt64(value[i]), true);
@@ -38,6 +39,12 @@ internal class StringLiteralNode : SyntaxNode
             var llvmPtr = module.LlvmBuilder.BuildGEP(llvmValue, new[] { llvmIndex });
             module.LlvmBuilder.BuildStore(llvmChar, llvmPtr);
         }
+
+        // Store null char
+        var charIndex = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, Convert.ToUInt64(value.Length), true);
+        var charPtr = module.LlvmBuilder.BuildGEP(llvmValue, new[] { charIndex });
+        module.LlvmBuilder.BuildStore(LlvmUtils.ByteZero, charPtr);
+
         return llvmValue;
     }
 

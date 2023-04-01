@@ -32,9 +32,8 @@ internal class FloatLiteralNode : SyntaxNode
         var value = float.Parse(_syntaxToken.Text, CultureInfo.InvariantCulture);
         if (value < 0)
         {
-            var zeroValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Float, 0, true);
             var llvmValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Float, Convert.ToUInt64(Math.Abs(value)), true);
-            var sub = LLVMValueRef.CreateConstSub(zeroValue, llvmValue);
+            var sub = LLVMValueRef.CreateConstSub(LlvmUtils.FloatZero, llvmValue);
             return sub;
         }
         else

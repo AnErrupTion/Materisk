@@ -92,16 +92,14 @@ internal class BinaryExpressionNode : SyntaxNode
             case SyntaxType.LessThanEqu:
             {
                 var gtValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSGT, leftValue, rightValue);
-                var zeroValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, 0, true);
-                resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, gtValue, zeroValue);
+                resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, gtValue, LlvmUtils.IntZero);
                 break;
             }
             case SyntaxType.GreaterThan: resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSGT, leftValue, rightValue); break;
             case SyntaxType.GreaterThanEqu:
             {
                 var gtValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSLT, leftValue, rightValue);
-                var zeroValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, 0, true);
-                resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, gtValue, zeroValue);
+                resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, gtValue, LlvmUtils.IntZero);
                 break;
             }
             default: throw new InvalidOperationException($"Trying to do a binary expression on: {_operatorToken.Type}");
