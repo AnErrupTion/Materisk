@@ -1,7 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
-using LLVMSharp.Interop;
+using MateriskLLVM;
 using Materisk.Lex;
 using Materisk.Parse.Nodes.Misc;
 
@@ -60,9 +60,33 @@ internal class IdentifierNode : SyntaxNode
         throw new InvalidOperationException($"Unable to find value for identifier: {name}");
     }
 
-    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        throw new NotImplementedException();
+        var name = Token.Text;
+
+        foreach (var typeDef in module.Types)
+            if (typeDef.Name == name)
+                return typeDef;
+
+        foreach (var meth in module.Types[0].Methods)
+            if (meth.Name == name)
+                return meth.LlvmMethod;
+
+        var index = 0;
+
+        foreach (var argument in method.Arguments)
+        {
+            if (argument.Name == name)
+                return method.LlvmMethod.Params[index];
+
+            index++;
+        }
+
+        foreach (var variable in method.Variables)
+            if (variable.Name == name)
+                return variable.Mutable ? module.LlvmBuilder.BuildLoad(variable.Value) : variable.Value;
+
+        throw new InvalidOperationException($"Unable to find value for identifier: {name}");
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

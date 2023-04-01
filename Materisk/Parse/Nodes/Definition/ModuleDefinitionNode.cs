@@ -1,7 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
-using LLVMSharp.Interop;
+using MateriskLLVM;
 using Materisk.Lex;
 using Materisk.Parse.Nodes.Misc;
 
@@ -44,9 +44,21 @@ internal class ModuleDefinitionNode : SyntaxNode
         return typeDef;
     }
 
-    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        throw new NotImplementedException();
+        var newType = new MateriskType(module, _className.Text);
+        
+        module.Types.Add(newType);
+        
+        foreach (var bodyNode in _body)
+        {
+            if (bodyNode is not ModuleFunctionDefinitionNode and not ModuleFieldDefinitionNode)
+                throw new Exception($"Unexpected node in module definition: {bodyNode.GetType()}");
+
+            bodyNode.Emit(module, newType, method);
+        }
+
+        return null;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

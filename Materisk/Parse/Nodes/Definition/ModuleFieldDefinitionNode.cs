@@ -1,7 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
-using LLVMSharp.Interop;
+using MateriskLLVM;
 using Materisk.Lex;
 using Materisk.Parse.Nodes.Misc;
 using Materisk.Utils;
@@ -44,9 +44,11 @@ internal class ModuleFieldDefinitionNode : SyntaxNode
         return newField;
     }
 
-    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        throw new NotImplementedException();
+        var newField = new MateriskField(type, _nameToken.Text, TypeSigUtils.GetTypeSignatureFor(_typeToken.Text));
+        type.Fields.Add(newField);
+        return newField.LlvmField;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

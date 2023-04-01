@@ -2,6 +2,7 @@
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
 using LLVMSharp.Interop;
+using MateriskLLVM;
 using Materisk.Lex;
 using Materisk.Parse.Nodes.Misc;
 
@@ -64,9 +65,49 @@ internal class BinaryExpressionNode : SyntaxNode
         return null!;
     }
 
-    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        throw new NotImplementedException();
+        var leftValue = (LLVMValueRef)_left.Emit(module, type, method);
+        var rightValue = (LLVMValueRef)_right.Emit(module, type, method);
+
+        LLVMValueRef resultValue;
+
+        // TODO: Unsigned and float
+        switch (_operatorToken.Type)
+        { 
+            case SyntaxType.PlusEquals:
+            case SyntaxType.PlusPlus:
+            case SyntaxType.Plus: resultValue = module.LlvmBuilder.BuildAdd(leftValue, rightValue); break;
+            case SyntaxType.MinusEquals:
+            case SyntaxType.MinusMinus:
+            case SyntaxType.Minus: resultValue = module.LlvmBuilder.BuildSub(leftValue, rightValue); break;
+            case SyntaxType.DivEquals:
+            case SyntaxType.Div: resultValue = module.LlvmBuilder.BuildSDiv(leftValue, rightValue); break;
+            case SyntaxType.MulEquals:
+            case SyntaxType.Mul: resultValue = module.LlvmBuilder.BuildMul(leftValue, rightValue); break;
+            case SyntaxType.ModEquals:
+            case SyntaxType.Mod: resultValue = module.LlvmBuilder.BuildSRem(leftValue, rightValue); break;
+            case SyntaxType.EqualsEquals: resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, leftValue, rightValue); break;
+            case SyntaxType.LessThan: resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSLT, leftValue, rightValue); break;
+            case SyntaxType.LessThanEqu:
+            {
+                var gtValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSGT, leftValue, rightValue);
+                var zeroValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, 0, true);
+                resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, gtValue, zeroValue);
+                break;
+            }
+            case SyntaxType.GreaterThan: resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSGT, leftValue, rightValue); break;
+            case SyntaxType.GreaterThanEqu:
+            {
+                var gtValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSLT, leftValue, rightValue);
+                var zeroValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, 0, true);
+                resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, gtValue, zeroValue);
+                break;
+            }
+            default: throw new InvalidOperationException($"Trying to do a binary expression on: {_operatorToken.Type}");
+        }
+
+        return resultValue;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

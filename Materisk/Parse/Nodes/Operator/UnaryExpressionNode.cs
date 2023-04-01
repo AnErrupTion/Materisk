@@ -2,6 +2,7 @@
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
 using LLVMSharp.Interop;
+using MateriskLLVM;
 using Materisk.Lex;
 using Materisk.Parse.Nodes.Misc;
 
@@ -42,9 +43,27 @@ internal class UnaryExpressionNode : SyntaxNode
         return null!;
     }
 
-    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        throw new NotImplementedException();
+        var value = (LLVMValueRef)_rhs.Emit(module, type, method);
+
+        LLVMValueRef resultValue;
+
+        switch (_token.Type)
+        {
+            // TODO: Float compare and negation
+            case SyntaxType.Bang:
+            {
+                var zeroValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, 0, true);
+                resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, value, zeroValue);
+                break;
+            }
+            case SyntaxType.Minus: resultValue = module.LlvmBuilder.BuildNeg(value); break;
+            case SyntaxType.Plus: return value;
+            default: throw new InvalidOperationException($"Trying to do a unary expression on: {_token.Type}");
+        }
+
+        return resultValue;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

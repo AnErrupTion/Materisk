@@ -1,8 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using AsmResolver.PE.DotNet.Cil;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
-using LLVMSharp.Interop;
+using MateriskLLVM;
 using Materisk.Lex;
 using Materisk.Parse.Nodes.Misc;
 using Materisk.Utils;
@@ -14,14 +13,12 @@ internal class FieldDefinitionNode : SyntaxNode
     private readonly bool _isPublic;
     private readonly SyntaxToken _nameToken;
     private readonly SyntaxToken _typeToken;
-    private readonly SyntaxNode? _statement;
 
-    public FieldDefinitionNode(bool isPublic, SyntaxToken nameToken, SyntaxToken typeToken, SyntaxNode? statement = null)
+    public FieldDefinitionNode(bool isPublic, SyntaxToken nameToken, SyntaxToken typeToken)
     {
         _isPublic = isPublic;
         _nameToken = nameToken;
         _typeToken = typeToken;
-        _statement = statement;
     }
 
     public override NodeType Type => NodeType.FieldDefinition;
@@ -37,25 +34,22 @@ internal class FieldDefinitionNode : SyntaxNode
             attributes,
             TypeSigUtils.GetTypeSignatureFor(module, _typeToken.Text));
 
-        if (_statement != null)
-        {
-            _statement.Emit(variables, module, type, method, arguments);
-            method.CilMethodBody!.Instructions.Add(CilOpCodes.Stsfld, newField);
-        }
-
         module.TopLevelTypes[1].Fields.Add(newField);
 
         return newField;
     }
 
-    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    // TODO: Non-static fields
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        throw new NotImplementedException();
+        var newField = new MateriskField(module.Types[0], _nameToken.Text, TypeSigUtils.GetTypeSignatureFor(_typeToken.Text));
+        module.Types[0].Fields.Add(newField);
+        return newField.LlvmField;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
         yield return new TokenNode(_nameToken);
-        yield return _statement;
+        yield return new TokenNode(_typeToken);
     }
 }

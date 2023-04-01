@@ -5,6 +5,7 @@ using AsmResolver.DotNet.Signatures.Types;
 using AsmResolver.PE.DotNet.Cil;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
 using LLVMSharp.Interop;
+using MateriskLLVM;
 using Materisk.Lex;
 using Materisk.Native;
 using Materisk.Parse.Nodes.Misc;
@@ -96,9 +97,39 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
         return newMethod;
     }
 
-    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    // TODO: Constructor and instance methods
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        throw new NotImplementedException();
+        var targetName = _name.Text;
+
+        var argts = new List<MateriskMethodArgument>();
+        var parameters = new List<LLVMTypeRef>();
+
+        foreach (var arg in _args)
+        {
+            var argType = TypeSigUtils.GetTypeSignatureFor(arg.Key.Text);
+            parameters.Add(argType);
+            argts.Add(new(arg.Value.Text, argType));
+        }
+
+        var newMethod = new MateriskMethod(
+            type,
+            targetName,
+            LLVMTypeRef.CreateFunction(
+                TypeSigUtils.GetTypeSignatureFor(_returnType.Text),
+                parameters.ToArray()),
+            argts.ToArray());
+
+        type.Methods.Add(newMethod);
+
+        if (!_isNative)
+        {
+            var lastValue = _body.Emit(module, type, newMethod);
+            if (lastValue is not null)
+                module.LlvmBuilder.BuildRetVoid();
+        } else LlvmNativeFuncImpl.Emit(module, type.Name, newMethod);
+
+        return newMethod.LlvmMethod;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

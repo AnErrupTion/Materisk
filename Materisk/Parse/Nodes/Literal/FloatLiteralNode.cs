@@ -3,6 +3,7 @@ using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
 using LLVMSharp.Interop;
+using MateriskLLVM;
 using Materisk.Lex;
 using Materisk.Parse.Nodes.Misc;
 
@@ -26,9 +27,21 @@ internal class FloatLiteralNode : SyntaxNode
         return value;
     }
 
-    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        throw new NotImplementedException();
+        var value = float.Parse(_syntaxToken.Text, CultureInfo.InvariantCulture);
+        if (value < 0)
+        {
+            var zeroValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Float, 0, true);
+            var llvmValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Float, Convert.ToUInt64(Math.Abs(value)), true);
+            var sub = LLVMValueRef.CreateConstSub(zeroValue, llvmValue);
+            return sub;
+        }
+        else
+        {
+            var llvmValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Float, Convert.ToUInt64(value), true);
+            return llvmValue;
+        }
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

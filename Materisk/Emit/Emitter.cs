@@ -1,9 +1,7 @@
-using AsmResolver.DotNet;
-using AsmResolver.DotNet.Code.Cil;
-using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
+using System.Diagnostics;
+using LLVMSharp.Interop;
+using MateriskLLVM;
 using Materisk.Parse.Nodes;
-using Newtonsoft.Json;
-using FileAttributes = AsmResolver.PE.DotNet.Metadata.Tables.Rows.FileAttributes;
 
 namespace Materisk.Emit;
 
@@ -18,57 +16,41 @@ public class Emitter
         _rootNode = rootNode;
     }
 
-    public void Emit(EmitType emitType, string customCoreLib, List<string> references)
+    public void Emit(bool noStdLib)
     {
-        if (emitType is EmitType.Cil)
-        {
-            // Generate assembly
-            var assembly = new AssemblyDefinition(_moduleName, new Version(1, 0, 0, 0));
-            var module = new ModuleDefinition(_moduleName,
-                string.IsNullOrEmpty(customCoreLib)
-                ? KnownCorLibs.MsCorLib_v4_0_0_0
-                : new AssemblyReference(AssemblyDefinition.FromFile(customCoreLib)));
+        LLVM.InitializeAllTargetInfos();
+        LLVM.InitializeAllTargets();
+        LLVM.InitializeAllTargetMCs();
+        LLVM.InitializeAllAsmParsers();
+        LLVM.InitializeAllAsmPrinters();
 
-            foreach (var reference in references)
-                module.FileReferences.Add(new(reference, FileAttributes.ContainsMetadata));
+        var targetTriple = LLVMTargetRef.DefaultTriple;
+        var cpu = "generic";
+        var features = "";
 
-            assembly.Modules.Add(module);
+        var target = LLVMTargetRef.GetTargetFromTriple(targetTriple);
+        var targetMachine = target.CreateTargetMachine(
+            targetTriple,
+            cpu, features,
+            LLVMCodeGenOptLevel.LLVMCodeGenLevelNone,
+            LLVMRelocMode.LLVMRelocDefault,
+            LLVMCodeModel.LLVMCodeModelDefault);
+        var dataLayout = targetMachine.CreateTargetDataLayout();
 
-            var mainType = new TypeDefinition(_moduleName, "Program", TypeAttributes.Public | TypeAttributes.Class, module.CorLibTypeFactory.Object.Type);
-            module.TopLevelTypes.Add(mainType);
+        var module = new MateriskModule(_moduleName);
+        unsafe { LLVM.SetModuleDataLayout(module.LlvmModule, dataLayout); }
+        module.LlvmModule.Target = targetTriple;
 
-            var variables = new Dictionary<string, CilLocalVariable>();
-            _rootNode.Emit(variables, module, null!, null!, null!);
+        var type = new MateriskType(module, "Program");
+        module.Types.Add(type);
 
-            assembly.Write($"{_moduleName}.dll");
+        _rootNode.Emit(module, type, null!);
 
-            // Generate runtimeconfig.json file
-            using var stream = File.Create($"{_moduleName}.runtimeconfig.json");
-            using var writer = new StreamWriter(stream);
-            using var runtimeConfig = new JsonTextWriter(writer);
+        module.LlvmModule.Dump();
+        module.LlvmModule.Verify(LLVMVerifierFailureAction.LLVMAbortProcessAction);
 
-            runtimeConfig.WriteStartObject();
-            {
-                runtimeConfig.WritePropertyName("runtimeOptions");
-                runtimeConfig.WriteStartObject();
-                {
-                    runtimeConfig.WritePropertyName("tfm");
-                    runtimeConfig.WriteValue("net7.0");
-                    runtimeConfig.WritePropertyName("framework");
-                    runtimeConfig.WriteStartObject();
-                    {
-                        runtimeConfig.WritePropertyName("name");
-                        runtimeConfig.WriteValue("Microsoft.NETCore.App");
-                        runtimeConfig.WritePropertyName("version");
-                        runtimeConfig.WriteValue("7.0.0");
-                    }
-                    runtimeConfig.WriteEndObject();
-                }
-                runtimeConfig.WriteEndObject();
-            }
-            runtimeConfig.WriteEndObject();
-
-            runtimeConfig.Flush();
-        }
+        var path = $"{_moduleName}.o";
+        targetMachine.EmitToFile(module.LlvmModule, path, LLVMCodeGenFileType.LLVMObjectFile);
+        Process.Start("clang", $"{path} -o {_moduleName}{(noStdLib ? " -nostdlib" : string.Empty)}").WaitForExit();
     }
 }

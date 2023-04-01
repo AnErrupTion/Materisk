@@ -203,8 +203,18 @@ public class Parser
             _position++;
 
             var ident = MatchToken(SyntaxType.Identifier);
-            var type = MatchToken(SyntaxType.Identifier);
+
             var current = Peek();
+            var mutable = false;
+            if (current.Type is SyntaxType.Keyword)
+            {
+                _position++;
+                mutable = current.Text is "mut";
+            }
+
+            var type = MatchToken(SyntaxType.Identifier);
+
+            current = Peek();
 
             SyntaxToken? secondType = null;
 
@@ -215,7 +225,7 @@ public class Parser
 
             _position++;
             var expr = ParseExpression(type, secondType);
-            return new InitVariableNode(ident, type, secondType, expr);
+            return new InitVariableNode(mutable, ident, type, secondType, expr);
         }
 
         if (Peek().Type == SyntaxType.Identifier && Peek(1).Type
@@ -489,37 +499,21 @@ public class Parser
     {
         MatchKeyword("if");
 
-        var node = new IfNode();
-
         MatchToken(SyntaxType.LParen);
-        var initialCond = ParseExpression(typeToken, secondTypeToken);
+        var conditionNode = ParseExpression(typeToken, secondTypeToken);
         MatchToken(SyntaxType.RParen);
 
-        var initialBlock = ParseScopedStatements();
-
-        node.AddCase(initialCond, initialBlock);
-
-        while (Peek() is { Type: SyntaxType.Keyword, Text: "elif" })
-        {
-            _position++;
-
-            MatchToken(SyntaxType.LParen);
-            var cond = ParseExpression(typeToken, secondTypeToken);
-            MatchToken(SyntaxType.RParen);
-            var block = ParseScopedStatements();
-
-            node.AddCase(cond, block);
-        }
+        var blockNode = ParseScopedStatements();
 
         if (Peek() is { Type: SyntaxType.Keyword, Text: "else" })
         {
             _position++;
-            var block = ParseScopedStatements();
+            var elseBlockNode = ParseScopedStatements();
 
-            node.AddCase(new BoolLiteralNode(true), block);
+            return new IfNode(conditionNode, blockNode, elseBlockNode);
         }
 
-        return node;
+        return new IfNode(conditionNode, blockNode);
     }
 
     private SyntaxNode ParseForExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)

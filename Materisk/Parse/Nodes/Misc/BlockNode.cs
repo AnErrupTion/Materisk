@@ -1,6 +1,6 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using LLVMSharp.Interop;
+using MateriskLLVM;
 
 namespace Materisk.Parse.Nodes.Misc;
 
@@ -30,9 +30,14 @@ internal class BlockNode : SyntaxNode
         return lastVal!;
     }
 
-    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        throw new NotImplementedException();
+        object? lastValue = null;
+
+        foreach (var node in _nodes)
+            lastValue = node.Emit(module, type, method);
+
+        return lastValue!;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

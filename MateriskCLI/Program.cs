@@ -13,7 +13,7 @@ public static class Program
     {
         if (args.Length == 0)
         {
-            Console.WriteLine("MateriskCLI <file> [-l] [-p] [-c <file>] [-a <file>]");
+            Console.WriteLine("MateriskCLI <file> [-l] [-p] [-n]");
             return;
         }
 
@@ -55,7 +55,7 @@ public static class Program
         var emitter = new Emitter(name, ast);
 
         watch.Restart();
-        emitter.Emit(EmitType.Cil, settings.CustomCoreLib, settings.References);
+        emitter.Emit(settings.NoStdLib);
         watch.Stop();
 
         Console.WriteLine($"Emitted code in {watch.Elapsed.Milliseconds} ms ({watch.Elapsed.Seconds} s).");

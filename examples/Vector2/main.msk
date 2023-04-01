@@ -1,4 +1,4 @@
 fn pub main() void
 {
-	var value int = 0;
+	var test string = "Hello, World!";
 }

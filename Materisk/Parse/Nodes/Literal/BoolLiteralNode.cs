@@ -2,6 +2,7 @@
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
 using LLVMSharp.Interop;
+using MateriskLLVM;
 
 namespace Materisk.Parse.Nodes.Literal;
 
@@ -23,9 +24,11 @@ public class BoolLiteralNode : SyntaxNode
         return value;
     }
 
-    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        throw new NotImplementedException();
+        var value = Value ? 1 : 0;
+        var llvmValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int1, Convert.ToUInt64(value), true);
+        return llvmValue;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

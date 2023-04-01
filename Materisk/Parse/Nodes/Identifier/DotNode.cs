@@ -1,26 +1,27 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
-using LLVMSharp.Interop;
+using MateriskLLVM;
 using Materisk.Parse.Nodes.Branch;
 
 namespace Materisk.Parse.Nodes.Identifier;
 
 internal class DotNode : SyntaxNode
 {
+    private readonly SyntaxNode _callNode;
+
+    public List<SyntaxNode> NextNodes { get; } = new();
+
     public DotNode(SyntaxNode callNode)
     {
-        CallNode = callNode;
+        _callNode = callNode;
     }
-
-    public SyntaxNode CallNode { get; }
-    public List<SyntaxNode> NextNodes { get; } = new();
 
     public override NodeType Type => NodeType.Dot;
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var currentValue = CallNode.Emit(variables, module, type, method, arguments);
+        var currentValue = _callNode.Emit(variables, module, type, method, arguments);
 
         foreach (var node in NextNodes)
             switch (node)
@@ -163,15 +164,46 @@ internal class DotNode : SyntaxNode
         return currentValue;
     }
 
-    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        throw new NotImplementedException();
+        var currentValue = _callNode.Emit(module, type, method);
+
+        foreach (var node in NextNodes)
+            switch (node)
+            {
+                case IdentifierNode rvn: throw new NotImplementedException();
+                case AssignExpressionNode aen: throw new NotImplementedException();
+                case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:
+                {
+                    var name = cnIdentNode.Token.Text;
+                    var typeName = currentValue is MateriskType mType ? mType.Name : currentValue.ToString();
+
+                    MateriskMethod? newMethod = null;
+                    foreach (var typeDef in module.Types)
+                        foreach (var meth in typeDef.Methods)
+                            if (typeDef.Name == typeName && meth.Name == name)
+                            {
+                                newMethod = meth;
+                                break;
+                            }
+
+                    if (newMethod == null)
+                        throw new InvalidOperationException($"Unable to find method with name: {name}");
+
+                    var args = cn.EmitArgs(module, type, method);
+                    currentValue = module.LlvmBuilder.BuildCall(newMethod.LlvmMethod, args.ToArray());
+                    break;
+                }
+                case CallNode: throw new Exception("Tried to call a non identifier in dot node stack.");
+                default: throw new Exception("Unexpected node in dot node stack!");
+            }
+
+        return currentValue;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return CallNode;
-
+        yield return _callNode;
         foreach (var node in NextNodes) yield return node;
     }
 

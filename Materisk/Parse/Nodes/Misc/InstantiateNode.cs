@@ -1,7 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
-using LLVMSharp.Interop;
+using MateriskLLVM;
 using Materisk.Lex;
 
 namespace Materisk.Parse.Nodes.Misc;
@@ -38,7 +38,7 @@ internal class InstantiateNode : SyntaxNode
         return null!;
     }
 
-    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
         throw new NotImplementedException();
     }
