@@ -80,7 +80,7 @@ public class Parser
                 MatchToken(SyntaxType.Semicolon);
                 return new BreakNode();
             }
-            case { Type: SyntaxType.Keyword, Text: "import" }:
+            case { Type: SyntaxType.Keyword, Text: "using" }:
             {
                 _position++;
 

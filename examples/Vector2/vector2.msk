@@ -1,4 +1,4 @@
-import "stdlib.msk";
+using "stdlib.msk";
 
 mod pub dyn Vector2
 {
@@ -13,11 +13,11 @@ mod pub dyn Vector2
 
 	fn pub print() void
 	{
-		Console.print(string "<Vector2 x=");
-		Console.print(string Int.toString(self.x));
-		Console.print(string " y=");
-		Console.print(string Int.toString(self.y));
-		Console.println(string ">");
+		Console.print(str "<Vector2 x=");
+		Console.print(str Int.toString(self.x));
+		Console.print(str " y=");
+		Console.print(str Int.toString(self.y));
+		Console.println(str ">");
 	}
 
 	fn pub add(Vector2 other) Vector2
