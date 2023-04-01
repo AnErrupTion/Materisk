@@ -88,8 +88,7 @@ internal class IndexNode : SyntaxNode
             {
                 var llvmPtr = module.LlvmBuilder.BuildGEP(variable, new[] { index });
                 var value = (LLVMValueRef)_setNode.Emit(module, type, method);
-                module.LlvmBuilder.BuildStore(value, llvmPtr);
-                break;
+                return module.LlvmBuilder.BuildStore(value, llvmPtr);
             }
             case LLVMTypeKind.LLVMPointerTypeKind:
             {
@@ -100,7 +99,7 @@ internal class IndexNode : SyntaxNode
             case LLVMTypeKind.LLVMArrayTypeKind: throw new NotImplementedException();
         }
 
-        return variable;
+        return null!;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
