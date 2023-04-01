@@ -1,15 +1,10 @@
 import "stdlib.msk";
 
-fld x int = 6;
+fld x string;
 
 fn pub main() void
 {
-	if (x == 6)
-	{
-		Console.println(string "x == 6");
-	}
-	else
-	{
-		Console.println(string "x != 6");
-	};
+	x = "Hello, World!";
+
+	Console.println(string x);
 }

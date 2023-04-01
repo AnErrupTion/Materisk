@@ -49,8 +49,7 @@ internal class ModuleFieldDefinitionNode : SyntaxNode
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        var value = (LLVMValueRef?)_statement?.Emit(module, type, method);
-        var newField = new MateriskField(type, _nameToken.Text, TypeSigUtils.GetTypeSignatureFor(_typeToken.Text), value);
+        var newField = new MateriskField(type, _nameToken.Text, TypeSigUtils.GetTypeSignatureFor(_typeToken.Text));
         type.Fields.Add(newField);
         return newField.LlvmField;
     }

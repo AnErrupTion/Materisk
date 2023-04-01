@@ -45,8 +45,7 @@ internal class FieldDefinitionNode : SyntaxNode
     // TODO: Non-static fields
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        var value = (LLVMValueRef?)_statement?.Emit(module, type, method);
-        var newField = new MateriskField(module.Types[0], _nameToken.Text, TypeSigUtils.GetTypeSignatureFor(_typeToken.Text), value);
+        var newField = new MateriskField(module.Types[0], _nameToken.Text, TypeSigUtils.GetTypeSignatureFor(_typeToken.Text));
         module.Types[0].Fields.Add(newField);
         return newField.LlvmField;
     }

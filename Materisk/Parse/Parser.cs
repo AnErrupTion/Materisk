@@ -159,15 +159,11 @@ public class Parser
             var nameToken = MatchToken(SyntaxType.Identifier);
             var type = MatchToken(SyntaxType.Identifier);
 
-            var current = Peek();
-            if (current.Type == SyntaxType.Equals)
-            {
-                _position++;
-                var expression = ParseExpression(null, null);
-                nodes.Add(new ModuleFieldDefinitionNode(isPublic, isStatic, nameToken, type, expression));
-            } else nodes.Add(new ModuleFieldDefinitionNode(isPublic, isStatic, nameToken, type));
+            if (Peek().Type == SyntaxType.Equals)
+                throw new InvalidOperationException("Can not initialize a field directly!");
 
             MatchToken(SyntaxType.Semicolon);
+            nodes.Add(new ModuleFieldDefinitionNode(isPublic, isStatic, nameToken, type));
         }
 
         while (Peek() is { Type: SyntaxType.Keyword, Text: "fn" })
@@ -590,13 +586,8 @@ public class Parser
         var nameToken = MatchToken(SyntaxType.Identifier);
         var type = MatchToken(SyntaxType.Identifier);
 
-        var current = Peek();
-        if (current.Type == SyntaxType.Equals)
-        {
-            _position++;
-            var expression = ParseExpression(null, null);
-            return new FieldDefinitionNode(isPublic, nameToken, type, expression);
-        }
+        if (Peek().Type == SyntaxType.Equals)
+            throw new InvalidOperationException("Can not initialize a field directly!");
 
         return new FieldDefinitionNode(isPublic, nameToken, type);
     }
