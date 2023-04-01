@@ -1,10 +1,7 @@
 import "stdlib.msk";
 
-fld x string;
-
 fn pub main() void
 {
-	x = "Hello, World!";
-
-	Console.println(string x);
+	var string str = "Hello, World!";
+	var length i32 = lenof(str string);
 }

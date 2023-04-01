@@ -1,10 +1,12 @@
 mod pub Console
 {
-	fn native pub print(string text) void {}
+	fn native pub print(str text) void {}
 
-	fn pub println(string text) void
+	fn pub println(str text) void
 	{
-		Console.print(string text);
-		Console.print(string "\n");
+		Console.print(str text);
+		Console.print(str "\n");
 	}
 }
+
+fn native pub lenof(str text) i32 {}

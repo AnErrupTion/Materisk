@@ -26,9 +26,9 @@ internal class CastNode : SyntaxNode
 
         switch (_ident.Text)
         {
-            case "int": method.CilMethodBody!.Instructions.Add(CilOpCodes.Conv_I4); break;
-            case "float": method.CilMethodBody!.Instructions.Add(CilOpCodes.Conv_R4); break;
-            case "byte": method.CilMethodBody!.Instructions.Add(CilOpCodes.Conv_I1); break;
+            case "i32": method.CilMethodBody!.Instructions.Add(CilOpCodes.Conv_I4); break;
+            case "f32": method.CilMethodBody!.Instructions.Add(CilOpCodes.Conv_R4); break;
+            case "u8": method.CilMethodBody!.Instructions.Add(CilOpCodes.Conv_I1); break;
         }
 
         return null!;
@@ -40,9 +40,9 @@ internal class CastNode : SyntaxNode
         var value = (LLVMValueRef)_node.Emit(module, type, method);
         var resultValue = _ident.Text switch
         {
-            "int" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Int32),
-            "float" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Float),
-            "byte" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Int8)
+            "i32" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Int32),
+            "f32" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Float),
+            "u8" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Int8)
         };
         return resultValue;
     }
