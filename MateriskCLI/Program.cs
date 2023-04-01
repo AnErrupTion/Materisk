@@ -4,7 +4,6 @@ using Materisk.Emit;
 using Materisk.Lex;
 using Materisk.Parse;
 using Materisk.Parse.Nodes;
-using NativeCIL;
 
 namespace MateriskCLI;
 

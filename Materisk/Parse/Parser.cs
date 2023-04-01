@@ -1,5 +1,11 @@
 ﻿using Materisk.Lex;
 using Materisk.Parse.Nodes;
+using Materisk.Parse.Nodes.Branch;
+using Materisk.Parse.Nodes.Definition;
+using Materisk.Parse.Nodes.Identifier;
+using Materisk.Parse.Nodes.Literal;
+using Materisk.Parse.Nodes.Misc;
+using Materisk.Parse.Nodes.Operator;
 
 namespace Materisk.Parse;
 
@@ -510,7 +516,7 @@ public class Parser
             _position++;
             var block = ParseScopedStatements();
 
-            node.AddCase(new BoolNode(true), block);
+            node.AddCase(new BoolLiteralNode(true), block);
         }
 
         return node;

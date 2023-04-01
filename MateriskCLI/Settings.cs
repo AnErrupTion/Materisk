@@ -1,4 +1,4 @@
-namespace NativeCIL;
+namespace MateriskCLI;
 
 public class Settings
 {
