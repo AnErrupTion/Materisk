@@ -1,6 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
+using LLVMSharp.Interop;
 using MateriskLLVM;
 using Materisk.Lex;
 using Materisk.Parse.Nodes.Misc;
@@ -13,12 +14,14 @@ internal class FieldDefinitionNode : SyntaxNode
     private readonly bool _isPublic;
     private readonly SyntaxToken _nameToken;
     private readonly SyntaxToken _typeToken;
+    private readonly SyntaxNode? _statement;
 
-    public FieldDefinitionNode(bool isPublic, SyntaxToken nameToken, SyntaxToken typeToken)
+    public FieldDefinitionNode(bool isPublic, SyntaxToken nameToken, SyntaxToken typeToken, SyntaxNode? statement = null)
     {
         _isPublic = isPublic;
         _nameToken = nameToken;
         _typeToken = typeToken;
+        _statement = statement;
     }
 
     public override NodeType Type => NodeType.FieldDefinition;
@@ -42,7 +45,8 @@ internal class FieldDefinitionNode : SyntaxNode
     // TODO: Non-static fields
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        var newField = new MateriskField(module.Types[0], _nameToken.Text, TypeSigUtils.GetTypeSignatureFor(_typeToken.Text));
+        var value = (LLVMValueRef?)_statement?.Emit(module, type, method);
+        var newField = new MateriskField(module.Types[0], _nameToken.Text, TypeSigUtils.GetTypeSignatureFor(_typeToken.Text), value);
         module.Types[0].Fields.Add(newField);
         return newField.LlvmField;
     }

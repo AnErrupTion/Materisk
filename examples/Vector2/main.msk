@@ -1,10 +1,8 @@
 import "stdlib.msk";
 
+fld x int = 6;
+
 fn pub main() void
 {
-	Console.println(string "Hello, World!");
-
-	var pointer mut ptr byte = 753664;
-	pointer[0] = 65;
-	pointer[1] = 15;
+	x = 9;
 }
