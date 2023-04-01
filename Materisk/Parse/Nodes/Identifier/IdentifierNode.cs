@@ -70,7 +70,7 @@ internal class IdentifierNode : SyntaxNode
 
         foreach (var field in module.Types[0].Fields)
             if (field.Name == name)
-                return field.LlvmField;
+                return module.LlvmBuilder.BuildLoad(field.LlvmField);
 
         foreach (var meth in module.Types[0].Methods)
             if (meth.Name == name)
