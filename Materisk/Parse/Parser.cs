@@ -81,7 +81,14 @@ public class Parser
                 var path = MatchToken(SyntaxType.String);
                 MatchToken(SyntaxType.Semicolon);
 
-                return new ImportNode(path);
+                if (!File.Exists(path.Text))
+                    throw new Exception($"Failed to import \"{path.Text}\": File not found");
+
+                var lexer = new Lexer(File.ReadAllText(path.Text));
+                var lexedTokens = lexer.Lex();
+
+                var parser = new Parser(lexedTokens);
+                return parser.Parse();
             }
             case { Type: SyntaxType.Keyword, Text: "fn" }:
             {
@@ -127,7 +134,7 @@ public class Parser
         return new ModuleDefinitionNode(className, body, isPublic);
     }
 
-    private SyntaxNode[] ParseModuleBody(SyntaxToken moduleName, bool isStatic)
+    private List<SyntaxNode> ParseModuleBody(SyntaxToken moduleName, bool isStatic)
     {
         var nodes = new List<SyntaxNode>();
 
@@ -179,7 +186,7 @@ public class Parser
             nodes.Add(new ModuleFunctionDefinitionNode(moduleName, name, args, returnType, body, isStatic, isPublic, isNative));
         }
 
-        return nodes.ToArray();
+        return nodes;
     }
 
     private SyntaxNode ParseExpression(SyntaxToken? typeToken, SyntaxToken? secondTypeToken)

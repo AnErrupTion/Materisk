@@ -1,3 +1,5 @@
+import "stdlib.msk";
+
 fn pub main() void
 {
 	var pointer ptr byte = 753664;
