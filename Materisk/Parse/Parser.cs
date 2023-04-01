@@ -408,11 +408,11 @@ public class Parser
 
                 if (typeToken?.Text is "ptr")
                     return new IntLiteralNode(current); // TODO: UInt
-                
-                if (secondTypeToken is null)
+
+                if (typeToken is null && secondTypeToken is null)
                     return new IntLiteralNode(current);
 
-                return secondTypeToken.Text switch
+                return (secondTypeToken is null ? typeToken.Text : secondTypeToken.Text) switch
                 {
                     "int" => new IntLiteralNode(current),
                     "float" => new FloatLiteralNode(current),

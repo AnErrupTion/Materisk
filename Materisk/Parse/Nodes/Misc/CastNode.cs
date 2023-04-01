@@ -1,6 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
+using LLVMSharp.Interop;
 using MateriskLLVM;
 using Materisk.Lex;
 
@@ -33,9 +34,17 @@ internal class CastNode : SyntaxNode
         return null!;
     }
 
+    // TODO: Fix casts from float
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        throw new NotImplementedException();
+        var value = (LLVMValueRef)_node.Emit(module, type, method);
+        var resultValue = _ident.Text switch
+        {
+            "int" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Int32),
+            "float" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Float),
+            "byte" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Int8)
+        };
+        return resultValue;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

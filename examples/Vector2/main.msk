@@ -1,6 +1,6 @@
+import "stdlib.msk";
+
 fn pub main() void
 {
-	var pointer ptr byte = 753664;
-	pointer[0] = 65;
-	pointer[1] = 15;
+	Console.println(string "Hello, World!");
 }
