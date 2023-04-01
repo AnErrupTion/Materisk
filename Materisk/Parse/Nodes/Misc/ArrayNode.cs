@@ -1,6 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
+using LLVMSharp.Interop;
 using Materisk.Lex;
 using Materisk.Utils;
 
@@ -28,6 +29,11 @@ internal class ArrayNode : SyntaxNode
         method.CilMethodBody!.Instructions.Add(CilOpCodes.Newarr, arrayType);
 
         return null!;
+    }
+
+    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    {
+        throw new NotImplementedException();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

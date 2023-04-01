@@ -2,6 +2,7 @@
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.DotNet.Signatures.Types;
 using AsmResolver.PE.DotNet.Cil;
+using LLVMSharp.Interop;
 
 namespace Materisk.Parse.Nodes.Misc;
 
@@ -65,6 +66,11 @@ internal class IndexNode : SyntaxNode
         }
 
         return null!;
+    }
+
+    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    {
+        throw new NotImplementedException();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

@@ -1,6 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
+using LLVMSharp.Interop;
 using Materisk.Lex;
 
 namespace Materisk.Parse.Nodes.Misc;
@@ -35,6 +36,11 @@ internal class InstantiateNode : SyntaxNode
 
         method.CilMethodBody!.Instructions.Add(CilOpCodes.Newobj, constructor);
         return null!;
+    }
+
+    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    {
+        throw new NotImplementedException();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

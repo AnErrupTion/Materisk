@@ -1,6 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
+using LLVMSharp.Interop;
 
 namespace Materisk.Parse.Nodes.Branch;
 
@@ -68,6 +69,11 @@ internal class ForNode : SyntaxNode
         }
 
         return null!;
+    }
+
+    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    {
+        throw new NotImplementedException();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

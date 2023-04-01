@@ -2,6 +2,7 @@
 using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
+using LLVMSharp.Interop;
 using Materisk.Lex;
 using Materisk.Parse.Nodes.Misc;
 
@@ -23,6 +24,11 @@ internal class FloatLiteralNode : SyntaxNode
         var value = float.Parse(_syntaxToken.Text, CultureInfo.InvariantCulture);
         method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldc_R4, value);
         return value;
+    }
+
+    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    {
+        throw new NotImplementedException();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

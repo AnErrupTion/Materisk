@@ -4,6 +4,7 @@ using AsmResolver.DotNet.Signatures;
 using AsmResolver.DotNet.Signatures.Types;
 using AsmResolver.PE.DotNet.Cil;
 using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
+using LLVMSharp.Interop;
 using Materisk.Lex;
 using Materisk.Native;
 using Materisk.Parse.Nodes.Misc;
@@ -68,6 +69,11 @@ internal class FunctionDefinitionNode : SyntaxNode
             module.ManagedEntryPointMethod = newMethod;
 
         return newMethod;
+    }
+
+    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    {
+        throw new NotImplementedException();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

@@ -1,6 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
+using LLVMSharp.Interop;
 using Materisk.Lex;
 using Materisk.Parse.Nodes.Misc;
 
@@ -22,6 +23,11 @@ internal class StringLiteralNode : SyntaxNode
         var value = _syntaxToken.Text;
         method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldstr, value);
         return value;
+    }
+
+    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    {
+        throw new NotImplementedException();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

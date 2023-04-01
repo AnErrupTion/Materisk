@@ -1,6 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
+using LLVMSharp.Interop;
 
 namespace Materisk.Parse.Nodes.Literal;
 
@@ -20,6 +21,11 @@ public class BoolLiteralNode : SyntaxNode
         var value = Value ? 1 : 0;
         method.CilMethodBody!.Instructions.Add(CilInstruction.CreateLdcI4(value));
         return value;
+    }
+
+    public override object Emit(List<string> variables, LLVMModuleRef module, LLVMValueRef method, List<string> arguments)
+    {
+        throw new NotImplementedException();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
