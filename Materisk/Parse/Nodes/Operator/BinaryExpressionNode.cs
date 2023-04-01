@@ -69,42 +69,30 @@ internal class BinaryExpressionNode : SyntaxNode
     {
         var leftValue = (LLVMValueRef)_left.Emit(module, type, method);
         var rightValue = (LLVMValueRef)_right.Emit(module, type, method);
-
-        LLVMValueRef resultValue;
-
-        // TODO: Unsigned and float
-        switch (_operatorToken.Type)
-        { 
-            case SyntaxType.PlusEquals:
-            case SyntaxType.PlusPlus:
-            case SyntaxType.Plus: resultValue = module.LlvmBuilder.BuildAdd(leftValue, rightValue); break;
-            case SyntaxType.MinusEquals:
-            case SyntaxType.MinusMinus:
-            case SyntaxType.Minus: resultValue = module.LlvmBuilder.BuildSub(leftValue, rightValue); break;
-            case SyntaxType.DivEquals:
-            case SyntaxType.Div: resultValue = module.LlvmBuilder.BuildSDiv(leftValue, rightValue); break;
-            case SyntaxType.MulEquals:
-            case SyntaxType.Mul: resultValue = module.LlvmBuilder.BuildMul(leftValue, rightValue); break;
-            case SyntaxType.ModEquals:
-            case SyntaxType.Mod: resultValue = module.LlvmBuilder.BuildSRem(leftValue, rightValue); break;
-            case SyntaxType.EqualsEquals: resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, leftValue, rightValue); break;
-            case SyntaxType.LessThan: resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSLT, leftValue, rightValue); break;
-            case SyntaxType.LessThanEqu:
-            {
-                var gtValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSGT, leftValue, rightValue);
-                resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, gtValue, LlvmUtils.IntZero);
-                break;
-            }
-            case SyntaxType.GreaterThan: resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSGT, leftValue, rightValue); break;
-            case SyntaxType.GreaterThanEqu:
-            {
-                var gtValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSLT, leftValue, rightValue);
-                resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, gtValue, LlvmUtils.IntZero);
-                break;
-            }
-            default: throw new InvalidOperationException($"Trying to do a binary expression on: {_operatorToken.Type}");
-        }
-
+        var resultValue = _operatorToken.Type switch
+        {
+            // TODO: Unsigned and float
+            SyntaxType.PlusEquals => module.LlvmBuilder.BuildAdd(leftValue, rightValue),
+            SyntaxType.PlusPlus => module.LlvmBuilder.BuildAdd(leftValue, rightValue),
+            SyntaxType.Plus => module.LlvmBuilder.BuildAdd(leftValue, rightValue),
+            SyntaxType.MinusEquals => module.LlvmBuilder.BuildSub(leftValue, rightValue),
+            SyntaxType.MinusMinus => module.LlvmBuilder.BuildSub(leftValue, rightValue),
+            SyntaxType.Minus => module.LlvmBuilder.BuildSub(leftValue, rightValue),
+            SyntaxType.DivEquals => module.LlvmBuilder.BuildSDiv(leftValue, rightValue),
+            SyntaxType.Div => module.LlvmBuilder.BuildSDiv(leftValue, rightValue),
+            SyntaxType.MulEquals => module.LlvmBuilder.BuildMul(leftValue, rightValue),
+            SyntaxType.Mul => module.LlvmBuilder.BuildMul(leftValue, rightValue),
+            SyntaxType.ModEquals => module.LlvmBuilder.BuildSRem(leftValue, rightValue),
+            SyntaxType.Mod => module.LlvmBuilder.BuildSRem(leftValue, rightValue),
+            SyntaxType.EqualsEquals => module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, leftValue, rightValue),
+            SyntaxType.LessThan => module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSLT, leftValue, rightValue),
+            SyntaxType.LessThanEqu => module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ,
+                module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSGT, leftValue, rightValue), LlvmUtils.IntZero),
+            SyntaxType.GreaterThan => module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSGT, leftValue, rightValue),
+            SyntaxType.GreaterThanEqu => module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ,
+                module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSLT, leftValue, rightValue), LlvmUtils.IntZero),
+            _ => throw new InvalidOperationException($"Trying to do a binary expression on: {_operatorToken.Type}")
+        };
         return resultValue;
     }
 

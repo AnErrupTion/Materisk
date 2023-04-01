@@ -46,18 +46,14 @@ internal class UnaryExpressionNode : SyntaxNode
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
         var value = (LLVMValueRef)_rhs.Emit(module, type, method);
-
-        LLVMValueRef resultValue;
-
-        switch (_token.Type)
+        var resultValue = _token.Type switch
         {
             // TODO: Float compare and negation
-            case SyntaxType.Bang: resultValue = module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, value, LlvmUtils.IntZero); break;
-            case SyntaxType.Minus: resultValue = module.LlvmBuilder.BuildNeg(value); break;
-            case SyntaxType.Plus: return value;
-            default: throw new InvalidOperationException($"Trying to do a unary expression on: {_token.Type}");
-        }
-
+            SyntaxType.Bang => module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, value, LlvmUtils.IntZero),
+            SyntaxType.Minus => module.LlvmBuilder.BuildNeg(value),
+            SyntaxType.Plus => value,
+            _ => throw new InvalidOperationException($"Trying to do a unary expression on: {_token.Type}")
+        };
         return resultValue;
     }
 

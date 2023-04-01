@@ -2,6 +2,8 @@
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.DotNet.Signatures.Types;
 using AsmResolver.PE.DotNet.Cil;
+using LLVMSharp;
+using LLVMSharp.Interop;
 using MateriskLLVM;
 
 namespace Materisk.Parse.Nodes.Misc;
@@ -70,7 +72,35 @@ internal class IndexNode : SyntaxNode
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        throw new NotImplementedException();
+        var variable = (LLVMValueRef)_nameNode.Emit(module, type, method); 
+        var index = (LLVMValueRef)_indexNode.Emit(module, type, method);
+
+        // This should get the type of each element in the array or the pointer.
+        // For example: for "int[]" or "int*" we'd get "int"
+        var underlyingType = variable.TypeOf.Kind;
+
+        if (underlyingType is not LLVMTypeKind.LLVMArrayTypeKind and not LLVMTypeKind.LLVMPointerTypeKind)
+            throw new InvalidOperationException($"Catastrophic failure: variable is not array or pointer: {underlyingType}"); // This should never happen either
+
+        switch (variable.TypeOf.Kind)
+        {
+            case LLVMTypeKind.LLVMPointerTypeKind when _setNode != null:
+            {
+                var llvmPtr = module.LlvmBuilder.BuildGEP(variable, new[] { index });
+                var value = (LLVMValueRef)_setNode.Emit(module, type, method);
+                module.LlvmBuilder.BuildStore(value, llvmPtr);
+                break;
+            }
+            case LLVMTypeKind.LLVMPointerTypeKind:
+            {
+                var llvmPtr = module.LlvmBuilder.BuildGEP(variable, new[] { index });
+                return module.LlvmBuilder.BuildLoad(llvmPtr);
+            }
+            case LLVMTypeKind.LLVMArrayTypeKind when _setNode != null: throw new NotImplementedException();
+            case LLVMTypeKind.LLVMArrayTypeKind: throw new NotImplementedException();
+        }
+
+        return variable;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

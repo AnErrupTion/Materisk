@@ -1,15 +1,18 @@
+using LLVMSharp.Interop;
+
 namespace MateriskCLI;
 
 public class Settings
 {
-    public readonly string InputFile;
+    public readonly string InputFile, TargetTriple = LLVMTargetRef.DefaultTriple, Cpu = "generic", Features = string.Empty;
     public readonly bool ShowLexOutput, ShowParseOutput, NoStdLib;
 
     public Settings(ref string[] args)
     {
-        for (var i = 0; i < args.Length; i++)
+        var index = 0;
+        while (index < args.Length)
         {
-            var arg = args[i];
+            var arg = args[index++];
             if (arg[0] != '-')
             {
                 InputFile = arg;
@@ -23,6 +26,9 @@ public class Settings
                 case 'l': ShowLexOutput = true; break;
                 case 'p': ShowParseOutput = true; break;
                 case 'n': NoStdLib = true; break;
+                case 't': TargetTriple = args[index++]; break;
+                case 'c': Cpu = args[index++]; break;
+                case 'f': Features = args[index++]; break;
             }
         }
     }

@@ -16,17 +16,16 @@ public class Emitter
         _rootNode = rootNode;
     }
 
-    public void Emit(bool noStdLib)
+    public void Emit(bool noStdLib, string targetTriple, string cpu, string features)
     {
+        if (noStdLib)
+            LlvmUtils.MainFunctionNameOverride = "_start";
+        
         LLVM.InitializeAllTargetInfos();
         LLVM.InitializeAllTargets();
         LLVM.InitializeAllTargetMCs();
         LLVM.InitializeAllAsmParsers();
         LLVM.InitializeAllAsmPrinters();
-
-        var targetTriple = LLVMTargetRef.DefaultTriple;
-        var cpu = "generic";
-        var features = "";
 
         var target = LLVMTargetRef.GetTargetFromTriple(targetTriple);
         var targetMachine = target.CreateTargetMachine(

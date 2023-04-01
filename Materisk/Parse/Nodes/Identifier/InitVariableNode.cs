@@ -57,6 +57,9 @@ internal class InitVariableNode : SyntaxNode
             throw new InvalidOperationException("Can not initialize the same variable twice!");
 
         var value = (LLVMValueRef)_expr.Emit(module, type, method);
+        if (_typeToken.Text is "ptr" && _secondTypeToken is not null)
+            value = module.LlvmBuilder.BuildIntToPtr(value, LLVMTypeRef.CreatePointer(value.TypeOf, 0));
+
         if (_mutable)
         {
             var constValue = value;
