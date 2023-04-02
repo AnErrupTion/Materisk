@@ -26,7 +26,7 @@ internal class AssignExpressionNode : SyntaxNode
         return null!;
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var name = Ident.Text;
         if (string.IsNullOrEmpty(name))
@@ -43,7 +43,7 @@ internal class AssignExpressionNode : SyntaxNode
                     /*if (!field.IsStatic)
                         throw new InvalidOperationException($"Field \"{name}\" is not static.");*/
 
-                    var fieldValue = (LLVMValueRef)Expr.Emit(module, type, method);
+                    var fieldValue = (LLVMValueRef)Expr.Emit(module, type, method, metadata);
                     module.LlvmBuilder.BuildStore(fieldValue, field.LlvmField);
                     return fieldValue;
                 }
@@ -54,7 +54,7 @@ internal class AssignExpressionNode : SyntaxNode
         if (!variable.Mutable)
             throw new InvalidOperationException("Can not assign to an immutable variable!");
 
-        var varValue = (LLVMValueRef)Expr.Emit(module, type, method);
+        var varValue = (LLVMValueRef)Expr.Emit(module, type, method, metadata);
         module.LlvmBuilder.BuildStore(varValue, variable.Value);
         return varValue;
     }

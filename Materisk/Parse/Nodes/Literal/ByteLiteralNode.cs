@@ -28,7 +28,7 @@ internal class ByteLiteralNode : SyntaxNode
         return value;
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var value = byte.Parse(_syntaxToken.Text, CultureInfo.InvariantCulture);
         var llvmValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int8, Convert.ToUInt64(value), true);

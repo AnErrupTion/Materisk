@@ -31,7 +31,7 @@ internal class ModuleFieldDefinitionNode : SyntaxNode
         return null!;
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var newField = new MateriskField(type, _nameToken.Text, TypeSigUtils.GetTypeSignatureFor(_typeToken.Text));
         type.Fields.Add(newField);

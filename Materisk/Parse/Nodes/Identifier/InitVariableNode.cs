@@ -31,7 +31,7 @@ internal class InitVariableNode : SyntaxNode
         return null!;
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var name = _identToken.Text;
 
@@ -41,7 +41,7 @@ internal class InitVariableNode : SyntaxNode
         if (method.GetVariableByName(name) is not null)
             throw new InvalidOperationException("Can not initialize the same variable twice!");
 
-        var value = (LLVMValueRef)_expr.Emit(module, type, method);
+        var value = (LLVMValueRef)_expr.Emit(module, type, method, metadata);
         var valueType = value.TypeOf;
         
         if (_typeToken.Text is "ptr" && _secondTypeToken is not null)

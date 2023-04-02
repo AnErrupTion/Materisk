@@ -6,6 +6,12 @@ fn pub main() void
 
 	while (index < 5)
 	{
+		if (index == 2)
+		{
+			index++;
+			continue;
+		};
+
 		Console.println(str "Hello, World!");
 		index++;
 	};

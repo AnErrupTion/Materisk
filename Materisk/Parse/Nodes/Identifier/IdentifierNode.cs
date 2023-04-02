@@ -60,7 +60,7 @@ internal class IdentifierNode : SyntaxNode
         throw new InvalidOperationException($"Unable to find value for identifier: {name}");
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var name = Token.Text;
 

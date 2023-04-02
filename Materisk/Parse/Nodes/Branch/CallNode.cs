@@ -23,25 +23,19 @@ internal class CallNode : SyntaxNode
         return null!;
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var toCall = (MateriskMethod)ToCallNode.Emit(module, type, method);
-        var args = EmitArgs(module, type, method);
+        var toCall = (MateriskMethod)ToCallNode.Emit(module, type, method, metadata);
+        var args = EmitArgs(module, type, method, metadata);
         return module.LlvmBuilder.BuildCall2(toCall.Type, toCall.LlvmMethod, args.ToArray());
     }
 
-    public void EmitArgs(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
-    {
-        foreach (var n in _argumentNodes)
-            n.Emit(variables, module, type, method, arguments);
-    }
-
-    public List<LLVMValueRef> EmitArgs(MateriskModule module, MateriskType type, MateriskMethod method)
+    public List<LLVMValueRef> EmitArgs(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var args = new List<LLVMValueRef>();
 
         foreach (var n in _argumentNodes)
-            args.Add((LLVMValueRef)n.Emit(module, type, method));
+            args.Add((LLVMValueRef)n.Emit(module, type, method, metadata));
 
         return args;
     }

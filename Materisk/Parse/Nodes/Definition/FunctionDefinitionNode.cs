@@ -35,7 +35,7 @@ internal class FunctionDefinitionNode : SyntaxNode
         return null!;
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var argts = new List<MateriskMethodArgument>();
         var parameters = new List<LLVMTypeRef>();
@@ -61,7 +61,7 @@ internal class FunctionDefinitionNode : SyntaxNode
 
         if (!_isNative)
         {
-            var lastValue = _block.Emit(module, mType, newMethod);
+            var lastValue = _block.Emit(module, mType, newMethod, metadata);
             if (lastValue is not null)
                 module.LlvmBuilder.BuildRetVoid();
         } else LlvmNativeFuncImpl.Emit(module, mType.Name, newMethod);

@@ -38,7 +38,7 @@ internal class WhileNode : SyntaxNode
         return null!;
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var ifBlock = method.LlvmMethod.AppendBasicBlock("if");
         var thenBlock = method.LlvmMethod.AppendBasicBlock("then");
@@ -47,12 +47,16 @@ internal class WhileNode : SyntaxNode
         module.LlvmBuilder.BuildBr(ifBlock);
 
         module.LlvmBuilder.PositionAtEnd(ifBlock);
-        var ifValue = (LLVMValueRef)_condNode.Emit(module, type, method);
+        var ifValue = (LLVMValueRef)_condNode.Emit(module, type, method, metadata);
         var conditionValue = module.LlvmBuilder.BuildCondBr(ifValue, thenBlock, elseBlock);
 
         module.LlvmBuilder.PositionAtEnd(thenBlock);
-        _block.Emit(module, type, method);
-        module.LlvmBuilder.BuildBr(ifBlock);
+        metadata.AddMetadata(Tuple.Create(method, thenBlock, elseBlock));
+        var lastValue = (LLVMValueRef)_block.Emit(module, type, method, metadata);
+
+        // To handle "break" and "continue"
+        if (lastValue != null && lastValue.InstructionOpcode is not LLVMOpcode.LLVMBr)
+            module.LlvmBuilder.BuildBr(ifBlock);
 
         module.LlvmBuilder.PositionAtEnd(elseBlock);
 

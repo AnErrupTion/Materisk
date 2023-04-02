@@ -10,7 +10,7 @@ public abstract class SyntaxNode
 
     public abstract object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments);
 
-    public abstract object Emit(MateriskModule module, MateriskType type, MateriskMethod method);
+    public abstract object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata);
 
     public abstract IEnumerable<SyntaxNode> GetChildren();
 }

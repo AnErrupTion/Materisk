@@ -26,7 +26,7 @@ internal class ModuleDefinitionNode : SyntaxNode
         return null!;
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var newType = new MateriskType(module, _className.Text);
 
@@ -37,7 +37,7 @@ internal class ModuleDefinitionNode : SyntaxNode
             if (bodyNode is not ModuleFunctionDefinitionNode and not ModuleFieldDefinitionNode)
                 throw new Exception($"Unexpected node in module definition: {bodyNode.GetType()}");
 
-            bodyNode.Emit(module, newType, method);
+            bodyNode.Emit(module, newType, method, metadata);
         }
 
         return newType;

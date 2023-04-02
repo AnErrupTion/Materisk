@@ -27,7 +27,7 @@ internal class IntLiteralNode : SyntaxNode
         return value;
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var value = int.Parse(_syntaxToken.Text, CultureInfo.InvariantCulture);
         if (value < 0)

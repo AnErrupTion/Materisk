@@ -146,9 +146,9 @@ internal class DotNode : SyntaxNode
         return currentValue;
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var currentValue = _callNode.Emit(module, type, method);
+        var currentValue = _callNode.Emit(module, type, method, metadata);
 
         foreach (var node in NextNodes)
             switch (node)
@@ -172,7 +172,7 @@ internal class DotNode : SyntaxNode
                     if (newMethod == null)
                         throw new InvalidOperationException($"Unable to find method with name: {name}");
 
-                    var args = cn.EmitArgs(module, type, method);
+                    var args = cn.EmitArgs(module, type, method, metadata);
                     currentValue = module.LlvmBuilder.BuildCall2(newMethod.Type, newMethod.LlvmMethod, args.ToArray());
                     break;
                 }

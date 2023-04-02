@@ -43,7 +43,8 @@ public class Emitter
         var type = new MateriskType(module, "Program");
         module.Types.Add(type);
 
-        _rootNode.Emit(module, type, null!);
+        var metadata = new MateriskMetadata();
+        _rootNode.Emit(module, type, null!, metadata);
 
         module.LlvmModule.Dump();
         module.LlvmModule.Verify(LLVMVerifierFailureAction.LLVMAbortProcessAction);

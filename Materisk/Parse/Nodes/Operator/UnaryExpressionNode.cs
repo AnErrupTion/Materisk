@@ -25,9 +25,9 @@ internal class UnaryExpressionNode : SyntaxNode
         return null!;
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var value = (LLVMValueRef)_rhs.Emit(module, type, method);
+        var value = (LLVMValueRef)_rhs.Emit(module, type, method, metadata);
         var resultValue = _token.Type switch
         {
             SyntaxType.Bang => value.TypeOf == LLVMTypeRef.Float

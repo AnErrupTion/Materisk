@@ -98,7 +98,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
     }
 
     // TODO: Constructor and instance methods
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var targetName = _name.Text;
 
@@ -124,7 +124,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
 
         if (!_isNative)
         {
-            var lastValue = _body.Emit(module, type, newMethod);
+            var lastValue = _body.Emit(module, type, newMethod, metadata);
             if (lastValue is not null)
                 module.LlvmBuilder.BuildRetVoid();
         } else LlvmNativeFuncImpl.Emit(module, type.Name, newMethod);

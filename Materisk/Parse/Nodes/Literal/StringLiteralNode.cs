@@ -26,7 +26,7 @@ internal class StringLiteralNode : SyntaxNode
         return value;
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var value = _syntaxToken.Text;
         var llvmType = LLVMTypeRef.Int8;

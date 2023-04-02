@@ -27,10 +27,10 @@ internal class BinaryExpressionNode : SyntaxNode
         return null!;
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var leftValue = (LLVMValueRef)_left.Emit(module, type, method);
-        var rightValue = (LLVMValueRef)_right.Emit(module, type, method);
+        var leftValue = (LLVMValueRef)_left.Emit(module, type, method, metadata);
+        var rightValue = (LLVMValueRef)_right.Emit(module, type, method, metadata);
         var resultValue = _operatorToken.Type switch
         {
             // TODO: Signed

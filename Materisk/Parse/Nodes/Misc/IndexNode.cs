@@ -71,10 +71,10 @@ internal class IndexNode : SyntaxNode
     }
 
     // TODO: Opaque pointer support (LLVM 15+)
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var variable = (LLVMValueRef)_nameNode.Emit(module, type, method); 
-        var index = (LLVMValueRef)_indexNode.Emit(module, type, method);
+        var variable = (LLVMValueRef)_nameNode.Emit(module, type, method, metadata); 
+        var index = (LLVMValueRef)_indexNode.Emit(module, type, method, metadata);
 
         var underlyingType = variable.TypeOf.Kind;
 
@@ -86,7 +86,7 @@ internal class IndexNode : SyntaxNode
             case LLVMTypeKind.LLVMPointerTypeKind when _setNode is not null:
             {
                 var llvmPtr = module.LlvmBuilder.BuildGEP(variable, new[] { index });
-                var value = (LLVMValueRef)_setNode.Emit(module, type, method);
+                var value = (LLVMValueRef)_setNode.Emit(module, type, method, metadata);
                 return module.LlvmBuilder.BuildStore(value, llvmPtr);
             }
             case LLVMTypeKind.LLVMPointerTypeKind:

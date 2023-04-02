@@ -24,7 +24,7 @@ public class BoolLiteralNode : SyntaxNode
         return value;
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var value = Value ? 1 : 0;
         var llvmValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int1, Convert.ToUInt64(value), true);

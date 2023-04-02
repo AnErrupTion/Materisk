@@ -25,9 +25,9 @@ internal class IfNode : SyntaxNode
         return null!;
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var value = (LLVMValueRef)_conditionNode.Emit(module, type, method);
+        var value = (LLVMValueRef)_conditionNode.Emit(module, type, method, metadata);
 
         if (_elseBlockNode is null)
         {
@@ -36,8 +36,11 @@ internal class IfNode : SyntaxNode
             var conditionValue = module.LlvmBuilder.BuildCondBr(value, thenBlock, nextBlock);
 
             module.LlvmBuilder.PositionAtEnd(thenBlock);
-            _blockNode.Emit(module, type, method);
-            module.LlvmBuilder.BuildBr(nextBlock);
+            var lastValue = (LLVMValueRef)_blockNode.Emit(module, type, method, metadata);
+
+            // To handle "break" and "continue"
+            if (lastValue != null && lastValue.InstructionOpcode is not LLVMOpcode.LLVMBr)
+                module.LlvmBuilder.BuildBr(nextBlock);
 
             module.LlvmBuilder.PositionAtEnd(nextBlock);
 
@@ -51,12 +54,18 @@ internal class IfNode : SyntaxNode
             var conditionValue = module.LlvmBuilder.BuildCondBr(value, thenBlock, elseBlock);
 
             module.LlvmBuilder.PositionAtEnd(thenBlock);
-            _blockNode.Emit(module, type, method);
-            module.LlvmBuilder.BuildBr(nextBlock);
+            var lastValue = (LLVMValueRef)_blockNode.Emit(module, type, method, metadata);
+
+            // To handle "break" and "continue"
+            if (lastValue != null && lastValue.InstructionOpcode is not LLVMOpcode.LLVMBr)
+                module.LlvmBuilder.BuildBr(nextBlock);
 
             module.LlvmBuilder.PositionAtEnd(elseBlock);
-            _elseBlockNode.Emit(module, type, method);
-            module.LlvmBuilder.BuildBr(nextBlock);
+            lastValue = (LLVMValueRef)_elseBlockNode.Emit(module, type, method, metadata);
+
+            // To handle "break" and "continue"
+            if (lastValue != null && lastValue.InstructionOpcode is not LLVMOpcode.LLVMBr)
+                module.LlvmBuilder.BuildBr(nextBlock);
 
             module.LlvmBuilder.PositionAtEnd(nextBlock);
 

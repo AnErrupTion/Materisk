@@ -20,12 +20,12 @@ internal class BlockNode : SyntaxNode
         return null!;
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         object? lastValue = null;
 
         foreach (var node in _nodes)
-            lastValue = node.Emit(module, type, method);
+            lastValue = node.Emit(module, type, method, metadata);
 
         return lastValue!;
     }

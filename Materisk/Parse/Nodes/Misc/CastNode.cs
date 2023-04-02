@@ -25,9 +25,9 @@ internal class CastNode : SyntaxNode
     }
 
     // TODO: Fix casts from float
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var value = (LLVMValueRef)_node.Emit(module, type, method);
+        var value = (LLVMValueRef)_node.Emit(module, type, method, metadata);
         var resultValue = _ident.Text switch
         {
             "i32" or "u32" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Int32),

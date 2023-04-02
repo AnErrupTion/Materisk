@@ -21,9 +21,9 @@ internal class ReturnNode : SyntaxNode
         return null!;
     }
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var value = _returnValueNode?.Emit(module, type, method);
+        var value = _returnValueNode?.Emit(module, type, method, metadata);
         if (value is not null)
             module.LlvmBuilder.BuildRet((LLVMValueRef)value);
         else
