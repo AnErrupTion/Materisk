@@ -2,6 +2,7 @@ using "stdlib.msk";
 
 fn pub main() void
 {
-	var array arr str = [2];
+	var array arr str = [1];
 	array[0] = "hi";
+	Console.println(array[0]);
 }

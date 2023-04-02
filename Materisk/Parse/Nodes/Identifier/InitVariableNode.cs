@@ -47,7 +47,7 @@ internal class InitVariableNode : SyntaxNode
 
         LLVMTypeRef pointerElementType = null;
 
-        if (_typeToken.Text is "ptr" && _secondTypeToken is not null)
+        if (_typeToken.Text is "ptr" or "arr" && _secondTypeToken is not null)
         {
             value = module.LlvmBuilder.BuildIntToPtr(value, LLVMTypeRef.CreatePointer(valueType, 0));
             pointerElementType = TypeSigUtils.GetTypeSignatureFor(_secondTypeToken.Text);

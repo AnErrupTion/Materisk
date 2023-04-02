@@ -422,12 +422,14 @@ public class Parser
                 if (typeToken is null && secondTypeToken is null)
                     return new IntLiteralNode(current);
 
-                return (secondTypeToken is null ? typeToken.Text : secondTypeToken.Text) switch
+                var type = secondTypeToken is null ? typeToken.Text : secondTypeToken.Text;
+                
+                return type switch
                 {
                     "i32" or "u32" => new IntLiteralNode(current),
                     "f32" => new FloatLiteralNode(current),
                     "i8" or "u8" => new ByteLiteralNode(current),
-                    _ => throw new NotImplementedException($"Unimplemented number type: {secondTypeToken.Text}")
+                    _ => throw new NotImplementedException($"Unimplemented number type: {type}")
                 };
             }
             case SyntaxType.String:

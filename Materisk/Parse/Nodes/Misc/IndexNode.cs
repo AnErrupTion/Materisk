@@ -80,8 +80,8 @@ internal class IndexNode : SyntaxNode
 
         var underlyingType = variableValue.TypeOf.Kind;
 
-        if (underlyingType is not LLVMTypeKind.LLVMArrayTypeKind and not LLVMTypeKind.LLVMPointerTypeKind)
-            throw new InvalidOperationException($"Catastrophic failure: variable is not array or pointer: {underlyingType}"); // This should never happen either
+        if (underlyingType is not LLVMTypeKind.LLVMPointerTypeKind)
+            throw new InvalidOperationException($"Catastrophic failure: variable is not pointer: {underlyingType}"); // This should never happen either
 
         switch (underlyingType)
         {
@@ -96,8 +96,6 @@ internal class IndexNode : SyntaxNode
                 var llvmPtr = module.LlvmBuilder.BuildGEP2(variable.Type, variableValue, new[] { index });
                 return module.LlvmBuilder.BuildLoad2(variable.PointerElementType, llvmPtr);
             }
-            case LLVMTypeKind.LLVMArrayTypeKind when _setNode is not null: throw new NotImplementedException();
-            case LLVMTypeKind.LLVMArrayTypeKind: throw new NotImplementedException();
         }
 
         return null!;
