@@ -3,6 +3,18 @@ using "stdlib.msk";
 fn pub main() void
 {
 	var array arr str = [1];
-	array[0] = "hi";
-	Console.println(array[0]);
+	array[0] = "ABCD";
+
+	var string str = array[0];
+	Console.println(string);
+
+	var byte u8 = string[0];
+	if (byte == (u8)65)
+	{
+		Console.println("Correct!");
+	}
+	else
+	{
+		Console.println("Incorrect!");
+	};
 }

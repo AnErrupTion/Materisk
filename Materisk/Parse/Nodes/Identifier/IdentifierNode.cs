@@ -39,15 +39,15 @@ internal class IdentifierNode : SyntaxNode
 
         foreach (var field in module.Types[0].Fields)
             if (field.Name == name)
-                return module.LlvmBuilder.BuildLoad2(field.Type, field.LlvmField);
+                return field;
 
         foreach (var meth in module.Types[0].Methods)
             if (meth.Name == name)
                 return meth;
 
-        for (var i = 0; i < method.Arguments.Length; i++)
-            if (method.Arguments[i].Name == name)
-                return method.LlvmMethod.Params[i];
+        foreach (var arg in method.Arguments)
+            if (arg.Name == name)
+                return arg;
 
         foreach (var variable in method.Variables)
             if (variable.Name == name)

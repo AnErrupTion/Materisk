@@ -35,7 +35,10 @@ internal class CallNode : SyntaxNode
         var args = new List<LLVMValueRef>();
 
         foreach (var n in _argumentNodes)
-            args.Add((LLVMValueRef)n.Emit(module, type, method, metadata));
+        {
+            var value = n.Emit(module, type, method, metadata);
+            args.Add(value is MateriskUnit unit ? unit.Load() : (LLVMValueRef)value);
+        }
 
         return args;
     }

@@ -109,9 +109,18 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
 
         foreach (var arg in _args)
         {
-            var argType = TypeSigUtils.GetTypeSignatureFor(arg.Key.Item1.Text, arg.Key.Item2?.Text);
+            var firstType = arg.Key.Item1.Text;
+            var secondType = arg.Key.Item2?.Text;
+            var argType = TypeSigUtils.GetTypeSignatureFor(firstType, secondType);
+            var pointerElementType = firstType switch
+            {
+                "ptr" or "arr" when secondType is not null => TypeSigUtils.GetTypeSignatureFor(secondType),
+                "str" => LLVMTypeRef.Int8,
+                _ => null
+            };
+
             parameters.Add(argType);
-            argts.Add(new(arg.Value.Text, argType));
+            argts.Add(new(arg.Value.Text, argType, pointerElementType));
         }
 
         var newMethod = new MateriskMethod(

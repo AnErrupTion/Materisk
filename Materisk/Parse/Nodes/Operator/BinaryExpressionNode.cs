@@ -29,8 +29,12 @@ internal class BinaryExpressionNode : SyntaxNode
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var leftValue = (LLVMValueRef)_left.Emit(module, type, method, metadata);
-        var rightValue = (LLVMValueRef)_right.Emit(module, type, method, metadata);
+        var lhs = _left.Emit(module, type, method, metadata);
+        var rhs = _right.Emit(module, type, method, metadata);
+
+        var leftValue = lhs is MateriskUnit leftUnit ? leftUnit.Load() : (LLVMValueRef)lhs;
+        var rightValue = rhs is MateriskUnit rightUnit ? rightUnit.Load() : (LLVMValueRef)rhs;
+
         var resultValue = _operatorToken.Type switch
         {
             // TODO: Signed
@@ -74,6 +78,7 @@ internal class BinaryExpressionNode : SyntaxNode
                     LlvmUtils.IntZero),
             _ => throw new InvalidOperationException($"Trying to do a binary expression on: {_operatorToken.Type}")
         };
+
         return resultValue;
     }
 

@@ -2,13 +2,12 @@ using LLVMSharp.Interop;
 
 namespace MateriskLLVM;
 
-public sealed class MateriskField
+public sealed class MateriskField : MateriskUnit
 {
     public LLVMValueRef LlvmField;
 
     public readonly MateriskType ParentType;
     public readonly string Name;
-    public readonly LLVMTypeRef Type;
 
     public MateriskField(MateriskType type, string name, LLVMTypeRef fieldType)
     {
@@ -19,4 +18,6 @@ public sealed class MateriskField
         Name = name;
         Type = fieldType;
     }
+
+    public override LLVMValueRef Load() => ParentType.ParentModule.LlvmBuilder.BuildLoad2(Type, LlvmField);
 }

@@ -69,32 +69,35 @@ internal class IndexNode : SyntaxNode
         return null!;
     }
 
-    // TODO: Opaque pointer support (LLVM 15+)
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var variable = (MateriskLocalVariable)_nameNode.Emit(module, type, method, metadata);
-        var variableValue = variable.Mutable
-            ? module.LlvmBuilder.BuildLoad2(variable.Type, variable.Value)
-            : variable.Value;
-        var index = (LLVMValueRef)_indexNode.Emit(module, type, method, metadata);
+        var name = _nameNode.Emit(module, type, method, metadata);
 
-        var underlyingType = variableValue.TypeOf.Kind;
+        if (name is not MateriskUnit unit)
+            throw new NotImplementedException($"Value isn't MateriskUnit: {name}");
+
+        var llvmType = unit.Type;
+        var llvmElementType = unit.PointerElementType;
+        var llvmValue = unit.Load();
+        var underlyingType = llvmValue.TypeOf.Kind;
 
         if (underlyingType is not LLVMTypeKind.LLVMPointerTypeKind)
             throw new InvalidOperationException($"Catastrophic failure: variable is not pointer: {underlyingType}"); // This should never happen either
+
+        var index = (LLVMValueRef)_indexNode.Emit(module, type, method, metadata);
 
         switch (underlyingType)
         {
             case LLVMTypeKind.LLVMPointerTypeKind when _setNode is not null:
             {
-                var llvmPtr = module.LlvmBuilder.BuildGEP2(variable.Type, variableValue, new[] { index });
+                var llvmPtr = module.LlvmBuilder.BuildGEP2(llvmType, llvmValue, new[] { index });
                 var value = (LLVMValueRef)_setNode.Emit(module, type, method, metadata);
                 return module.LlvmBuilder.BuildStore(value, llvmPtr);
             }
             case LLVMTypeKind.LLVMPointerTypeKind:
             {
-                var llvmPtr = module.LlvmBuilder.BuildGEP2(variable.Type, variableValue, new[] { index });
-                return module.LlvmBuilder.BuildLoad2(variable.PointerElementType, llvmPtr);
+                var llvmPtr = module.LlvmBuilder.BuildGEP2(llvmType, llvmValue, new[] { index });
+                return module.LlvmBuilder.BuildLoad2(llvmElementType, llvmPtr);
             }
         }
 

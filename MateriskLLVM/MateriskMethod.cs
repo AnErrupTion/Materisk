@@ -2,13 +2,12 @@ using LLVMSharp.Interop;
 
 namespace MateriskLLVM;
 
-public sealed class MateriskMethod
+public sealed class MateriskMethod : MateriskUnit
 {
     public LLVMValueRef LlvmMethod;
 
     public readonly MateriskType ParentType;
     public readonly string Name;
-    public readonly LLVMTypeRef Type;
     public readonly MateriskMethodArgument[] Arguments;
     public readonly List<MateriskLocalVariable> Variables;
 
@@ -24,6 +23,9 @@ public sealed class MateriskMethod
         Type = methodType;
         Arguments = arguments;
         Variables = new();
+
+        for (var i = 0; i < Arguments.Length; i++)
+            Arguments[i].Value = LlvmMethod.Params[i];
     }
 
     public MateriskLocalVariable? GetVariableByName(string name)
@@ -34,4 +36,6 @@ public sealed class MateriskMethod
 
         return null;
     }
+
+    public override LLVMValueRef Load() => throw new NotImplementedException();
 }

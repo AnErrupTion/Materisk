@@ -7,5 +7,6 @@ public static class SyntaxFacts
         or "if" or "elif" or "else"
         or "for" or "while" or "fn" or "var" or "fld" or "mut"
         or "using" or "native" or "new"
-        or "mod" or "dyn" or "pub";
+        or "mod" or "dyn" or "pub"
+        or "true" or "false";
 }

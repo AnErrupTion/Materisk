@@ -2,7 +2,7 @@ using LLVMSharp.Interop;
 
 namespace MateriskLLVM;
 
-public sealed class MateriskModule
+public sealed class MateriskModule : MateriskUnit
 {
     public LLVMModuleRef LlvmModule;
     public LLVMBuilderRef LlvmBuilder;
@@ -18,4 +18,6 @@ public sealed class MateriskModule
         Name = name;
         Types = new();
     }
+
+    public override LLVMValueRef Load() => throw new NotImplementedException();
 }

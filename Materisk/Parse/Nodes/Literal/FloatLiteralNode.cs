@@ -1,51 +1,40 @@
-﻿using System.Globalization;
-using AsmResolver.DotNet;
+﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using AsmResolver.PE.DotNet.Cil;
 using LLVMSharp.Interop;
 using MateriskLLVM;
-using Materisk.Lex;
-using Materisk.Parse.Nodes.Misc;
 
 namespace Materisk.Parse.Nodes.Literal;
 
 internal class FloatLiteralNode : SyntaxNode
 {
-    private readonly SyntaxToken _syntaxToken;
+    private readonly float _value;
 
-    public FloatLiteralNode(SyntaxToken syntaxToken)
+    public FloatLiteralNode(float value)
     {
-        _syntaxToken = syntaxToken;
+        _value = value;
     }
 
     public override NodeType Type => NodeType.FloatLiteral;
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var value = float.Parse(_syntaxToken.Text, CultureInfo.InvariantCulture);
-        method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldc_R4, value);
-        return value;
+        return null!;
     }
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var value = float.Parse(_syntaxToken.Text, CultureInfo.InvariantCulture);
-        if (value < 0)
+        if (_value < 0)
         {
-            var llvmValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Float, Convert.ToUInt64(Math.Abs(value)), true);
-            var sub = LLVMValueRef.CreateConstSub(LlvmUtils.FloatZero, llvmValue);
-            return sub;
+            var llvmValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Float, Convert.ToUInt64(Math.Abs(_value)), true);
+            return LLVMValueRef.CreateConstSub(LlvmUtils.FloatZero, llvmValue);
         }
-        else
-        {
-            var llvmValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Float, Convert.ToUInt64(value), true);
-            return llvmValue;
-        }
+
+        return LLVMValueRef.CreateConstInt(LLVMTypeRef.Float, Convert.ToUInt64(_value), true);
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(_syntaxToken);
+        return Enumerable.Empty<SyntaxNode>();
     }
 
     public override string ToString()

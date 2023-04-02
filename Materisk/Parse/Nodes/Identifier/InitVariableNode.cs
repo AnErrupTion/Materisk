@@ -47,10 +47,19 @@ internal class InitVariableNode : SyntaxNode
 
         LLVMTypeRef pointerElementType = null;
 
-        if (_typeToken.Text is "ptr" or "arr" && _secondTypeToken is not null)
+        switch (_typeToken.Text)
         {
-            value = module.LlvmBuilder.BuildIntToPtr(value, LLVMTypeRef.CreatePointer(valueType, 0));
-            pointerElementType = TypeSigUtils.GetTypeSignatureFor(_secondTypeToken.Text);
+            case "ptr" or "arr" when _secondTypeToken is not null:
+            {
+                value = module.LlvmBuilder.BuildIntToPtr(value, LLVMTypeRef.CreatePointer(valueType, 0));
+                pointerElementType = TypeSigUtils.GetTypeSignatureFor(_secondTypeToken.Text);
+                break;
+            }
+            case "str":
+            {
+                pointerElementType = LLVMTypeRef.Int8;
+                break;
+            }
         }
 
         if (_mutable)
@@ -59,7 +68,7 @@ internal class InitVariableNode : SyntaxNode
             value = module.LlvmBuilder.BuildAlloca(value.TypeOf);
             module.LlvmBuilder.BuildStore(constValue, value);
         }
-        method.Variables.Add(new(name, _mutable, valueType, pointerElementType, value));
+        method.Variables.Add(new(method, name, _mutable, valueType, pointerElementType, value));
         return value;
     }
 

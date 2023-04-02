@@ -13,6 +13,7 @@ public enum SyntaxType
     Plus, Minus, Mod, Mul, Div, Pow,
     Dot,
     LParen, RParen,
+    Bool,
     Number,
     String,
     LSqBracket, RSqBracket,
