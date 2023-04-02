@@ -110,6 +110,6 @@ internal class IndexNode : SyntaxNode
 
     public override string ToString()
     {
-        return "ArrIdxNode:";
+        return "IdxNode:";
     }
 }
