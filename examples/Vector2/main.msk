@@ -1,6 +1,6 @@
-import "stdlib.msk";
+using "stdlib.msk";
 
 fn pub main() void
 {
-	var string str = "Hello, World!";
+	Console.println(str "Hello, World!");
 }
