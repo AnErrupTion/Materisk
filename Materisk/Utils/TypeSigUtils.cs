@@ -62,7 +62,7 @@ internal static class TypeSigUtils
                     "i32" or "u32" => LLVMTypeRef.CreateArray(LLVMTypeRef.Int32, arrayItemCount),
                     "f32" => LLVMTypeRef.CreateArray(LLVMTypeRef.Float, arrayItemCount),
                     "i8" or "u8" => LLVMTypeRef.CreateArray(LLVMTypeRef.Int8, arrayItemCount),
-                    "str" => throw new InvalidOperationException("Unable to make a string array!"),
+                    "str" => LLVMTypeRef.CreateArray(LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0), arrayItemCount),
                     "void" => LLVMTypeRef.CreateArray(LLVMTypeRef.Void, arrayItemCount),
                     _ => throw new InvalidOperationException("Unable to make an array for a custom type!")
                 };
@@ -74,7 +74,7 @@ internal static class TypeSigUtils
                     "i32" or "u32" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Int32, 0),
                     "f32" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Float, 0),
                     "i8" or "u8" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0),
-                    "str" => throw new InvalidOperationException("Unable to make a string pointer!"),
+                    "str" => LLVMTypeRef.CreatePointer(LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0), 0),
                     "void" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Void, 0),
                     _ => throw new InvalidOperationException("Unable to make a pointer for a custom type!")
                 };

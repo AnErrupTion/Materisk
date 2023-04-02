@@ -2,6 +2,6 @@ using "stdlib.msk";
 
 fn pub main() void
 {
-	var array arr u8 = [2];
-	var string mut str = "Hello, World!";
+	var array arr str = [2];
+	array[0] = "hi";
 }
