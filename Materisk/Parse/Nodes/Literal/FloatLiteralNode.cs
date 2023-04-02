@@ -23,13 +23,7 @@ internal class FloatLiteralNode : SyntaxNode
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        if (_value < 0)
-        {
-            var llvmValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Float, Convert.ToUInt64(Math.Abs(_value)), true);
-            return LLVMValueRef.CreateConstSub(LlvmUtils.FloatZero, llvmValue);
-        }
-
-        return LLVMValueRef.CreateConstInt(LLVMTypeRef.Float, Convert.ToUInt64(_value), true);
+        return LLVMValueRef.CreateConstReal(LLVMTypeRef.Float, Convert.ToDouble(_value));
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

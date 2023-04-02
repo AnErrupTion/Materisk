@@ -2,9 +2,9 @@ using "stdlib.msk";
 
 fn pub main() void
 {
-	var length u32 = lenof("ABCDEFGH");
+	var length mut f64 = (f64)4.2;
 
-	if (length == 8)
+	if (length == (f64)4.2)
 	{
 		Console.println("Correct!");
 	}

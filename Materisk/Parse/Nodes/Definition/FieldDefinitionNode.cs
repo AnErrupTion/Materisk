@@ -12,14 +12,12 @@ internal class FieldDefinitionNode : SyntaxNode
     private readonly bool _isPublic;
     private readonly SyntaxToken _nameToken;
     private readonly SyntaxToken _typeToken;
-    private readonly SyntaxNode? _statement;
 
-    public FieldDefinitionNode(bool isPublic, SyntaxToken nameToken, SyntaxToken typeToken, SyntaxNode? statement = null)
+    public FieldDefinitionNode(bool isPublic, SyntaxToken nameToken, SyntaxToken typeToken)
     {
         _isPublic = isPublic;
         _nameToken = nameToken;
         _typeToken = typeToken;
-        _statement = statement;
     }
 
     public override NodeType Type => NodeType.FieldDefinition;

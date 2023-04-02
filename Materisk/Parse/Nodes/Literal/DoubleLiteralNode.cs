@@ -23,13 +23,7 @@ internal class DoubleLiteralNode : SyntaxNode
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        if (_value < 0)
-        {
-            var llvmValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Double, Convert.ToUInt64(Math.Abs(_value)), true);
-            return LLVMValueRef.CreateConstSub(LlvmUtils.DoubleZero, llvmValue);
-        }
-
-        return LLVMValueRef.CreateConstInt(LLVMTypeRef.Double, Convert.ToUInt64(_value), true);
+        return LLVMValueRef.CreateConstReal(LLVMTypeRef.Double, _value);
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

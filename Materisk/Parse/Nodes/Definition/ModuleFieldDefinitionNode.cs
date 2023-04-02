@@ -13,15 +13,13 @@ internal class ModuleFieldDefinitionNode : SyntaxNode
     private readonly bool _isStatic;
     private readonly SyntaxToken _nameToken;
     private readonly SyntaxToken _typeToken;
-    private readonly SyntaxNode? _statement;
 
-    public ModuleFieldDefinitionNode(bool isPublic, bool isStatic, SyntaxToken nameToken, SyntaxToken typeToken, SyntaxNode? statement = null)
+    public ModuleFieldDefinitionNode(bool isPublic, bool isStatic, SyntaxToken nameToken, SyntaxToken typeToken)
     {
         _isPublic = isPublic;
         _isStatic = isStatic;
         _nameToken = nameToken;
         _typeToken = typeToken;
-        _statement = statement;
     }
 
     public override NodeType Type => NodeType.ModuleFieldDefinition;
