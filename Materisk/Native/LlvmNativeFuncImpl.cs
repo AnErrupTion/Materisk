@@ -5,8 +5,8 @@ namespace Materisk.Native;
 
 public static class LlvmNativeFuncImpl
 {
-    public static LLVMTypeRef MallocType, FreeType, StrlenType, PrintfType;
-    public static LLVMValueRef Malloc, Free, Strlen, Printf;
+    public static LLVMTypeRef MallocType, FreeType, PrintfType;
+    public static LLVMValueRef Malloc, Free, Printf;
 
     public static void Emit(MateriskModule module, string typeName, MateriskMethod method)
     {
@@ -30,16 +30,6 @@ public static class LlvmNativeFuncImpl
 
                 module.LlvmBuilder.BuildCall2(FreeType, Free, method.LlvmMethod.Params);
                 module.LlvmBuilder.BuildRetVoid();
-                return;
-            }
-            case "lenof":
-            {
-                StrlenType = LLVMTypeRef.CreateFunction(LLVMTypeRef.Int32, new[] { LlvmUtils.BytePointer });
-                Strlen = module.LlvmModule.AddFunction("strlen", StrlenType);
-                Strlen.Linkage = LLVMLinkage.LLVMExternalLinkage;
-
-                var length = module.LlvmBuilder.BuildCall2(StrlenType, Strlen, method.LlvmMethod.Params);
-                module.LlvmBuilder.BuildRet(length);
                 return;
             }
         }
