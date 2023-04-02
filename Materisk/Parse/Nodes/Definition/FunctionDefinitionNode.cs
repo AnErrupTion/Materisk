@@ -12,17 +12,19 @@ namespace Materisk.Parse.Nodes.Definition;
 internal class FunctionDefinitionNode : SyntaxNode
 {
     private readonly SyntaxToken _nameToken;
-    private readonly Dictionary<SyntaxToken, SyntaxToken> _args;
+    private readonly Dictionary<Tuple<SyntaxToken, SyntaxToken?>, SyntaxToken> _args;
     private readonly SyntaxToken _returnType;
+    private readonly SyntaxToken? _secondReturnType;
     private readonly SyntaxNode _block;
     private readonly bool _isPublic;
     private readonly bool _isNative;
 
-    public FunctionDefinitionNode(SyntaxToken nameToken, Dictionary<SyntaxToken, SyntaxToken> args, SyntaxToken returnType, SyntaxNode block, bool isPublic, bool isNative)
+    public FunctionDefinitionNode(SyntaxToken nameToken, Dictionary<Tuple<SyntaxToken, SyntaxToken?>, SyntaxToken> args, SyntaxToken returnType, SyntaxToken? secondReturnType, SyntaxNode block, bool isPublic, bool isNative)
     {
         _nameToken = nameToken;
         _args = args;
         _returnType = returnType;
+        _secondReturnType = secondReturnType;
         _block = block;
         _isPublic = isPublic;
         _isNative = isNative;
@@ -42,7 +44,7 @@ internal class FunctionDefinitionNode : SyntaxNode
 
         foreach (var arg in _args)
         {
-            var argType = TypeSigUtils.GetTypeSignatureFor(arg.Key.Text);
+            var argType = TypeSigUtils.GetTypeSignatureFor(arg.Key.Item1.Text, arg.Key.Item2?.Text);
             parameters.Add(argType);
             argts.Add(new(arg.Value.Text, argType));
         }
@@ -51,7 +53,7 @@ internal class FunctionDefinitionNode : SyntaxNode
             module.Types[0],
             _nameToken.Text,
             LLVMTypeRef.CreateFunction(
-                TypeSigUtils.GetTypeSignatureFor(_returnType.Text),
+                TypeSigUtils.GetTypeSignatureFor(_returnType.Text, _secondReturnType?.Text),
                 parameters.ToArray()),
             argts.ToArray());
 

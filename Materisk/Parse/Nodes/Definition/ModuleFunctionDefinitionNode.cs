@@ -17,19 +17,21 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
 {
     private readonly SyntaxToken _moduleName;
     private readonly SyntaxToken _name;
-    private readonly Dictionary<SyntaxToken, SyntaxToken> _args;
+    private readonly Dictionary<Tuple<SyntaxToken, SyntaxToken?>, SyntaxToken> _args;
     private readonly SyntaxToken _returnType;
+    private readonly SyntaxToken? _secondReturnType;
     private readonly SyntaxNode _body;
     private readonly bool _isStatic;
     private readonly bool _isPublic;
     private readonly bool _isNative;
 
-    public ModuleFunctionDefinitionNode(SyntaxToken moduleName, SyntaxToken name, Dictionary<SyntaxToken, SyntaxToken> args, SyntaxToken returnType, SyntaxNode body, bool isStatic, bool isPublic, bool isNative)
+    public ModuleFunctionDefinitionNode(SyntaxToken moduleName, SyntaxToken name, Dictionary<Tuple<SyntaxToken, SyntaxToken?>, SyntaxToken> args, SyntaxToken returnType, SyntaxToken? secondReturnType, SyntaxNode body, bool isStatic, bool isPublic, bool isNative)
     {
         _moduleName = moduleName;
         _name = name;
         _args = args;
         _returnType = returnType;
+        _secondReturnType = secondReturnType;
         _body = body;
         _isStatic = isStatic;
         _isPublic = isPublic;
@@ -47,7 +49,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
 
         foreach (var arg in _args)
         {
-            parameters.Add(TypeSigUtils.GetTypeSignatureFor(module, arg.Key.Text));
+            parameters.Add(TypeSigUtils.GetTypeSignatureFor(module, arg.Key.Item1.Text, arg.Key.Item2?.Text));
             argts.Add(arg.Value.Text);
         }
 
@@ -107,7 +109,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
 
         foreach (var arg in _args)
         {
-            var argType = TypeSigUtils.GetTypeSignatureFor(arg.Key.Text);
+            var argType = TypeSigUtils.GetTypeSignatureFor(arg.Key.Item1.Text, arg.Key.Item2?.Text);
             parameters.Add(argType);
             argts.Add(new(arg.Value.Text, argType));
         }
@@ -116,7 +118,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
             type,
             targetName,
             LLVMTypeRef.CreateFunction(
-                TypeSigUtils.GetTypeSignatureFor(_returnType.Text),
+                TypeSigUtils.GetTypeSignatureFor(_returnType.Text, _secondReturnType?.Text),
                 parameters.ToArray()),
             argts.ToArray());
 

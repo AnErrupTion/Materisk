@@ -188,9 +188,19 @@ public class Parser
             var name = MatchToken(SyntaxType.Identifier);
             var args = ParseFunctionArgs();
             var returnType = MatchToken(SyntaxType.Identifier);
+
+            SyntaxToken? secondReturnType = null;
+
+            var current = Peek();
+            if (current.Type is SyntaxType.Identifier)
+            {
+                _position++;
+                secondReturnType = current;
+            }
+
             var body = ParseScopedStatements();
 
-            nodes.Add(new ModuleFunctionDefinitionNode(moduleName, name, args, returnType, body, isStatic, isPublic, isNative));
+            nodes.Add(new ModuleFunctionDefinitionNode(moduleName, name, args, returnType, secondReturnType, body, isStatic, isPublic, isNative));
         }
 
         return nodes;
@@ -489,7 +499,7 @@ public class Parser
         if (Peek().Type == SyntaxType.RSqBracket)
             throw new InvalidOperationException("Array length not specified!");
 
-        var expr = ParseExpression(typeToken, secondTypeToken);
+        var expr = ParseExpression(null!, null!); // TODO: Is this right?
         MatchToken(SyntaxType.RSqBracket);
 
         return new ArrayNode(secondTypeToken, expr);
@@ -566,9 +576,19 @@ public class Parser
         var nameToken = MatchToken(SyntaxType.Identifier);
         var args = ParseFunctionArgs();
         var returnType = MatchToken(SyntaxType.Identifier);
+
+        SyntaxToken? secondReturnType = null;
+
+        var current = Peek();
+        if (current.Type is SyntaxType.Identifier)
+        {
+            _position++;
+            secondReturnType = current;
+        }
+
         var block = ParseScopedStatements();
 
-        return new FunctionDefinitionNode(nameToken, args, returnType, block, isPublic, isNative);
+        return new FunctionDefinitionNode(nameToken, args, returnType, secondReturnType, block, isPublic, isNative);
     }
 
     private SyntaxNode ParseFieldExpression()
@@ -621,25 +641,41 @@ public class Parser
         return new InstantiateNode(ident, argumentNodes);
     }
 
-    private Dictionary<SyntaxToken, SyntaxToken> ParseFunctionArgs()
+    private Dictionary<Tuple<SyntaxToken, SyntaxToken?>, SyntaxToken> ParseFunctionArgs()
     {
         MatchToken(SyntaxType.LParen);
 
-        var args = new Dictionary<SyntaxToken, SyntaxToken>();
+        var args = new Dictionary<Tuple<SyntaxToken, SyntaxToken?>, SyntaxToken>();
 
         if (Peek().Type is not SyntaxType.RParen)
         {
             var type = MatchToken(SyntaxType.Identifier);
             var ident = MatchToken(SyntaxType.Identifier);
 
-            args.Add(type, ident);
+            SyntaxToken? secondType = null;
+
+            if (Peek().Type is SyntaxType.Identifier)
+            {
+                secondType = ident;
+                ident = MatchToken(SyntaxType.Identifier);
+            }
+
+            args.Add(Tuple.Create(type, secondType), ident);
 
             while (Peek().Type == SyntaxType.Comma)
             {
                 _position++;
+
                 type = MatchToken(SyntaxType.Identifier);
                 ident = MatchToken(SyntaxType.Identifier);
-                args.Add(type, ident);
+
+                if (Peek().Type is SyntaxType.Identifier)
+                {
+                    secondType = ident;
+                    ident = MatchToken(SyntaxType.Identifier);
+                }
+
+                args.Add(Tuple.Create(type, secondType), ident);
             }
         }
 

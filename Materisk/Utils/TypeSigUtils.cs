@@ -51,11 +51,22 @@ internal static class TypeSigUtils
     }
 
     // TODO: Structs as types
-    public static LLVMTypeRef GetTypeSignatureFor(string name, string? secondName = null)
+    public static LLVMTypeRef GetTypeSignatureFor(string name, string? secondName = null, uint arrayItemCount = 0)
     {
         switch (name)
         {
             case "arr" when secondName is not null:
+            {
+                return secondName switch
+                {
+                    "i32" or "u32" => LLVMTypeRef.CreateArray(LLVMTypeRef.Int32, arrayItemCount),
+                    "f32" => LLVMTypeRef.CreateArray(LLVMTypeRef.Float, arrayItemCount),
+                    "i8" or "u8" => LLVMTypeRef.CreateArray(LLVMTypeRef.Int8, arrayItemCount),
+                    "str" => throw new InvalidOperationException("Unable to make a string array!"),
+                    "void" => LLVMTypeRef.CreateArray(LLVMTypeRef.Void, arrayItemCount),
+                    _ => throw new InvalidOperationException("Unable to make an array for a custom type!")
+                };
+            }
             case "ptr" when secondName is not null:
             {
                 return secondName switch

@@ -32,7 +32,8 @@ internal class CastNode : SyntaxNode
         {
             "i32" or "u32" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Int32),
             "f32" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Float),
-            "i8" or "u8" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Int8)
+            "i8" or "u8" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Int8),
+            _ => throw new InvalidOperationException($"Can not cast to type: {_ident.Text}")
         };
         return resultValue;
     }

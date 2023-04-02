@@ -30,7 +30,7 @@ internal class StringLiteralNode : SyntaxNode
     {
         var value = _syntaxToken.Text;
         var llvmType = LLVMTypeRef.Int8;
-        var llvmValue = module.LlvmBuilder.BuildArrayAlloca(llvmType, LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, Convert.ToUInt64(value.Length + 1), true));
+        var llvmValue = module.LlvmBuilder.BuildAlloca(LLVMTypeRef.CreateArray(llvmType, (uint)(value.Length + 1)));
 
         // Store items
         for (var i = 0; i < value.Length; i++)

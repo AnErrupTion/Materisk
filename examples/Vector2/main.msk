@@ -2,8 +2,6 @@ using "stdlib.msk";
 
 fn pub main() void
 {
-	var pointer ptr u8 = 765446;
-	pointer[0] = (u8)65;
-	pointer[1] = (u8)15;
-	var value u8 = pointer[0];
+	var array arr u8 = [2];
+	var string mut str = "Hello, World!";
 }
