@@ -5,8 +5,8 @@ namespace Materisk.Native;
 
 public static class LlvmNativeFuncImpl
 {
-    public static LLVMTypeRef MallocType, FreeType, StrlenType, PrintfType;
-    public static LLVMValueRef Malloc, Free, Strlen, Printf;
+    public static LLVMTypeRef MallocType, FreeType, StrlenType, PrintfType, SprintfType;
+    public static LLVMValueRef Malloc, Free, Strlen, Printf, Sprintf;
 
     public static void Emit(MateriskModule module, string typeName, MateriskMethod method)
     {
@@ -14,8 +14,7 @@ public static class LlvmNativeFuncImpl
         {
             case "allocate":
             {
-                MallocType = LLVMTypeRef.CreateFunction(LLVMTypeRef.CreatePointer(LLVMTypeRef.Void, 0),
-                    new[] { LLVMTypeRef.Int32 });
+                MallocType = LLVMTypeRef.CreateFunction(LlvmUtils.VoidPointer, new[] { LLVMTypeRef.Int32 });
                 Malloc = module.LlvmModule.AddFunction("malloc", MallocType);
                 Malloc.Linkage = LLVMLinkage.LLVMExternalLinkage;
 
@@ -25,8 +24,7 @@ public static class LlvmNativeFuncImpl
             }
             case "free":
             {
-                FreeType = LLVMTypeRef.CreateFunction(LLVMTypeRef.Void, 
-                    new[] { LLVMTypeRef.CreatePointer(LLVMTypeRef.Void, 0) });
+                FreeType = LLVMTypeRef.CreateFunction(LLVMTypeRef.Void,  new[] { LlvmUtils.VoidPointer });
                 Free = module.LlvmModule.AddFunction("free", FreeType);
                 Free.Linkage = LLVMLinkage.LLVMExternalLinkage;
 
@@ -36,8 +34,7 @@ public static class LlvmNativeFuncImpl
             }
             case "lenof":
             {
-                StrlenType = LLVMTypeRef.CreateFunction(LLVMTypeRef.Int32,
-                    new[] { LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0) });
+                StrlenType = LLVMTypeRef.CreateFunction(LLVMTypeRef.Int32, new[] { LlvmUtils.BytePointer });
                 Strlen = module.LlvmModule.AddFunction("strlen", StrlenType);
                 Strlen.Linkage = LLVMLinkage.LLVMExternalLinkage;
 
@@ -60,8 +57,7 @@ public static class LlvmNativeFuncImpl
             }
             case "Console" when method.Name is "print":
             {
-                PrintfType = LLVMTypeRef.CreateFunction(LLVMTypeRef.Void,
-                    new[] { LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0) });
+                PrintfType = LLVMTypeRef.CreateFunction(LLVMTypeRef.Void, new[] { LlvmUtils.BytePointer });
                 Printf = module.LlvmModule.AddFunction("printf", PrintfType);
                 Printf.Linkage = LLVMLinkage.LLVMExternalLinkage;
 
