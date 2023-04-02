@@ -29,9 +29,9 @@ internal class ModuleDefinitionNode : SyntaxNode
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
         var newType = new MateriskType(module, _className.Text);
-        
+
         module.Types.Add(newType);
-        
+
         foreach (var bodyNode in _body)
         {
             if (bodyNode is not ModuleFunctionDefinitionNode and not ModuleFieldDefinitionNode)
@@ -40,7 +40,7 @@ internal class ModuleDefinitionNode : SyntaxNode
             bodyNode.Emit(module, newType, method);
         }
 
-        return null!;
+        return newType;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

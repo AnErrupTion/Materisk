@@ -35,7 +35,7 @@ internal class ModuleFieldDefinitionNode : SyntaxNode
     {
         var newField = new MateriskField(type, _nameToken.Text, TypeSigUtils.GetTypeSignatureFor(_typeToken.Text));
         type.Fields.Add(newField);
-        return newField.LlvmField;
+        return newField;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

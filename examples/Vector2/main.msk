@@ -2,5 +2,8 @@ using "stdlib.msk";
 
 fn pub main() void
 {
-	Console.println(str "Hello, World!");
+	for (var i mut i32 = 0; i < 5; i++)
+	{
+		Console.println(str "Hello, World!");
+	};
 }

@@ -129,7 +129,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
                 module.LlvmBuilder.BuildRetVoid();
         } else LlvmNativeFuncImpl.Emit(module, type.Name, newMethod);
 
-        return newMethod.LlvmMethod;
+        return newMethod;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
