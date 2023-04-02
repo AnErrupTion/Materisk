@@ -4,6 +4,7 @@ using LLVMSharp.Interop;
 using MateriskLLVM;
 using Materisk.Lex;
 using Materisk.Parse.Nodes.Misc;
+using Materisk.Utils;
 
 namespace Materisk.Parse.Nodes.Identifier;
 
@@ -43,9 +44,14 @@ internal class InitVariableNode : SyntaxNode
 
         var value = (LLVMValueRef)_expr.Emit(module, type, method, metadata);
         var valueType = value.TypeOf;
-        
+
+        LLVMTypeRef pointerElementType = null;
+
         if (_typeToken.Text is "ptr" && _secondTypeToken is not null)
+        {
             value = module.LlvmBuilder.BuildIntToPtr(value, LLVMTypeRef.CreatePointer(valueType, 0));
+            pointerElementType = TypeSigUtils.GetTypeSignatureFor(_secondTypeToken.Text);
+        }
 
         if (_mutable)
         {
@@ -53,7 +59,7 @@ internal class InitVariableNode : SyntaxNode
             value = module.LlvmBuilder.BuildAlloca(value.TypeOf);
             module.LlvmBuilder.BuildStore(constValue, value);
         }
-        method.Variables.Add(new(name, _mutable, valueType, value));
+        method.Variables.Add(new(name, _mutable, valueType, pointerElementType, value));
         return value;
     }
 

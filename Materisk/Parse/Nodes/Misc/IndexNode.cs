@@ -2,7 +2,6 @@
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.DotNet.Signatures.Types;
 using AsmResolver.PE.DotNet.Cil;
-using LLVMSharp;
 using LLVMSharp.Interop;
 using MateriskLLVM;
 
@@ -73,10 +72,13 @@ internal class IndexNode : SyntaxNode
     // TODO: Opaque pointer support (LLVM 15+)
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var variable = (LLVMValueRef)_nameNode.Emit(module, type, method, metadata); 
+        var variable = (MateriskLocalVariable)_nameNode.Emit(module, type, method, metadata);
+        var variableValue = variable.Mutable
+            ? module.LlvmBuilder.BuildLoad2(variable.Type, variable.Value)
+            : variable.Value;
         var index = (LLVMValueRef)_indexNode.Emit(module, type, method, metadata);
 
-        var underlyingType = variable.TypeOf.Kind;
+        var underlyingType = variableValue.TypeOf.Kind;
 
         if (underlyingType is not LLVMTypeKind.LLVMArrayTypeKind and not LLVMTypeKind.LLVMPointerTypeKind)
             throw new InvalidOperationException($"Catastrophic failure: variable is not array or pointer: {underlyingType}"); // This should never happen either
@@ -85,14 +87,14 @@ internal class IndexNode : SyntaxNode
         {
             case LLVMTypeKind.LLVMPointerTypeKind when _setNode is not null:
             {
-                var llvmPtr = module.LlvmBuilder.BuildGEP(variable, new[] { index });
+                var llvmPtr = module.LlvmBuilder.BuildGEP2(variable.Type, variableValue, new[] { index });
                 var value = (LLVMValueRef)_setNode.Emit(module, type, method, metadata);
                 return module.LlvmBuilder.BuildStore(value, llvmPtr);
             }
             case LLVMTypeKind.LLVMPointerTypeKind:
             {
-                var llvmPtr = module.LlvmBuilder.BuildGEP(variable, new[] { index });
-                return module.LlvmBuilder.BuildLoad(llvmPtr);
+                var llvmPtr = module.LlvmBuilder.BuildGEP2(variable.Type, variableValue, new[] { index });
+                return module.LlvmBuilder.BuildLoad2(variable.PointerElementType, llvmPtr);
             }
             case LLVMTypeKind.LLVMArrayTypeKind when _setNode is not null: throw new NotImplementedException();
             case LLVMTypeKind.LLVMArrayTypeKind: throw new NotImplementedException();

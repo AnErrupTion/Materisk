@@ -1,7 +1,5 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using AsmResolver.PE.DotNet.Cil;
-using LLVMSharp.Interop;
 using MateriskLLVM;
 using Materisk.Lex;
 using Materisk.Parse.Nodes.Misc;
@@ -21,48 +19,19 @@ internal class IdentifierNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var name = Token.Text;
-
-        if (name is "self" && method.DeclaringType is not null && method.Parameters.ThisParameter is not null)
-        {
-            method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldarg, method.Parameters.ThisParameter);
-            return method.DeclaringType;
-        }
-
-        foreach (var typeDef in module.TopLevelTypes)
-            if (typeDef.Name == name)
-                return typeDef;
-
-        foreach (var meth in module.TopLevelTypes[1].Methods)
-            if (meth.Name == name)
-                return meth;
-
-        var index = 0;
-
-        foreach (var argument in arguments)
-        {
-            if (argument == name)
-            {
-                method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldarg, method.Parameters[index]);
-                return argument;
-            }
-
-            index++;
-        }
-
-        foreach (var variable in variables)
-            if (variable.Key == name)
-            {
-                method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldloc, variable.Value);
-                return variable.Value;
-            }
-
-        throw new InvalidOperationException($"Unable to find value for identifier: {name}");
+        return null!;
     }
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var name = Token.Text;
+
+        // TODO: Instantiation support
+        /*if (name is "self" && method.DeclaringType is not null && method.Parameters.ThisParameter is not null)
+        {
+            method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldarg, method.Parameters.ThisParameter);
+            return method.DeclaringType;
+        }*/
 
         foreach (var typeDef in module.Types)
             if (typeDef.Name == name)
@@ -82,7 +51,7 @@ internal class IdentifierNode : SyntaxNode
 
         foreach (var variable in method.Variables)
             if (variable.Name == name)
-                return variable.Mutable ? module.LlvmBuilder.BuildLoad2(variable.Type, variable.Value) : variable.Value;
+                return variable;
 
         throw new InvalidOperationException($"Unable to find value for identifier: {name}");
     }

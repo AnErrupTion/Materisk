@@ -2,17 +2,8 @@ using "stdlib.msk";
 
 fn pub main() void
 {
-	var index mut i32 = 0;
-
-	while (index < 5)
-	{
-		if (index == 2)
-		{
-			index++;
-			continue;
-		};
-
-		Console.println(str "Hello, World!");
-		index++;
-	};
+	var pointer ptr u8 = 765446;
+	pointer[0] = (u8)65;
+	pointer[1] = (u8)15;
+	var value u8 = pointer[0];
 }

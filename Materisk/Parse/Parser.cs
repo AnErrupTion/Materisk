@@ -360,12 +360,12 @@ public class Parser
 
             if (Peek().Type is not SyntaxType.RParen)
             {
-                argumentNodes.Add(ParseExpression(typeToken, MatchToken(SyntaxType.Identifier)));
+                argumentNodes.Add(ParseExpression(typeToken, secondTypeToken));
 
                 while (Peek().Type is SyntaxType.Comma)
                 {
                     _position++;
-                    argumentNodes.Add(ParseExpression(typeToken, MatchToken(SyntaxType.Identifier)));
+                    argumentNodes.Add(ParseExpression(typeToken, secondTypeToken));
                 }
 
                 MatchToken(SyntaxType.RParen);

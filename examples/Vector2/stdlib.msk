@@ -4,8 +4,8 @@ mod pub Console
 
 	fn pub println(str text) void
 	{
-		Console.print(str text);
-		Console.print(str "\n");
+		Console.print(text);
+		Console.print("\n");
 	}
 }
 
