@@ -2,18 +2,16 @@
 using AsmResolver.DotNet.Code.Cil;
 using LLVMSharp.Interop;
 using MateriskLLVM;
-using Materisk.Lex;
-using Materisk.Parse.Nodes.Misc;
 
 namespace Materisk.Parse.Nodes.Literal;
 
 internal class StringLiteralNode : SyntaxNode
 {
-    private readonly SyntaxToken _syntaxToken;
+    private readonly string _text;
 
-    public StringLiteralNode(SyntaxToken syntaxToken)
+    public StringLiteralNode(string text)
     {
-        _syntaxToken = syntaxToken;
+        _text = text;
     }
 
     public override NodeType Type => NodeType.StringLiteral;
@@ -25,21 +23,20 @@ internal class StringLiteralNode : SyntaxNode
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var value = _syntaxToken.Text;
         var llvmType = LLVMTypeRef.Int8;
-        var llvmValue = module.LlvmBuilder.BuildAlloca(LLVMTypeRef.CreateArray(llvmType, (uint)(value.Length + 1)));
+        var llvmValue = module.LlvmBuilder.BuildAlloca(LLVMTypeRef.CreateArray(llvmType, (uint)(_text.Length + 1)));
 
         // Store items
-        for (var i = 0; i < value.Length; i++)
+        for (var i = 0; i < _text.Length; i++)
         {
-            var llvmChar = LLVMValueRef.CreateConstInt(llvmType, Convert.ToUInt64(value[i]), true);
+            var llvmChar = LLVMValueRef.CreateConstInt(llvmType, Convert.ToUInt64(_text[i]), true);
             var llvmIndex = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, Convert.ToUInt64(i), true);
             var llvmPtr = module.LlvmBuilder.BuildGEP2(llvmType, llvmValue, new[] { llvmIndex });
             module.LlvmBuilder.BuildStore(llvmChar, llvmPtr);
         }
 
         // Store null char
-        var charIndex = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, Convert.ToUInt64(value.Length), true);
+        var charIndex = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, Convert.ToUInt64(_text.Length), true);
         var charPtr = module.LlvmBuilder.BuildGEP2(llvmType, llvmValue, new[] { charIndex });
         module.LlvmBuilder.BuildStore(LlvmUtils.ByteZero, charPtr);
 
@@ -48,7 +45,7 @@ internal class StringLiteralNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(_syntaxToken);
+        return Enumerable.Empty<SyntaxNode>();
     }
 
     public override string ToString()

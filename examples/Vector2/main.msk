@@ -17,4 +17,14 @@ fn pub main() void
 	{
 		Console.println("Incorrect!");
 	};
+
+	var value bool = true;
+	if (value == true)
+	{
+		Console.println("Correct!");
+	}
+	else
+	{
+		Console.println("Incorrect!");
+	};
 }

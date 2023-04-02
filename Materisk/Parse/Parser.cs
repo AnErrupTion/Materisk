@@ -438,7 +438,7 @@ public class Parser
             case SyntaxType.String:
             {
                 _position++;
-                return new StringLiteralNode(current);
+                return new StringLiteralNode(current.Text);
             }
             case SyntaxType.Identifier when Peek(1).Type is SyntaxType.LSqBracket:
             {
@@ -460,9 +460,19 @@ public class Parser
             {
                 return ParseArrayExpression(secondTypeToken);
             }
-            case SyntaxType.Keyword when Peek().Text == "if":
+            case SyntaxType.Keyword when current.Text is "if":
             {
                 return ParseIfExpression(secondTypeToken);
+            }
+            case SyntaxType.Keyword when current.Text is "true":
+            {
+                _position++;
+                return new BoolLiteralNode(true);
+            }
+            case SyntaxType.Keyword when current.Text is "false":
+            {
+                _position++;
+                return new BoolLiteralNode(false);
             }
         }
 
