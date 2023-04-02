@@ -5,8 +5,8 @@ namespace Materisk.Native;
 
 public static class LlvmNativeFuncImpl
 {
-    public static LLVMTypeRef MallocType, FreeType, StrlenType, PrintfType, SprintfType;
-    public static LLVMValueRef Malloc, Free, Strlen, Printf, Sprintf;
+    public static LLVMTypeRef MallocType, FreeType, StrlenType, PrintfType;
+    public static LLVMValueRef Malloc, Free, Strlen, Printf;
 
     public static void Emit(MateriskModule module, string typeName, MateriskMethod method)
     {

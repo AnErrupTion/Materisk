@@ -3,4 +3,13 @@ using "stdlib.msk";
 fn pub main() void
 {
 	var length u32 = lenof("ABCDEFGH");
+
+	if (length == 8)
+	{
+		Console.println("Correct!");
+	}
+	else
+	{
+		Console.println("Incorrect!");
+	};
 }

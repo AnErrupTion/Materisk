@@ -14,14 +14,7 @@ fn native pub free(ptr void pointer) void {}
 
 fn pub lenof(str text) u32
 {
-	var zero str = "Zero!";
-
-	for (var i mut u32 = 0; i < 8; i++)
-	{
-		if (text[i] == (u8)0)
-		{
-			Console.println(zero);
-		};
-	};
-	return 0;
+	var index mut u32 = 0;
+	while (text[index++] != (u8)0) {};
+	return index;
 }

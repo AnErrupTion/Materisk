@@ -28,15 +28,16 @@ internal class CastNode : SyntaxNode
     // TODO: Pointer casts
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var value = (LLVMValueRef)_node.Emit(module, type, method, metadata);
+        var value = _node.Emit(module, type, method, metadata);
+        var llvmValue = value is MateriskUnit unit ? unit.Load() : (LLVMValueRef)value;
         var resultValue = _ident.Text switch
         {
-            "i8" or "u8" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Int8),
-            "i16" or "u16" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Int16),
-            "i32" or "u32" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Int32),
-            "i64" or "u64" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Int64),
-            "f32" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Float),
-            "f64" => module.LlvmBuilder.BuildIntCast(value, LLVMTypeRef.Double),
+            "i8" or "u8" => module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Int8),
+            "i16" or "u16" => module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Int16),
+            "i32" or "u32" => module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Int32),
+            "i64" or "u64" => module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Int64),
+            "f32" => module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Float),
+            "f64" => module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Double),
             _ => throw new InvalidOperationException($"Can not cast to type: {_ident.Text}")
         };
         return resultValue;

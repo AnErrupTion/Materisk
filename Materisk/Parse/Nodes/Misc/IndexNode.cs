@@ -76,13 +76,12 @@ internal class IndexNode : SyntaxNode
         if (name is not MateriskUnit unit)
             throw new NotImplementedException($"Value isn't MateriskUnit: {name}");
 
-        var llvmType = unit.Type;
         var llvmElementType = unit.PointerElementType;
         var llvmValue = unit.Load();
         var underlyingType = llvmValue.TypeOf.Kind;
 
         if (underlyingType is not LLVMTypeKind.LLVMPointerTypeKind)
-            throw new InvalidOperationException($"Catastrophic failure: variable is not pointer: {underlyingType}"); // This should never happen either
+            throw new InvalidOperationException($"Catastrophic failure: variable is not pointer: {underlyingType}"); // This should never happen
 
         var indexValue = _indexNode.Emit(module, type, method, metadata);
         var index = indexValue is MateriskUnit indexUnit ? indexUnit.Load() : (LLVMValueRef)indexValue;
@@ -91,13 +90,13 @@ internal class IndexNode : SyntaxNode
         {
             case LLVMTypeKind.LLVMPointerTypeKind when _setNode is not null:
             {
-                var llvmPtr = module.LlvmBuilder.BuildGEP2(llvmType, llvmValue, new[] { index });
+                var llvmPtr = module.LlvmBuilder.BuildGEP2(llvmElementType, llvmValue, new[] { index });
                 var value = _setNode.Emit(module, type, method, metadata);
                 return module.LlvmBuilder.BuildStore(value is MateriskUnit valueUnit ? valueUnit.Load() : (LLVMValueRef)value, llvmPtr);
             }
             case LLVMTypeKind.LLVMPointerTypeKind:
             {
-                var llvmPtr = module.LlvmBuilder.BuildGEP2(llvmType, llvmValue, new[] { index });
+                var llvmPtr = module.LlvmBuilder.BuildGEP2(llvmElementType, llvmValue, new[] { index });
                 return module.LlvmBuilder.BuildLoad2(llvmElementType, llvmPtr);
             }
         }
