@@ -1,7 +1,5 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
-using LLVMSharp.Interop;
 using MateriskLLVM;
 using Materisk.Lex;
 using Materisk.Parse.Nodes.Misc;
@@ -30,21 +28,7 @@ internal class ModuleFieldDefinitionNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        FieldAttributes attributes = 0;
-
-        if (_isPublic)
-            attributes |= FieldAttributes.Public;
-
-        if (_isStatic)
-            attributes |= FieldAttributes.Static;
-
-        var newField = new FieldDefinition(_nameToken.Text,
-            attributes,
-            TypeSigUtils.GetTypeSignatureFor(module, _typeToken.Text));
-
-        type.Fields.Add(newField);
-
-        return newField;
+        return null!;
     }
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)

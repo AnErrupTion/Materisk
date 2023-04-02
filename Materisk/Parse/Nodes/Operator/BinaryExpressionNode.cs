@@ -1,6 +1,5 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using AsmResolver.PE.DotNet.Cil;
 using LLVMSharp.Interop;
 using MateriskLLVM;
 using Materisk.Lex;
@@ -25,43 +24,6 @@ internal class BinaryExpressionNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        _left.Emit(variables, module, type, method, arguments);
-        _right.Emit(variables, module, type, method, arguments);
-
-        switch (_operatorToken.Type)
-        { 
-            case SyntaxType.PlusEquals:
-            case SyntaxType.PlusPlus:
-            case SyntaxType.Plus: method.CilMethodBody!.Instructions.Add(CilOpCodes.Add); break;
-            case SyntaxType.MinusEquals:
-            case SyntaxType.MinusMinus:
-            case SyntaxType.Minus: method.CilMethodBody!.Instructions.Add(CilOpCodes.Sub); break;
-            case SyntaxType.DivEquals:
-            case SyntaxType.Div: method.CilMethodBody!.Instructions.Add(CilOpCodes.Div); break;
-            case SyntaxType.MulEquals:
-            case SyntaxType.Mul: method.CilMethodBody!.Instructions.Add(CilOpCodes.Mul); break;
-            case SyntaxType.ModEquals:
-            case SyntaxType.Mod: method.CilMethodBody!.Instructions.Add(CilOpCodes.Rem); break;
-            case SyntaxType.EqualsEquals: method.CilMethodBody!.Instructions.Add(CilOpCodes.Ceq); break;
-            case SyntaxType.LessThan: method.CilMethodBody!.Instructions.Add(CilOpCodes.Clt); break;
-            case SyntaxType.LessThanEqu:
-            {
-                method.CilMethodBody!.Instructions.Add(CilOpCodes.Cgt);
-                method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldc_I4_0);
-                method.CilMethodBody!.Instructions.Add(CilOpCodes.Ceq);
-                break;
-            }
-            case SyntaxType.GreaterThan: method.CilMethodBody!.Instructions.Add(CilOpCodes.Cgt); break;
-            case SyntaxType.GreaterThanEqu:
-            {
-                method.CilMethodBody!.Instructions.Add(CilOpCodes.Clt);
-                method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldc_I4_0);
-                method.CilMethodBody!.Instructions.Add(CilOpCodes.Ceq);
-                break;
-            }
-            default: throw new InvalidOperationException($"Trying to do a binary expression on: {_operatorToken.Type}");
-        }
-
         return null!;
     }
 
@@ -71,26 +33,45 @@ internal class BinaryExpressionNode : SyntaxNode
         var rightValue = (LLVMValueRef)_right.Emit(module, type, method);
         var resultValue = _operatorToken.Type switch
         {
-            // TODO: Unsigned and float
-            SyntaxType.PlusEquals => module.LlvmBuilder.BuildAdd(leftValue, rightValue),
-            SyntaxType.PlusPlus => module.LlvmBuilder.BuildAdd(leftValue, rightValue),
-            SyntaxType.Plus => module.LlvmBuilder.BuildAdd(leftValue, rightValue),
-            SyntaxType.MinusEquals => module.LlvmBuilder.BuildSub(leftValue, rightValue),
-            SyntaxType.MinusMinus => module.LlvmBuilder.BuildSub(leftValue, rightValue),
-            SyntaxType.Minus => module.LlvmBuilder.BuildSub(leftValue, rightValue),
-            SyntaxType.DivEquals => module.LlvmBuilder.BuildSDiv(leftValue, rightValue),
-            SyntaxType.Div => module.LlvmBuilder.BuildSDiv(leftValue, rightValue),
-            SyntaxType.MulEquals => module.LlvmBuilder.BuildMul(leftValue, rightValue),
-            SyntaxType.Mul => module.LlvmBuilder.BuildMul(leftValue, rightValue),
-            SyntaxType.ModEquals => module.LlvmBuilder.BuildSRem(leftValue, rightValue),
-            SyntaxType.Mod => module.LlvmBuilder.BuildSRem(leftValue, rightValue),
-            SyntaxType.EqualsEquals => module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, leftValue, rightValue),
-            SyntaxType.LessThan => module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSLT, leftValue, rightValue),
-            SyntaxType.LessThanEqu => module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ,
-                module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSGT, leftValue, rightValue), LlvmUtils.IntZero),
-            SyntaxType.GreaterThan => module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSGT, leftValue, rightValue),
-            SyntaxType.GreaterThanEqu => module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ,
-                module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntSLT, leftValue, rightValue), LlvmUtils.IntZero),
+            // TODO: Signed
+            SyntaxType.PlusEquals or SyntaxType.PlusPlus or SyntaxType.Plus => leftValue.TypeOf == LLVMTypeRef.Float
+                ? module.LlvmBuilder.BuildFAdd(leftValue, rightValue)
+                : module.LlvmBuilder.BuildAdd(leftValue, rightValue),
+            SyntaxType.MinusEquals or SyntaxType.MinusMinus or SyntaxType.Minus => leftValue.TypeOf == LLVMTypeRef.Float
+                ? module.LlvmBuilder.BuildFSub(leftValue, rightValue)
+                : module.LlvmBuilder.BuildSub(leftValue, rightValue),
+            SyntaxType.DivEquals or SyntaxType.Div => leftValue.TypeOf == LLVMTypeRef.Float
+                ? module.LlvmBuilder.BuildFDiv(leftValue, rightValue)
+                : module.LlvmBuilder.BuildUDiv(leftValue, rightValue),
+            SyntaxType.MulEquals or SyntaxType.Mul => leftValue.TypeOf == LLVMTypeRef.Float
+                ? module.LlvmBuilder.BuildFMul(leftValue, rightValue)
+                : module.LlvmBuilder.BuildMul(leftValue, rightValue),
+            SyntaxType.ModEquals or SyntaxType.Mod => leftValue.TypeOf == LLVMTypeRef.Float
+                ? module.LlvmBuilder.BuildFRem(leftValue, rightValue)
+                : module.LlvmBuilder.BuildURem(leftValue, rightValue),
+            SyntaxType.EqualsEquals => leftValue.TypeOf == LLVMTypeRef.Float
+                ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOEQ, leftValue, rightValue)
+                : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, leftValue, rightValue),
+            SyntaxType.LessThan => leftValue.TypeOf == LLVMTypeRef.Float
+                ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOLT, leftValue, rightValue)
+                : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntULT, leftValue, rightValue),
+            SyntaxType.LessThanEqu => leftValue.TypeOf == LLVMTypeRef.Float
+                ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOEQ,
+                    module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOGT, leftValue, rightValue),
+                    LlvmUtils.IntZero)
+                : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ,
+                    module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntUGT, leftValue, rightValue),
+                    LlvmUtils.IntZero),
+            SyntaxType.GreaterThan => leftValue.TypeOf == LLVMTypeRef.Float
+                ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOGT, leftValue, rightValue)
+                : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntUGT, leftValue, rightValue),
+            SyntaxType.GreaterThanEqu => leftValue.TypeOf == LLVMTypeRef.Float
+                ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOEQ,
+                    module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOLT, leftValue, rightValue),
+                    LlvmUtils.IntZero)
+                : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ,
+                    module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntULT, leftValue, rightValue),
+                    LlvmUtils.IntZero),
             _ => throw new InvalidOperationException($"Trying to do a binary expression on: {_operatorToken.Type}")
         };
         return resultValue;

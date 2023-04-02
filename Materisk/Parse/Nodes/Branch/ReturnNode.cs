@@ -18,7 +18,6 @@ internal class ReturnNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        _returnValueNode?.Emit(variables, module, type, method, arguments);
         return null!;
     }
 

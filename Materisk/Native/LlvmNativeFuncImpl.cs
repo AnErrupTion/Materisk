@@ -11,12 +11,12 @@ public static class LlvmNativeFuncImpl
         {
             case "lenof":
             {
-                var strlen = module.LlvmModule.AddFunction("strlen",
-                    LLVMTypeRef.CreateFunction(LLVMTypeRef.Int32,
-                        new[] { LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0) }));
+                var llvmType = LLVMTypeRef.CreateFunction(LLVMTypeRef.Int32,
+                    new[] { LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0) });
+                var strlen = module.LlvmModule.AddFunction("strlen", llvmType);
                 strlen.Linkage = LLVMLinkage.LLVMExternalLinkage;
 
-                var length = module.LlvmBuilder.BuildCall(strlen, method.LlvmMethod.Params);
+                var length = module.LlvmBuilder.BuildCall2(llvmType, strlen, method.LlvmMethod.Params);
                 module.LlvmBuilder.BuildRet(length);
                 return;
             }
@@ -35,12 +35,12 @@ public static class LlvmNativeFuncImpl
             }
             case "Console" when method.Name is "print":
             {
-                var printf = module.LlvmModule.AddFunction("printf",
-                    LLVMTypeRef.CreateFunction(LLVMTypeRef.Void,
-                        new[] { LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0) }));
+                var llvmType = LLVMTypeRef.CreateFunction(LLVMTypeRef.Void,
+                    new[] { LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0) });
+                var printf = module.LlvmModule.AddFunction("printf", llvmType);
                 printf.Linkage = LLVMLinkage.LLVMExternalLinkage;
 
-                module.LlvmBuilder.BuildCall(printf, method.LlvmMethod.Params);
+                module.LlvmBuilder.BuildCall2(llvmType, printf, method.LlvmMethod.Params);
                 module.LlvmBuilder.BuildRetVoid();
                 return;
             }

@@ -70,21 +70,20 @@ internal class IndexNode : SyntaxNode
         return null!;
     }
 
+    // TODO: Opaque pointer support (LLVM 15+)
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
         var variable = (LLVMValueRef)_nameNode.Emit(module, type, method); 
         var index = (LLVMValueRef)_indexNode.Emit(module, type, method);
 
-        // This should get the type of each element in the array or the pointer.
-        // For example: for "int[]" or "int*" we'd get "int"
         var underlyingType = variable.TypeOf.Kind;
 
         if (underlyingType is not LLVMTypeKind.LLVMArrayTypeKind and not LLVMTypeKind.LLVMPointerTypeKind)
             throw new InvalidOperationException($"Catastrophic failure: variable is not array or pointer: {underlyingType}"); // This should never happen either
 
-        switch (variable.TypeOf.Kind)
+        switch (underlyingType)
         {
-            case LLVMTypeKind.LLVMPointerTypeKind when _setNode != null:
+            case LLVMTypeKind.LLVMPointerTypeKind when _setNode is not null:
             {
                 var llvmPtr = module.LlvmBuilder.BuildGEP(variable, new[] { index });
                 var value = (LLVMValueRef)_setNode.Emit(module, type, method);
@@ -95,7 +94,7 @@ internal class IndexNode : SyntaxNode
                 var llvmPtr = module.LlvmBuilder.BuildGEP(variable, new[] { index });
                 return module.LlvmBuilder.BuildLoad(llvmPtr);
             }
-            case LLVMTypeKind.LLVMArrayTypeKind when _setNode != null: throw new NotImplementedException();
+            case LLVMTypeKind.LLVMArrayTypeKind when _setNode is not null: throw new NotImplementedException();
             case LLVMTypeKind.LLVMArrayTypeKind: throw new NotImplementedException();
         }
 
@@ -106,10 +105,11 @@ internal class IndexNode : SyntaxNode
     {
         yield return _nameNode;
         yield return _indexNode;
+        if (_setNode is not null) yield return _setNode;
     }
 
     public override string ToString()
     {
-        return "ArrayIndexNode:";
+        return "ArrIdxNode:";
     }
 }

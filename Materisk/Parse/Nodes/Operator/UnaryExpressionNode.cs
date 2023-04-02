@@ -1,6 +1,5 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using AsmResolver.PE.DotNet.Cil;
 using LLVMSharp.Interop;
 using MateriskLLVM;
 using Materisk.Lex;
@@ -23,23 +22,6 @@ internal class UnaryExpressionNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        _rhs.Emit(variables, module, type, method, arguments);
-
-        switch (_token.Type)
-        {
-            case SyntaxType.Bang:
-                method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldc_I4_0);
-                method.CilMethodBody!.Instructions.Add(CilOpCodes.Ceq);
-                break;
-            case SyntaxType.Minus:
-                method.CilMethodBody!.Instructions.Add(CilOpCodes.Neg);
-                break;
-            case SyntaxType.Plus:
-                break;
-            default:
-                throw new InvalidOperationException($"Trying to do a unary expression on: {_token.Type}");
-        }
-
         return null!;
     }
 
@@ -48,9 +30,12 @@ internal class UnaryExpressionNode : SyntaxNode
         var value = (LLVMValueRef)_rhs.Emit(module, type, method);
         var resultValue = _token.Type switch
         {
-            // TODO: Float compare and negation
-            SyntaxType.Bang => module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, value, LlvmUtils.IntZero),
-            SyntaxType.Minus => module.LlvmBuilder.BuildNeg(value),
+            SyntaxType.Bang => value.TypeOf == LLVMTypeRef.Float
+                ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOEQ, value, LlvmUtils.IntZero)
+                : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, value, LlvmUtils.IntZero),
+            SyntaxType.Minus => value.TypeOf == LLVMTypeRef.Float
+                ? module.LlvmBuilder.BuildFNeg(value)
+                : module.LlvmBuilder.BuildNeg(value),
             SyntaxType.Plus => value,
             _ => throw new InvalidOperationException($"Trying to do a unary expression on: {_token.Type}")
         };

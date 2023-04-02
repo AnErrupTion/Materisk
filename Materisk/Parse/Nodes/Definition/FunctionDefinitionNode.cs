@@ -1,9 +1,5 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using AsmResolver.DotNet.Signatures;
-using AsmResolver.DotNet.Signatures.Types;
-using AsmResolver.PE.DotNet.Cil;
-using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
 using LLVMSharp.Interop;
 using MateriskLLVM;
 using Materisk.Lex;
@@ -36,40 +32,7 @@ internal class FunctionDefinitionNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var attributes = MethodAttributes.Static;
-
-        if (_isPublic)
-            attributes |= MethodAttributes.Public;
-
-        var parameters = new List<TypeSignature>();
-        var argts = new List<string>();
-
-        foreach (var arg in _args)
-        {
-            parameters.Add(TypeSigUtils.GetTypeSignatureFor(module, arg.Key.Text));
-            argts.Add(arg.Value.Text);
-        }
-
-        var newMethod = new MethodDefinition(_nameToken.Text,
-            attributes,
-            MethodSignature.CreateStatic(TypeSigUtils.GetTypeSignatureFor(module, _returnType.Text), parameters));
-        newMethod.CilMethodBody = new(newMethod);
-
-        module.TopLevelTypes[1].Methods.Add(newMethod);
-
-        var typeDef = module.TopLevelTypes[1];
-
-        if (_isNative)
-            CilNativeFuncImpl.Emit(module, typeDef.Name!, newMethod);
-        else
-            _block.Emit(variables, module, typeDef, newMethod, argts);
-
-        newMethod.CilMethodBody!.Instructions.Add(CilOpCodes.Ret);
-
-        if (newMethod.Name == "main")
-            module.ManagedEntryPointMethod = newMethod;
-
-        return newMethod;
+        return null!;
     }
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)

@@ -1,6 +1,5 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
 using MateriskLLVM;
 using Materisk.Lex;
 using Materisk.Parse.Nodes.Misc;
@@ -24,24 +23,7 @@ internal class ModuleDefinitionNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var attributes = TypeAttributes.Class;
-
-        if (_isPublic)
-            attributes |= TypeAttributes.Public;
-
-        var typeDef = new TypeDefinition(module.Name, _className.Text, attributes, module.CorLibTypeFactory.Object.Type);
-
-        module.TopLevelTypes.Add(typeDef);
-
-        foreach (var bodyNode in _body)
-        {
-            if (bodyNode is not ModuleFunctionDefinitionNode and not ModuleFieldDefinitionNode)
-                throw new Exception($"Unexpected node in module definition: {bodyNode.GetType()}");
-
-            bodyNode.Emit(variables, module, typeDef, method, arguments);
-        }
-
-        return typeDef;
+        return null!;
     }
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
@@ -58,7 +40,7 @@ internal class ModuleDefinitionNode : SyntaxNode
             bodyNode.Emit(module, newType, method);
         }
 
-        return null;
+        return null!;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

@@ -60,19 +60,36 @@ internal static class TypeSigUtils
             {
                 return secondName switch
                 {
-                    "i32" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Int32, 0),
+                    "i32" or "u32" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Int32, 0),
                     "f32" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Float, 0),
-                    "u8" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0),
+                    "i8" or "u8" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0),
                     "str" => throw new InvalidOperationException("Unable to make a string pointer!"),
                     "void" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Void, 0),
                     _ => throw new InvalidOperationException("Unable to make a pointer for a custom type!")
                 };
             }
-            case "i32": return LLVMTypeRef.Int32;
-            case "f32": return LLVMTypeRef.Float;
-            case "u8": return LLVMTypeRef.Int8;
-            case "str": return LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0);
-            case "void": return LLVMTypeRef.Void;
+            case "i32":
+            case "u32":
+            {
+                return LLVMTypeRef.Int32;
+            }
+            case "f32":
+            {
+                return LLVMTypeRef.Float;
+            }
+            case "i8":
+            case "u8":
+            {
+                return LLVMTypeRef.Int8;
+            }
+            case "str":
+            {
+                return LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0);
+            }
+            case "void":
+            {
+                return LLVMTypeRef.Void;
+            }
             default:
             {
                 throw new NotImplementedException($"Unimplemented type: {name}");

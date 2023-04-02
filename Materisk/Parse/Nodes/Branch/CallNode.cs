@@ -1,6 +1,5 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using AsmResolver.PE.DotNet.Cil;
 using LLVMSharp.Interop;
 using MateriskLLVM;
 
@@ -21,18 +20,14 @@ internal class CallNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var toCall = ToCallNode.Emit(variables, module, type, method, arguments) as MethodDefinition;
-
-        EmitArgs(variables, module, type, method, arguments);
-        method.CilMethodBody!.Instructions.Add(CilOpCodes.Call, toCall);
         return null!;
     }
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        var toCall = ToCallNode.Emit(module, type, method);
+        var toCall = (MateriskMethod)ToCallNode.Emit(module, type, method);
         var args = EmitArgs(module, type, method);
-        return module.LlvmBuilder.BuildCall((LLVMValueRef)toCall, args.ToArray());
+        return module.LlvmBuilder.BuildCall2(toCall.Type, toCall.LlvmMethod, args.ToArray());
     }
 
     public void EmitArgs(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)

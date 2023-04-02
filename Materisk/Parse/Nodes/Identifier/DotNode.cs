@@ -191,7 +191,7 @@ internal class DotNode : SyntaxNode
                         throw new InvalidOperationException($"Unable to find method with name: {name}");
 
                     var args = cn.EmitArgs(module, type, method);
-                    currentValue = module.LlvmBuilder.BuildCall(newMethod.LlvmMethod, args.ToArray());
+                    currentValue = module.LlvmBuilder.BuildCall2(newMethod.Type, newMethod.LlvmMethod, args.ToArray());
                     break;
                 }
                 case CallNode: throw new Exception("Tried to call a non identifier in dot node stack.");

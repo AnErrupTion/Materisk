@@ -384,7 +384,7 @@ public class Parser
             MatchToken(SyntaxType.LParen);
             var ident = MatchToken(SyntaxType.Identifier);
 
-            if (ident.Text is not "i32" and not "f32" and not "u8")
+            if (ident.Text is not "i32" and not "u32" and not "f32" and not "i8" and not "u8")
                 throw new Exception($"Can not cast to: {ident.Text}");
 
             MatchToken(SyntaxType.RParen);
@@ -414,9 +414,9 @@ public class Parser
 
                 return (secondTypeToken is null ? typeToken.Text : secondTypeToken.Text) switch
                 {
-                    "i32" => new IntLiteralNode(current),
+                    "i32" or "u32" => new IntLiteralNode(current),
                     "f32" => new FloatLiteralNode(current),
-                    "u8" => new ByteLiteralNode(current),
+                    "i8" or "u8" => new ByteLiteralNode(current),
                     _ => throw new NotImplementedException($"Unimplemented number type: {secondTypeToken.Text}")
                 };
             }

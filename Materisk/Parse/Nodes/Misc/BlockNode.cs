@@ -17,17 +17,7 @@ internal class BlockNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        object? lastVal = null;
-
-        foreach (var node in _nodes)
-        {
-            var res = node.Emit(variables, module, type, method, arguments);
-
-            if (res != null)
-                lastVal = res;
-        }
-
-        return lastVal!;
+        return null!;
     }
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)

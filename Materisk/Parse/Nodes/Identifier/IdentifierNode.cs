@@ -1,6 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
+using LLVMSharp.Interop;
 using MateriskLLVM;
 using Materisk.Lex;
 using Materisk.Parse.Nodes.Misc;
@@ -18,7 +19,6 @@ internal class IdentifierNode : SyntaxNode
 
     public override NodeType Type => NodeType.Identifier;
 
-    // TODO: Find a way to not make the names conflict?
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
         var name = Token.Text;
@@ -70,11 +70,11 @@ internal class IdentifierNode : SyntaxNode
 
         foreach (var field in module.Types[0].Fields)
             if (field.Name == name)
-                return module.LlvmBuilder.BuildLoad(field.LlvmField);
+                return module.LlvmBuilder.BuildLoad2(field.Type, field.LlvmField);
 
         foreach (var meth in module.Types[0].Methods)
             if (meth.Name == name)
-                return meth.LlvmMethod;
+                return meth;
 
         for (var i = 0; i < method.Arguments.Length; i++)
             if (method.Arguments[i].Name == name)
@@ -82,7 +82,7 @@ internal class IdentifierNode : SyntaxNode
 
         foreach (var variable in method.Variables)
             if (variable.Name == name)
-                return variable.Mutable ? module.LlvmBuilder.BuildLoad(variable.Value) : variable.Value;
+                return variable.Mutable ? module.LlvmBuilder.BuildLoad2(variable.Type, variable.Value) : variable.Value;
 
         throw new InvalidOperationException($"Unable to find value for identifier: {name}");
     }
