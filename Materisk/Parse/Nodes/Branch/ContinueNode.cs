@@ -18,7 +18,10 @@ internal class ContinueNode : SyntaxNode
     {
         foreach (var obj in metadata.Metadata)
             if (obj is Tuple<MateriskMethod, LLVMBasicBlockRef, LLVMBasicBlockRef> t && t.Item1.Name == method.Name)
+            {
+                metadata.AddMetadata(true);
                 return module.LlvmBuilder.BuildBr(t.Item2); // Then block
+            }
 
         throw new InvalidOperationException($"Unable to find then block for method: {method.Name}");
     }

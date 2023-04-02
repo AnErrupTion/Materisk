@@ -36,11 +36,14 @@ internal class IfNode : SyntaxNode
             var conditionValue = module.LlvmBuilder.BuildCondBr(value, thenBlock, nextBlock);
 
             module.LlvmBuilder.PositionAtEnd(thenBlock);
-            var lastValue = (LLVMValueRef)_blockNode.Emit(module, type, method, metadata);
+            _blockNode.Emit(module, type, method, metadata);
 
             // To handle "break" and "continue"
-            if (lastValue != null && lastValue.InstructionOpcode is not LLVMOpcode.LLVMBr)
+            if (metadata.Last() is not true)
+            {
                 module.LlvmBuilder.BuildBr(nextBlock);
+                metadata.RemoveLast();
+            }
 
             module.LlvmBuilder.PositionAtEnd(nextBlock);
 
@@ -54,18 +57,24 @@ internal class IfNode : SyntaxNode
             var conditionValue = module.LlvmBuilder.BuildCondBr(value, thenBlock, elseBlock);
 
             module.LlvmBuilder.PositionAtEnd(thenBlock);
-            var lastValue = (LLVMValueRef)_blockNode.Emit(module, type, method, metadata);
+            _blockNode.Emit(module, type, method, metadata);
 
             // To handle "break" and "continue"
-            if (lastValue != null && lastValue.InstructionOpcode is not LLVMOpcode.LLVMBr)
+            if (metadata.Last() is not true)
+            {
                 module.LlvmBuilder.BuildBr(nextBlock);
+                metadata.RemoveLast();
+            }
 
             module.LlvmBuilder.PositionAtEnd(elseBlock);
-            lastValue = (LLVMValueRef)_elseBlockNode.Emit(module, type, method, metadata);
+            _elseBlockNode.Emit(module, type, method, metadata);
 
             // To handle "break" and "continue"
-            if (lastValue != null && lastValue.InstructionOpcode is not LLVMOpcode.LLVMBr)
+            if (metadata.Last() is not true)
+            {
                 module.LlvmBuilder.BuildBr(nextBlock);
+                metadata.RemoveLast();
+            }
 
             module.LlvmBuilder.PositionAtEnd(nextBlock);
 

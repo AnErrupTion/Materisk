@@ -38,38 +38,41 @@ internal class BinaryExpressionNode : SyntaxNode
         var resultValue = _operatorToken.Type switch
         {
             // TODO: Signed
-            SyntaxType.PlusEquals or SyntaxType.PlusPlus or SyntaxType.Plus => leftValue.TypeOf == LLVMTypeRef.Float
+            SyntaxType.PlusEquals or SyntaxType.PlusPlus or SyntaxType.Plus => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFAdd(leftValue, rightValue)
                 : module.LlvmBuilder.BuildAdd(leftValue, rightValue),
-            SyntaxType.MinusEquals or SyntaxType.MinusMinus or SyntaxType.Minus => leftValue.TypeOf == LLVMTypeRef.Float
+            SyntaxType.MinusEquals or SyntaxType.MinusMinus or SyntaxType.Minus => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFSub(leftValue, rightValue)
                 : module.LlvmBuilder.BuildSub(leftValue, rightValue),
-            SyntaxType.DivEquals or SyntaxType.Div => leftValue.TypeOf == LLVMTypeRef.Float
+            SyntaxType.DivEquals or SyntaxType.Div => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFDiv(leftValue, rightValue)
                 : module.LlvmBuilder.BuildUDiv(leftValue, rightValue),
-            SyntaxType.MulEquals or SyntaxType.Mul => leftValue.TypeOf == LLVMTypeRef.Float
+            SyntaxType.MulEquals or SyntaxType.Mul => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFMul(leftValue, rightValue)
                 : module.LlvmBuilder.BuildMul(leftValue, rightValue),
-            SyntaxType.ModEquals or SyntaxType.Mod => leftValue.TypeOf == LLVMTypeRef.Float
+            SyntaxType.ModEquals or SyntaxType.Mod => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFRem(leftValue, rightValue)
                 : module.LlvmBuilder.BuildURem(leftValue, rightValue),
-            SyntaxType.EqualsEquals => leftValue.TypeOf == LLVMTypeRef.Float
+            SyntaxType.BangEquals => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
+                ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealONE, leftValue, rightValue)
+                : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntNE, leftValue, rightValue),
+            SyntaxType.EqualsEquals => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOEQ, leftValue, rightValue)
                 : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, leftValue, rightValue),
-            SyntaxType.LessThan => leftValue.TypeOf == LLVMTypeRef.Float
+            SyntaxType.LessThan => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOLT, leftValue, rightValue)
                 : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntULT, leftValue, rightValue),
-            SyntaxType.LessThanEqu => leftValue.TypeOf == LLVMTypeRef.Float
+            SyntaxType.LessThanEqu => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOEQ,
                     module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOGT, leftValue, rightValue),
                     LlvmUtils.IntZero)
                 : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ,
                     module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntUGT, leftValue, rightValue),
                     LlvmUtils.IntZero),
-            SyntaxType.GreaterThan => leftValue.TypeOf == LLVMTypeRef.Float
+            SyntaxType.GreaterThan => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOGT, leftValue, rightValue)
                 : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntUGT, leftValue, rightValue),
-            SyntaxType.GreaterThanEqu => leftValue.TypeOf == LLVMTypeRef.Float
+            SyntaxType.GreaterThanEqu => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOEQ,
                     module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOLT, leftValue, rightValue),
                     LlvmUtils.IntZero)

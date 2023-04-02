@@ -43,11 +43,14 @@ internal class ForNode : SyntaxNode
         module.LlvmBuilder.PositionAtEnd(thenBlock);
         _stepNode.Emit(module, type, method, metadata);
         metadata.AddMetadata(Tuple.Create(method, thenBlock, elseBlock));
-        var lastValue = (LLVMValueRef)_block.Emit(module, type, method, metadata);
+        _block.Emit(module, type, method, metadata);
 
         // To handle "break" and "continue"
-        if (lastValue != null && lastValue.InstructionOpcode is not LLVMOpcode.LLVMBr)
+        if (metadata.Last() is not true)
+        {
             module.LlvmBuilder.BuildBr(ifBlock);
+            metadata.RemoveLast();
+        }
 
         module.LlvmBuilder.PositionAtEnd(elseBlock);
 

@@ -84,15 +84,16 @@ internal class IndexNode : SyntaxNode
         if (underlyingType is not LLVMTypeKind.LLVMPointerTypeKind)
             throw new InvalidOperationException($"Catastrophic failure: variable is not pointer: {underlyingType}"); // This should never happen either
 
-        var index = (LLVMValueRef)_indexNode.Emit(module, type, method, metadata);
+        var indexValue = _indexNode.Emit(module, type, method, metadata);
+        var index = indexValue is MateriskUnit indexUnit ? indexUnit.Load() : (LLVMValueRef)indexValue;
 
         switch (underlyingType)
         {
             case LLVMTypeKind.LLVMPointerTypeKind when _setNode is not null:
             {
                 var llvmPtr = module.LlvmBuilder.BuildGEP2(llvmType, llvmValue, new[] { index });
-                var value = (LLVMValueRef)_setNode.Emit(module, type, method, metadata);
-                return module.LlvmBuilder.BuildStore(value, llvmPtr);
+                var value = _setNode.Emit(module, type, method, metadata);
+                return module.LlvmBuilder.BuildStore(value is MateriskUnit valueUnit ? valueUnit.Load() : (LLVMValueRef)value, llvmPtr);
             }
             case LLVMTypeKind.LLVMPointerTypeKind:
             {

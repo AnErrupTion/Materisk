@@ -3,11 +3,18 @@ using AsmResolver.DotNet.Code.Cil;
 using LLVMSharp.Interop;
 using MateriskLLVM;
 
-namespace Materisk.Parse.Nodes.Branch;
+namespace Materisk.Parse.Nodes.Literal;
 
-internal class BreakNode : SyntaxNode
+internal class LongLiteralNode : SyntaxNode
 {
-    public override NodeType Type => NodeType.Break;
+    private readonly long _value;
+
+    public LongLiteralNode(long value)
+    {
+        _value = value;
+    }
+
+    public override NodeType Type => NodeType.LongLiteral;
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
@@ -16,14 +23,13 @@ internal class BreakNode : SyntaxNode
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        foreach (var obj in metadata.Metadata)
-            if (obj is Tuple<MateriskMethod, LLVMBasicBlockRef, LLVMBasicBlockRef> t && t.Item1.Name == method.Name)
-            {
-                metadata.AddMetadata(true);
-                return module.LlvmBuilder.BuildBr(t.Item3); // Else block
-            }
+        if (_value < 0)
+        {
+            var llvmValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int64, Convert.ToUInt64(Math.Abs(_value)), true);
+            return LLVMValueRef.CreateConstSub(LlvmUtils.LongZero, llvmValue);
+        }
 
-        throw new InvalidOperationException($"Unable to find else block for method: {method.Name}");
+        return LLVMValueRef.CreateConstInt(LLVMTypeRef.Int64, Convert.ToUInt64(_value), true);
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
@@ -33,6 +39,6 @@ internal class BreakNode : SyntaxNode
 
     public override string ToString()
     {
-        return "BreakNode:";
+        return "LongLitNode:";
     }
 }

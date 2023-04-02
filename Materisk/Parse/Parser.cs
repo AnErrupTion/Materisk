@@ -295,7 +295,7 @@ public class Parser
         return BinaryOperation(() => ParseArithmeticExpression(secondTypeToken),
             new[]
             {
-                SyntaxType.EqualsEquals, SyntaxType.LessThan, SyntaxType.LessThanEqu, SyntaxType.GreaterThan, SyntaxType.GreaterThanEqu
+                SyntaxType.BangEquals, SyntaxType.EqualsEquals, SyntaxType.LessThan, SyntaxType.LessThanEqu, SyntaxType.GreaterThan, SyntaxType.GreaterThanEqu
             });
     }
 

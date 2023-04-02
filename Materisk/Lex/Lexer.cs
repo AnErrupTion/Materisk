@@ -214,7 +214,14 @@ public class Lexer
                 }
                 case '!':
                 {
-                    insertToken = new(SyntaxType.Bang, _position, "!");
+                    var lookAhead = Peek(1);
+
+                    if (lookAhead == '=')
+                    {
+                        _position++;
+                        insertToken = new(SyntaxType.BangEquals, _position, "!=");
+                    } else insertToken = new(SyntaxType.Bang, _position, "!");
+
                     break;
                 }
             }

@@ -11,4 +11,10 @@ mod pub Console
 
 fn native pub allocate(i32 size) ptr void {}
 fn native pub free(ptr void pointer) void {}
-fn native pub lenof(str text) i32 {}
+
+fn pub lenof(str text) u32
+{
+	var index mut u32 = 0;
+	while (text[index++] != (u8)0) {};
+	return index + 1;
+}

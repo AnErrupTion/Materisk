@@ -30,10 +30,10 @@ internal class UnaryExpressionNode : SyntaxNode
         var value = (LLVMValueRef)_rhs.Emit(module, type, method, metadata);
         var resultValue = _token.Type switch
         {
-            SyntaxType.Bang => value.TypeOf == LLVMTypeRef.Float
+            SyntaxType.Bang => value.TypeOf == LLVMTypeRef.Float || value.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOEQ, value, LlvmUtils.IntZero)
                 : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, value, LlvmUtils.IntZero),
-            SyntaxType.Minus => value.TypeOf == LLVMTypeRef.Float
+            SyntaxType.Minus => value.TypeOf == LLVMTypeRef.Float || value.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFNeg(value)
                 : module.LlvmBuilder.BuildNeg(value),
             SyntaxType.Plus => value,
