@@ -135,25 +135,7 @@ internal class DotNode : SyntaxNode
                 }
                 case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:
                 {
-                    var name = cnIdentNode.Token.Text;
-                    var typeName = currentValue is CilLocalVariable variable ? variable.VariableType.ToString() : currentValue.ToString();
-
-                    MethodDefinition? newMethod = null;
-                    foreach (var typeDef in module.TopLevelTypes)
-                        foreach (var meth in typeDef.Methods)
-                            if (typeDef.FullName == typeName && meth.Name == name)
-                            {
-                                newMethod = meth;
-                                break;
-                            }
-
-                    if (newMethod == null)
-                        throw new InvalidOperationException($"Unable to find method with name: {name}");
-
-                    cn.EmitArgs(variables, module, type, method, arguments);
-
-                    method.CilMethodBody!.Instructions.Add(CilOpCodes.Call, newMethod);
-                    break;
+                    return null!;
                 }
                 case CallNode _:
                     throw new Exception("Tried to call a non identifier in dot node stack.");

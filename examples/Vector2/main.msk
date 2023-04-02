@@ -2,8 +2,11 @@ using "stdlib.msk";
 
 fn pub main() void
 {
-	for (var i mut i32 = 0; i < 5; i++)
+	var index mut i32 = 0;
+
+	while (index < 5)
 	{
 		Console.println(str "Hello, World!");
+		index++;
 	};
 }

@@ -1,6 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
+using LLVMSharp.Interop;
 using MateriskLLVM;
 
 namespace Materisk.Parse.Nodes.Branch;
@@ -39,7 +40,23 @@ internal class WhileNode : SyntaxNode
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method)
     {
-        throw new NotImplementedException();
+        var ifBlock = method.LlvmMethod.AppendBasicBlock("if");
+        var thenBlock = method.LlvmMethod.AppendBasicBlock("then");
+        var elseBlock = method.LlvmMethod.AppendBasicBlock("else");
+
+        module.LlvmBuilder.BuildBr(ifBlock);
+
+        module.LlvmBuilder.PositionAtEnd(ifBlock);
+        var ifValue = (LLVMValueRef)_condNode.Emit(module, type, method);
+        var conditionValue = module.LlvmBuilder.BuildCondBr(ifValue, thenBlock, elseBlock);
+
+        module.LlvmBuilder.PositionAtEnd(thenBlock);
+        _block.Emit(module, type, method);
+        module.LlvmBuilder.BuildBr(ifBlock);
+
+        module.LlvmBuilder.PositionAtEnd(elseBlock);
+
+        return conditionValue;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
