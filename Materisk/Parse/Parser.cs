@@ -164,7 +164,10 @@ public class Parser
 
             var current = Peek();
             if (current.Type is SyntaxType.Identifier)
+            {
+                _position++;
                 secondType = current;
+            }
 
             if (Peek().Type == SyntaxType.Equals)
                 throw new InvalidOperationException("Can not initialize a field directly!");
@@ -399,11 +402,21 @@ public class Parser
         if (Peek().Type is SyntaxType.LParen)
         {
             MatchToken(SyntaxType.LParen);
-            var ident = MatchToken(SyntaxType.Identifier);
+            var typeToken = MatchToken(SyntaxType.Identifier);
+
+            SyntaxToken? nextTypeToken = null;
+
+            var current = Peek();
+            if (current.Type is SyntaxType.Identifier)
+            {
+                _position++;
+                nextTypeToken = current;
+            }
+
             MatchToken(SyntaxType.RParen);
 
             var node = ParseCastExpression(secondTypeToken);
-            return new CastNode(ident, node);
+            return new CastNode(typeToken, nextTypeToken, node);
         }
 
         return ParseAtomExpression(secondTypeToken);
@@ -631,7 +644,10 @@ public class Parser
 
         var current = Peek();
         if (current.Type is SyntaxType.Identifier)
+        {
+            _position++;
             secondType = current;
+        }
 
         if (Peek().Type == SyntaxType.Equals)
             throw new InvalidOperationException("Can not initialize a field directly!");

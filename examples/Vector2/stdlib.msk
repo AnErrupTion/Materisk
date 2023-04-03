@@ -9,7 +9,7 @@ mod pub Console
 	}
 }
 
-fn native pub allocate(i32 size) ptr void {}
+fn native pub allocate(u32 size) ptr void {}
 fn native pub free(ptr void pointer) void {}
 
 fn pub lenof(str text) u32
