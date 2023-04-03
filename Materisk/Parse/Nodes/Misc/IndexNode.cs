@@ -69,7 +69,6 @@ internal class IndexNode : SyntaxNode
         return null!;
     }
 
-    // TODO: Array type kind
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var name = _nameNode.Emit(module, type, method, metadata);
