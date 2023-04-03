@@ -66,6 +66,7 @@ internal static class TypeSigUtils
                     "f32" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Float, 0),
                     "f64" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Double, 0),
                     "str" => LLVMTypeRef.CreatePointer(LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0), 0),
+                    "bool" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Int1, 0),
                     "void" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Void, 0),
                     _ => throw new InvalidOperationException("Unable to make a pointer for a custom type!")
                 };
@@ -101,6 +102,10 @@ internal static class TypeSigUtils
             case "str":
             {
                 return LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0);
+            }
+            case "bool":
+            {
+                return LLVMTypeRef.Int1;
             }
             case "void":
             {
