@@ -2,5 +2,15 @@ using "corelib.msk";
 
 fn pub main() void
 {
-
+	var string str = "My String";
+	var string2 mut arr u8 = [100];
+	Str.copy(string2, string);
+	if(Str.equals(string2, string) == true) 
+	{
+		Console.println("Same string");
+	}
+	else 
+	{
+		Console.println("Not the same string");
+	};
 }

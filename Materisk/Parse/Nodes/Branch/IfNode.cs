@@ -36,17 +36,11 @@ internal class IfNode : SyntaxNode
             var conditionValue = module.LlvmBuilder.BuildCondBr(value, thenBlock, nextBlock);
 
             module.LlvmBuilder.PositionAtEnd(thenBlock);
-            _blockNode.Emit(module, type, method, metadata);
+            var lastValue = _blockNode.Emit(module, type, method, metadata);
 
-            // To handle "break" and "continue"
-            if (metadata.Last()
-                is not MateriskMetadataType.Break
-                and not MateriskMetadataType.Continue
-                and not MateriskMetadataType.Return)
-            {
+            // To handle "break", "continue" and "return"
+            if (lastValue is LLVMValueRef { InstructionOpcode: not LLVMOpcode.LLVMBr and not LLVMOpcode.LLVMRet })
                 module.LlvmBuilder.BuildBr(nextBlock);
-                metadata.RemoveLast();
-            }
 
             module.LlvmBuilder.PositionAtEnd(nextBlock);
 
@@ -60,30 +54,18 @@ internal class IfNode : SyntaxNode
             var conditionValue = module.LlvmBuilder.BuildCondBr(value, thenBlock, elseBlock);
 
             module.LlvmBuilder.PositionAtEnd(thenBlock);
-            _blockNode.Emit(module, type, method, metadata);
+            var lastValue = _blockNode.Emit(module, type, method, metadata);
 
-            // To handle "break" and "continue"
-            if (metadata.Last()
-                is not MateriskMetadataType.Break
-                and not MateriskMetadataType.Continue
-                and not MateriskMetadataType.Return)
-            {
+            // To handle "break", "continue" and "return"
+            if (lastValue is LLVMValueRef { InstructionOpcode: not LLVMOpcode.LLVMBr and not LLVMOpcode.LLVMRet })
                 module.LlvmBuilder.BuildBr(nextBlock);
-                metadata.RemoveLast();
-            }
 
             module.LlvmBuilder.PositionAtEnd(elseBlock);
-            _elseBlockNode.Emit(module, type, method, metadata);
+            lastValue = _elseBlockNode.Emit(module, type, method, metadata);
 
-            // To handle "break" and "continue"
-            if (metadata.Last()
-                is not MateriskMetadataType.Break
-                and not MateriskMetadataType.Continue
-                and not MateriskMetadataType.Return)
-            {
+            // To handle "break", "continue" and "return"
+            if (lastValue is LLVMValueRef { InstructionOpcode: not LLVMOpcode.LLVMBr and not LLVMOpcode.LLVMRet })
                 module.LlvmBuilder.BuildBr(nextBlock);
-                metadata.RemoveLast();
-            }
 
             module.LlvmBuilder.PositionAtEnd(nextBlock);
 

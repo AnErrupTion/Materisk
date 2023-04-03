@@ -12,9 +12,35 @@ mod pub Console
 fn native pub allocate(u32 size) ptr void {}
 fn native pub free(ptr void pointer) void {}
 
-fn pub lenof(str text) u32
+mod pub Str
 {
-	var index mut u32 = 0;
-	while (text[index++] != (u8)0) {};
-	return index;
+	fn pub lenof(str text) u32
+	{
+		var index mut u32 = 0;
+		while (text[index++] != (u8)0) {};
+		return index;
+	}
+	fn pub copy(arr u8 dest, arr u8 src) void
+	{
+		var index mut u32 = 0;
+		while(src[index] != (u8)0)
+		{
+			dest[index] = src[index];
+			index++;
+		};
+		dest[index] = 0;
+	}
+	fn pub equals(arr u8 lhstr, arr u8 rhstr) bool 
+	{
+		var index mut u32 = 0;
+		while(lhstr[index] != (u8)0) 
+		{
+			if(lhstr[index] != rhstr[index]) 
+			{
+				return false;
+			};
+			index++;
+		};
+		return true;
+	}
 }

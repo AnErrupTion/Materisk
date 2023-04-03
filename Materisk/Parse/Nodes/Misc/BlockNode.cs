@@ -27,7 +27,7 @@ internal class BlockNode : SyntaxNode
         foreach (var node in Nodes)
             lastValue = node.Emit(module, type, method, metadata);
 
-        return lastValue!;
+        return lastValue ?? LlvmUtils.VoidNull;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

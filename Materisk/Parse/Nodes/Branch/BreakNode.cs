@@ -18,10 +18,7 @@ internal class BreakNode : SyntaxNode
     {
         foreach (var obj in metadata.Metadata)
             if (obj is Tuple<MateriskMethod, LLVMBasicBlockRef, LLVMBasicBlockRef> t && t.Item1.Name == method.Name)
-            {
-                metadata.AddMetadata(MateriskMetadataType.Break);
                 return module.LlvmBuilder.BuildBr(t.Item3); // Else block
-            }
 
         throw new InvalidOperationException($"Unable to find else block for method: {method.Name}");
     }

@@ -16,5 +16,7 @@ public static class LlvmUtils
     public static readonly LLVMTypeRef DoublePointer = LLVMTypeRef.CreatePointer(LLVMTypeRef.Double, 0);
     public static readonly LLVMTypeRef VoidPointer = LLVMTypeRef.CreatePointer(LLVMTypeRef.Void, 0);
 
+    public static readonly LLVMValueRef VoidNull = LLVMValueRef.CreateConstNull(LLVMTypeRef.Void);
+
     public static string MainFunctionNameOverride = "main";
 }
