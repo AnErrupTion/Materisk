@@ -8,11 +8,12 @@ public sealed class MateriskMethodArgument : MateriskUnit
     public readonly string Name;
     public LLVMValueRef Value;
 
-    public MateriskMethodArgument(string name, LLVMTypeRef type, LLVMTypeRef pointerElementType)
+    public MateriskMethodArgument(string name, LLVMTypeRef type, LLVMTypeRef pointerElementType, bool signed)
     {
         Name = name;
         Type = type;
         PointerElementType = pointerElementType;
+        Signed = signed;
     }
 
     public override LLVMValueRef Load() => Value;

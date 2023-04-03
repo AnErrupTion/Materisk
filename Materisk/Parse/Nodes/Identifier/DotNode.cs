@@ -54,6 +54,7 @@ internal class DotNode : SyntaxNode
 
                     if (mField == null)
                     {
+                        // TODO?
                         /*typeName = currentValue.ToString();
 
                         var found = false;
@@ -107,6 +108,7 @@ internal class DotNode : SyntaxNode
 
                     if (mField is null)
                     {
+                        // TODO?
                         /*typeName = currentValue.ToString();
 
                         var found = false;

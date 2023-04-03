@@ -120,7 +120,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
             };
 
             parameters.Add(argType);
-            argts.Add(new(arg.Value.Text, argType, pointerElementType));
+            argts.Add(new(arg.Value.Text, argType, pointerElementType, firstType[0] is 'i'));
         }
 
         var newMethod = new MateriskMethod(

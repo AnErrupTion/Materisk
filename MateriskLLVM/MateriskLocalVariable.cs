@@ -9,13 +9,14 @@ public sealed class MateriskLocalVariable : MateriskUnit
     public readonly bool Mutable;
     public LLVMValueRef Value;
 
-    public MateriskLocalVariable(MateriskMethod method, string name, bool mutable, LLVMTypeRef type, LLVMTypeRef pointerElementType, LLVMValueRef value)
+    public MateriskLocalVariable(MateriskMethod method, string name, bool mutable, LLVMTypeRef type, LLVMTypeRef pointerElementType, bool signed, LLVMValueRef value)
     {
         ParentMethod = method;
         Name = name;
         Mutable = mutable;
         Type = type;
         PointerElementType = pointerElementType;
+        Signed = signed;
         Value = value;
     }
 

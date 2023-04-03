@@ -9,7 +9,7 @@ public sealed class MateriskField : MateriskUnit
     public readonly MateriskType ParentType;
     public readonly string Name;
 
-    public MateriskField(MateriskType type, string name, LLVMTypeRef fieldType)
+    public MateriskField(MateriskType type, string name, LLVMTypeRef fieldType, LLVMTypeRef pointerElementType, bool signed)
     {
         LlvmField = type.ParentModule.LlvmModule.AddGlobal(fieldType, $"{type.Name}_{name}");
         LlvmField.Initializer = LLVMValueRef.CreateConstNull(fieldType);
@@ -17,6 +17,8 @@ public sealed class MateriskField : MateriskUnit
         ParentType = type;
         Name = name;
         Type = fieldType;
+        PointerElementType = pointerElementType;
+        Signed = signed;
     }
 
     public override LLVMValueRef Load() => ParentType.ParentModule.LlvmBuilder.BuildLoad2(Type, LlvmField);

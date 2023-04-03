@@ -32,12 +32,41 @@ internal class BinaryExpressionNode : SyntaxNode
         var lhs = _left.Emit(module, type, method, metadata);
         var rhs = _right.Emit(module, type, method, metadata);
 
-        var leftValue = lhs is MateriskUnit leftUnit ? leftUnit.Load() : (LLVMValueRef)lhs;
-        var rightValue = rhs is MateriskUnit rightUnit ? rightUnit.Load() : (LLVMValueRef)rhs;
+        LLVMValueRef leftValue, rightValue;
+        bool leftSigned, rightSigned;
 
+        if (lhs is MateriskUnit leftUnit)
+        {
+            leftValue = leftUnit.Load();
+            leftSigned = leftUnit.Signed;
+        }
+        else
+        {
+            leftValue = (LLVMValueRef)lhs;
+            leftSigned = false; // We can't guess!
+        }
+
+        if (rhs is MateriskUnit rightUnit)
+        {
+            rightValue = rightUnit.Load();
+            rightSigned = rightUnit.Signed;
+        }
+        else
+        {
+            rightValue = (LLVMValueRef)rhs;
+            rightSigned = false; // We can't guess!
+        }
+
+        if (leftSigned && !rightSigned || !leftSigned && rightSigned)
+            throw new InvalidOperationException("Both operands need to be either signed or unsigned!");
+
+        return EmitOperation(module, leftValue, rightValue, leftSigned, rightSigned);
+    }
+
+    private LLVMValueRef EmitOperation(MateriskModule module, LLVMValueRef leftValue, LLVMValueRef rightValue, bool leftSigned, bool rightSigned)
+    {
         var resultValue = _operatorToken.Type switch
         {
-            // TODO: Signed
             SyntaxType.PlusEquals or SyntaxType.PlusPlus or SyntaxType.Plus => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFAdd(leftValue, rightValue)
                 : module.LlvmBuilder.BuildAdd(leftValue, rightValue),
@@ -46,13 +75,17 @@ internal class BinaryExpressionNode : SyntaxNode
                 : module.LlvmBuilder.BuildSub(leftValue, rightValue),
             SyntaxType.DivEquals or SyntaxType.Div => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFDiv(leftValue, rightValue)
-                : module.LlvmBuilder.BuildUDiv(leftValue, rightValue),
+                : leftSigned
+                    ? module.LlvmBuilder.BuildSDiv(leftValue, rightValue)
+                    : module.LlvmBuilder.BuildUDiv(leftValue, rightValue),
             SyntaxType.MulEquals or SyntaxType.Mul => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFMul(leftValue, rightValue)
                 : module.LlvmBuilder.BuildMul(leftValue, rightValue),
             SyntaxType.ModEquals or SyntaxType.Mod => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFRem(leftValue, rightValue)
-                : module.LlvmBuilder.BuildURem(leftValue, rightValue),
+                : leftSigned
+                    ? module.LlvmBuilder.BuildSRem(leftValue, rightValue)
+                    : module.LlvmBuilder.BuildURem(leftValue, rightValue),
             SyntaxType.BangEquals => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealONE, leftValue, rightValue)
                 : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntNE, leftValue, rightValue),
@@ -94,6 +127,6 @@ internal class BinaryExpressionNode : SyntaxNode
 
     public override string ToString()
     {
-        return "BinaryExprNode: op=" + _operatorToken.Type;
+        return "BinExprNode: op=" + _operatorToken.Type;
     }
 }

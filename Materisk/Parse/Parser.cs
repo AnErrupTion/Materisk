@@ -160,11 +160,17 @@ public class Parser
             var nameToken = MatchToken(SyntaxType.Identifier);
             var type = MatchToken(SyntaxType.Identifier);
 
+            SyntaxToken? secondType = null;
+
+            var current = Peek();
+            if (current.Type is SyntaxType.Identifier)
+                secondType = current;
+
             if (Peek().Type == SyntaxType.Equals)
                 throw new InvalidOperationException("Can not initialize a field directly!");
 
             MatchToken(SyntaxType.Semicolon);
-            nodes.Add(new ModuleFieldDefinitionNode(isPublic, isStatic, nameToken, type));
+            nodes.Add(new ModuleFieldDefinitionNode(isPublic, isStatic, nameToken, type, secondType));
         }
 
         while (Peek() is { Type: SyntaxType.Keyword, Text: "fn" })
@@ -621,10 +627,16 @@ public class Parser
         var nameToken = MatchToken(SyntaxType.Identifier);
         var type = MatchToken(SyntaxType.Identifier);
 
+        SyntaxToken? secondType = null;
+
+        var current = Peek();
+        if (current.Type is SyntaxType.Identifier)
+            secondType = current;
+
         if (Peek().Type == SyntaxType.Equals)
             throw new InvalidOperationException("Can not initialize a field directly!");
 
-        return new FieldDefinitionNode(isPublic, nameToken, type);
+        return new FieldDefinitionNode(isPublic, nameToken, type, secondType);
     }
 
     private SyntaxNode ParseInstantiateExpression(SyntaxToken? secondTypeToken)

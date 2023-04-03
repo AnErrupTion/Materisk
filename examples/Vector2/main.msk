@@ -1,15 +1,12 @@
 using "stdlib.msk";
 
-mod pub Module
-{
-	fld test f64;
-}
+fld test f64;
 
 fn pub main() void
 {
-	Module.test = (f64)4.2;
+	test = (f64)4.2;
 
-	if (Module.test == (f64)4.2)
+	if (test == (f64)4.2)
 	{
 		Console.println("Correct!");
 	}

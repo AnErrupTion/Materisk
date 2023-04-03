@@ -68,7 +68,7 @@ internal class InitVariableNode : SyntaxNode
             value = module.LlvmBuilder.BuildAlloca(value.TypeOf);
             module.LlvmBuilder.BuildStore(constValue, value);
         }
-        method.Variables.Add(new(method, name, _mutable, valueType, pointerElementType, value));
+        method.Variables.Add(new(method, name, _mutable, valueType, pointerElementType, _typeToken.Text[0] is 'i', value));
         return value;
     }
 
