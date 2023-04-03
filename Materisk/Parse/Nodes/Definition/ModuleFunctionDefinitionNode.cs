@@ -10,7 +10,7 @@ namespace Materisk.Parse.Nodes.Definition;
 internal class ModuleFunctionDefinitionNode : SyntaxNode
 {
     private readonly string _name;
-    private readonly Dictionary<Tuple<string, string>, string> _args;
+    private readonly List<MethodArgument> _args;
     private readonly string _returnType;
     private readonly string _secondReturnType;
     private readonly SyntaxNode _body;
@@ -18,7 +18,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
     private readonly bool _isPublic;
     private readonly bool _isNative;
 
-    public ModuleFunctionDefinitionNode(string name, Dictionary<Tuple<string, string>, string> args, string returnType, string secondReturnType, SyntaxNode body, bool isStatic, bool isPublic, bool isNative)
+    public ModuleFunctionDefinitionNode(string name, List<MethodArgument> args, string returnType, string secondReturnType, SyntaxNode body, bool isStatic, bool isPublic, bool isNative)
     {
         _name = name;
         _args = args;
@@ -45,8 +45,8 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
 
         foreach (var arg in _args)
         {
-            var firstType = arg.Key.Item1;
-            var secondType = arg.Key.Item2;
+            var firstType = arg.Type;
+            var secondType = arg.SecondType;
             var argType = TypeSigUtils.GetTypeSignatureFor(firstType, secondType);
             var pointerElementType = firstType switch
             {
@@ -56,7 +56,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
             };
 
             parameters.Add(argType);
-            argts.Add(new(arg.Value, argType, pointerElementType, firstType[0] is 'i'));
+            argts.Add(new(arg.Name, argType, pointerElementType, firstType[0] is 'i'));
         }
 
         var newMethod = new MateriskMethod(

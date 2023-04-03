@@ -225,8 +225,12 @@ public class Parser
 
             var ident = MatchToken(SyntaxType.Identifier);
 
-            var current = Peek();
+            if (string.IsNullOrEmpty(ident.Text))
+                throw new InvalidOperationException("Can not assign to a non-existent identifier!");
+
             var mutable = false;
+            var current = Peek();
+
             if (current.Type is SyntaxType.Keyword)
             {
                 _position++;
@@ -259,6 +263,10 @@ public class Parser
                 )
         {
             var ident = MatchToken(SyntaxType.Identifier);
+
+            if (string.IsNullOrEmpty(ident.Text))
+                throw new InvalidOperationException("Can not assign to a non-existent identifier!");
+
             var current = Peek();
 
             switch (current.Type)
@@ -352,6 +360,10 @@ public class Parser
                     if (Peek(1).Type is SyntaxType.Equals)
                     {
                         var ident = MatchToken(SyntaxType.Identifier);
+
+                        if (string.IsNullOrEmpty(ident.Text))
+                            throw new InvalidOperationException("Can not assign to a non-existent identifier!");
+
                         MatchToken(SyntaxType.Equals);
                         var expr = ParseExpression(secondTypeToken);
 
@@ -687,11 +699,11 @@ public class Parser
         return new InstantiateNode(ident.Text, argumentNodes);
     }
 
-    private Dictionary<Tuple<string, string>, string> ParseFunctionArgs()
+    private List<MethodArgument> ParseFunctionArgs()
     {
         MatchToken(SyntaxType.LParen);
 
-        var args = new Dictionary<Tuple<string, string>, string>();
+        var args = new List<MethodArgument>();
 
         if (Peek().Type is not SyntaxType.RParen)
         {
@@ -706,7 +718,7 @@ public class Parser
                 ident = MatchToken(SyntaxType.Identifier);
             }
 
-            args.Add(Tuple.Create(type.Text, secondType is null ? string.Empty : secondType.Text), ident.Text);
+            args.Add(new(type.Text, secondType is null ? string.Empty : secondType.Text, ident.Text));
 
             while (Peek().Type == SyntaxType.Comma)
             {
@@ -721,7 +733,7 @@ public class Parser
                     ident = MatchToken(SyntaxType.Identifier);
                 }
 
-                args.Add(Tuple.Create(type.Text, secondType is null ? string.Empty : secondType.Text), ident.Text);
+                args.Add(new(type.Text, secondType is null ? string.Empty : secondType.Text, ident.Text));
             }
         }
 

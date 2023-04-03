@@ -26,10 +26,6 @@ internal class AssignExpressionNode : SyntaxNode
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        // TODO: Check in parser
-        if (string.IsNullOrEmpty(Identifier))
-            throw new InvalidOperationException("Can not assign to a non-existent identifier!");
-
         var variable = method.GetVariableByName(Identifier);
 
         if (variable is null)

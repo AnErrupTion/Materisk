@@ -32,10 +32,6 @@ internal class InitVariableNode : SyntaxNode
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        // TODO: Check in parser
-        if (string.IsNullOrEmpty(_name))
-            throw new InvalidOperationException("Can not assign to a non-existent identifier!");
-
         if (method.GetVariableByName(_name) is not null)
             throw new InvalidOperationException("Can not initialize the same variable twice!");
 
