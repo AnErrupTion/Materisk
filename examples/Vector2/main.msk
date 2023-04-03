@@ -1,8 +1,0 @@
-using "stdlib.msk";
-
-fn pub main() void
-{
-	var pointer mut ptr void = allocate(64);
-	var bytePtr mut ptr u8 = (ptr u8)pointer;
-	free((ptr void)bytePtr);
-}
