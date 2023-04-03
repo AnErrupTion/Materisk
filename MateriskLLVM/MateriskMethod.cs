@@ -11,7 +11,7 @@ public sealed class MateriskMethod : MateriskUnit
     public readonly MateriskMethodArgument[] Arguments;
     public readonly List<MateriskLocalVariable> Variables;
 
-    public MateriskMethod(MateriskType type, string name, LLVMTypeRef methodType, MateriskMethodArgument[] arguments)
+    public MateriskMethod(MateriskType type, string name, MateriskAttributes attributes, LLVMTypeRef methodType, MateriskMethodArgument[] arguments)
     {
         LlvmMethod = type.ParentModule.LlvmModule.AddFunction(name is "main" ? LlvmUtils.MainFunctionNameOverride : $"{type.Name}_{name}", methodType);
 
@@ -20,6 +20,7 @@ public sealed class MateriskMethod : MateriskUnit
 
         ParentType = type;
         Name = name;
+        Attributes = attributes;
         Type = methodType;
         Arguments = arguments;
         Variables = new();

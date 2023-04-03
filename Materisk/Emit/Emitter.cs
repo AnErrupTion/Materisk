@@ -40,7 +40,7 @@ public class Emitter
         unsafe { LLVM.SetModuleDataLayout(module.LlvmModule, dataLayout); }
         module.LlvmModule.Target = targetTriple;
 
-        var type = new MateriskType(module, "Program");
+        var type = new MateriskType(module, "Program", MateriskAttributesUtils.CreateAttributes(true, false, false));
         module.Types.Add(type);
 
         var metadata = new MateriskMetadata();

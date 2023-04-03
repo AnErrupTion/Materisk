@@ -9,13 +9,14 @@ public sealed class MateriskField : MateriskUnit
     public readonly MateriskType ParentType;
     public readonly string Name;
 
-    public MateriskField(MateriskType type, string name, LLVMTypeRef fieldType, LLVMTypeRef pointerElementType, bool signed)
+    public MateriskField(MateriskType type, string name, MateriskAttributes attributes, LLVMTypeRef fieldType, LLVMTypeRef pointerElementType, bool signed)
     {
         LlvmField = type.ParentModule.LlvmModule.AddGlobal(fieldType, $"{type.Name}_{name}");
         LlvmField.Initializer = LLVMValueRef.CreateConstNull(fieldType);
 
         ParentType = type;
         Name = name;
+        Attributes = attributes;
         Type = fieldType;
         PointerElementType = pointerElementType;
         Signed = signed;

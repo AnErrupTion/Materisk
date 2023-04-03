@@ -28,7 +28,6 @@ internal class FieldDefinitionNode : SyntaxNode
         return null!;
     }
 
-    // TODO: Non-static fields
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var pointerElementType = _type switch
@@ -39,6 +38,7 @@ internal class FieldDefinitionNode : SyntaxNode
         };
 
         var newField = new MateriskField(module.Types[0], _name,
+            MateriskAttributesUtils.CreateAttributes(_isPublic, true, false),
             TypeSigUtils.GetTypeSignatureFor(_type), pointerElementType, _type[0] is 'i');
         module.Types[0].Fields.Add(newField);
 

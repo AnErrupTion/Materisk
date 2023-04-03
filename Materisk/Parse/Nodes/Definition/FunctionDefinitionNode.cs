@@ -59,6 +59,7 @@ internal class FunctionDefinitionNode : SyntaxNode
         var newMethod = new MateriskMethod(
             module.Types[0],
             _name,
+            MateriskAttributesUtils.CreateAttributes(_isPublic, true, _isNative),
             LLVMTypeRef.CreateFunction(
                 TypeSigUtils.GetTypeSignatureFor(_returnType, _secondReturnType),
                 parameters.ToArray()),

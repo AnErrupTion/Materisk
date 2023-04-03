@@ -33,9 +33,8 @@ internal class AssignExpressionNode : SyntaxNode
             foreach (var field in method.ParentType.Fields)
                 if (field.Name == Identifier)
                 {
-                    // TODO: Non-static fields
-                    /*if (!field.IsStatic)
-                        throw new InvalidOperationException($"Field \"{name}\" is not static.");*/
+                    if (!field.Attributes.HasFlag(MateriskAttributes.Static))
+                        throw new InvalidOperationException($"Field \"{Identifier}\" is not static.");
 
                     var fieldValue = Expr.Emit(module, type, method, metadata);
                     field.Store(fieldValue is MateriskUnit fieldUnit ? fieldUnit.Load() : (LLVMValueRef)fieldValue);

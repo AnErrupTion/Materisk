@@ -1,17 +1,24 @@
+using LLVMSharp.Interop;
+
 namespace MateriskLLVM;
 
-public sealed class MateriskType
+public sealed class MateriskType : MateriskUnit
 {
     public readonly MateriskModule ParentModule;
     public readonly string Name;
     public readonly List<MateriskField> Fields;
     public readonly List<MateriskMethod> Methods;
 
-    public MateriskType(MateriskModule module, string name)
+    public MateriskType(MateriskModule module, string name, MateriskAttributes attributes)
     {
         ParentModule = module;
         Name = name;
+        Attributes = attributes;
         Fields = new();
         Methods = new();
     }
+
+    public override LLVMValueRef Load() => throw new NotImplementedException();
+
+    public override LLVMValueRef Store(LLVMValueRef value) => throw new NotImplementedException();
 }

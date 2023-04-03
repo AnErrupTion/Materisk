@@ -4,6 +4,8 @@ namespace MateriskLLVM;
 
 public abstract class MateriskUnit
 {
+    public MateriskAttributes Attributes { get; protected init; }
+
     public LLVMTypeRef Type { get; protected init; }
 
     public LLVMTypeRef PointerElementType { get; protected init; }
