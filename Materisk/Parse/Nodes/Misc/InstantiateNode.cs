@@ -8,12 +8,12 @@ namespace Materisk.Parse.Nodes.Misc;
 
 internal class InstantiateNode : SyntaxNode
 {
-    private readonly SyntaxToken _ident;
+    private readonly string _identifier;
     private readonly List<SyntaxNode> _argumentNodes;
 
-    public InstantiateNode(SyntaxToken ident, List<SyntaxNode> argumentNodes)
+    public InstantiateNode(string identifier, List<SyntaxNode> argumentNodes)
     {
-        _ident = ident;
+        _identifier = identifier;
         _argumentNodes = argumentNodes;
     }
 
@@ -21,7 +21,12 @@ internal class InstantiateNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var name = _ident.Text;
+        return null!;
+    }
+
+    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    {
+        /*var name = _ident.Text;
 
         var constructorType = module.TopLevelTypes.FirstOrDefault(x => x.Name == name);
         if (constructorType == null)
@@ -34,12 +39,7 @@ internal class InstantiateNode : SyntaxNode
         foreach (var arg in _argumentNodes)
             arg.Emit(variables, module, type, method, arguments);
 
-        method.CilMethodBody!.Instructions.Add(CilOpCodes.Newobj, constructor);
-        return null!;
-    }
-
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
-    {
+        method.CilMethodBody!.Instructions.Add(CilOpCodes.Newobj, constructor);*/
         throw new NotImplementedException();
     }
 

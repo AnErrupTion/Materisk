@@ -32,6 +32,6 @@ internal class BlockNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        foreach (var node in _nodes) yield return node;
+        return _nodes;
     }
 }

@@ -46,7 +46,7 @@ internal class ForNode : SyntaxNode
         _block.Emit(module, type, method, metadata);
 
         // To handle "break" and "continue"
-        if (metadata.Last() is not true)
+        if (metadata.Last() is not MateriskMetadataType.Break and not MateriskMetadataType.Continue)
         {
             module.LlvmBuilder.BuildBr(ifBlock);
             metadata.RemoveLast();

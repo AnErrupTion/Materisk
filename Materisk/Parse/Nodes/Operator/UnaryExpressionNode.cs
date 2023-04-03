@@ -2,18 +2,17 @@
 using AsmResolver.DotNet.Code.Cil;
 using LLVMSharp.Interop;
 using MateriskLLVM;
-using Materisk.Lex;
 
 namespace Materisk.Parse.Nodes.Operator;
 
 internal class UnaryExpressionNode : SyntaxNode
 {
-    private readonly SyntaxToken _token;
+    private readonly string _operator;
     private readonly SyntaxNode _rhs;
 
-    public UnaryExpressionNode(SyntaxToken token, SyntaxNode rhs)
+    public UnaryExpressionNode(string op, SyntaxNode rhs)
     {
-        _token = token;
+        _operator = op;
         _rhs = rhs;
     }
 
@@ -27,16 +26,16 @@ internal class UnaryExpressionNode : SyntaxNode
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var value = (LLVMValueRef)_rhs.Emit(module, type, method, metadata);
-        var resultValue = _token.Type switch
+        var resultValue = _operator switch
         {
-            SyntaxType.Bang => value.TypeOf == LLVMTypeRef.Float || value.TypeOf == LLVMTypeRef.Double
+            "!" => value.TypeOf == LLVMTypeRef.Float || value.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOEQ, value, LlvmUtils.IntZero)
                 : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, value, LlvmUtils.IntZero),
-            SyntaxType.Minus => value.TypeOf == LLVMTypeRef.Float || value.TypeOf == LLVMTypeRef.Double
+            "-" => value.TypeOf == LLVMTypeRef.Float || value.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFNeg(value)
                 : module.LlvmBuilder.BuildNeg(value),
-            SyntaxType.Plus => value,
-            _ => throw new InvalidOperationException($"Trying to do a unary expression on: {_token.Type}")
+            "+" => value,
+            _ => throw new InvalidOperationException($"Trying to do a unary expression on: \"{_operator}\"")
         };
         return resultValue;
     }

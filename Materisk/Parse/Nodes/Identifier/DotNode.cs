@@ -10,11 +10,13 @@ internal class DotNode : SyntaxNode
 {
     private readonly SyntaxNode _callNode;
 
-    public List<SyntaxNode> NextNodes { get; } = new();
+    public readonly List<SyntaxNode> NextNodes;
 
     public DotNode(SyntaxNode callNode)
     {
         _callNode = callNode;
+
+        NextNodes = new();
     }
 
     public override NodeType Type => NodeType.Dot;
@@ -33,7 +35,7 @@ internal class DotNode : SyntaxNode
             {
                 case IdentifierNode rvn:
                 {
-                    var name = rvn.Token.Text;
+                    var name = rvn.Name;
                     var typeName = currentValue switch
                     {
                         MateriskLocalVariable variable => variable.ParentMethod.ParentType.Name,
@@ -86,7 +88,7 @@ internal class DotNode : SyntaxNode
                 }
                 case AssignExpressionNode aen:
                 {
-                    var name = aen.Ident.Text;
+                    var name = aen.Identifier;
                     var typeName = currentValue switch
                     {
                         MateriskLocalVariable variable => variable.ParentMethod.ParentType.Name,
@@ -141,7 +143,7 @@ internal class DotNode : SyntaxNode
                 }
                 case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:
                 {
-                    var name = cnIdentNode.Token.Text;
+                    var name = cnIdentNode.Name;
                     var typeName = currentValue is MateriskType mType ? mType.Name : currentValue.ToString();
     
                     MateriskMethod? newMethod = null;
@@ -157,7 +159,7 @@ internal class DotNode : SyntaxNode
                         throw new InvalidOperationException($"Unable to find method with name: {name}");
 
                     var args = cn.EmitArgs(module, type, method, metadata);
-                    currentValue = module.LlvmBuilder.BuildCall2(newMethod.Type, newMethod.LlvmMethod, args.ToArray());
+                    currentValue = module.LlvmBuilder.BuildCall2(newMethod.Type, newMethod.LlvmMethod, args);
                     break;
                 }
                 case CallNode: throw new Exception("Tried to call a non identifier in dot node stack.");

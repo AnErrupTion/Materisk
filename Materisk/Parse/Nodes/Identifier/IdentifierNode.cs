@@ -1,17 +1,16 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using MateriskLLVM;
-using Materisk.Lex;
 
 namespace Materisk.Parse.Nodes.Identifier;
 
 internal class IdentifierNode : SyntaxNode
 {
-    public readonly SyntaxToken Token;
+    public readonly string Name;
 
-    public IdentifierNode(SyntaxToken syntaxToken)
+    public IdentifierNode(string name)
     {
-        Token = syntaxToken;
+        Name = name;
     }
 
     public override NodeType Type => NodeType.Identifier;
@@ -23,8 +22,6 @@ internal class IdentifierNode : SyntaxNode
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var name = Token.Text;
-
         // TODO: Instantiation support
         /*if (name is "self" && method.DeclaringType is not null && method.Parameters.ThisParameter is not null)
         {
@@ -33,25 +30,25 @@ internal class IdentifierNode : SyntaxNode
         }*/
 
         foreach (var typeDef in module.Types)
-            if (typeDef.Name == name)
+            if (typeDef.Name == Name)
                 return typeDef;
 
         foreach (var field in module.Types[0].Fields)
-            if (field.Name == name)
+            if (field.Name == Name)
                 return field;
 
         foreach (var meth in module.Types[0].Methods)
-            if (meth.Name == name)
+            if (meth.Name == Name)
                 return meth;
 
         foreach (var arg in method.Arguments)
-            if (arg.Name == name)
+            if (arg.Name == Name)
                 return arg;
 
         foreach (var variable in method.Variables)
-            if (variable.Name == name)
+            if (variable.Name == Name)
                 return variable;
 
-        throw new InvalidOperationException($"Unable to find value for identifier: {name}");
+        throw new InvalidOperationException($"Unable to find value for identifier: {Name}");
     }
 }

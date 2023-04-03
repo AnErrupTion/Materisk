@@ -1,12 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
-using AsmResolver.DotNet.Signatures;
-using AsmResolver.DotNet.Signatures.Types;
-using AsmResolver.PE.DotNet.Cil;
-using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
 using LLVMSharp.Interop;
 using MateriskLLVM;
-using Materisk.Lex;
 using Materisk.Native;
 using Materisk.Utils;
 
@@ -14,19 +9,17 @@ namespace Materisk.Parse.Nodes.Definition;
 
 internal class ModuleFunctionDefinitionNode : SyntaxNode
 {
-    private readonly SyntaxToken _moduleName;
-    private readonly SyntaxToken _name;
-    private readonly Dictionary<Tuple<SyntaxToken, SyntaxToken?>, SyntaxToken> _args;
-    private readonly SyntaxToken _returnType;
-    private readonly SyntaxToken? _secondReturnType;
+    private readonly string _name;
+    private readonly Dictionary<Tuple<string, string>, string> _args;
+    private readonly string _returnType;
+    private readonly string _secondReturnType;
     private readonly SyntaxNode _body;
     private readonly bool _isStatic;
     private readonly bool _isPublic;
     private readonly bool _isNative;
 
-    public ModuleFunctionDefinitionNode(SyntaxToken moduleName, SyntaxToken name, Dictionary<Tuple<SyntaxToken, SyntaxToken?>, SyntaxToken> args, SyntaxToken returnType, SyntaxToken? secondReturnType, SyntaxNode body, bool isStatic, bool isPublic, bool isNative)
+    public ModuleFunctionDefinitionNode(string name, Dictionary<Tuple<string, string>, string> args, string returnType, string secondReturnType, SyntaxNode body, bool isStatic, bool isPublic, bool isNative)
     {
-        _moduleName = moduleName;
         _name = name;
         _args = args;
         _returnType = returnType;
@@ -41,92 +34,36 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var targetName = _name.Text;
-
-        var argts = new List<string>();
-        var parameters = new List<TypeSignature>();
-
-        foreach (var arg in _args)
-        {
-            parameters.Add(TypeSigUtils.GetTypeSignatureFor(module, arg.Key.Item1.Text, arg.Key.Item2?.Text));
-            argts.Add(arg.Value.Text);
-        }
-
-        MethodDefinition newMethod;
-
-        if (targetName is "ctor")
-        {
-            if (_returnType.Text is not "void")
-                throw new InvalidOperationException("Return type for constructor must be void!");
-
-            newMethod = new MethodDefinition(".ctor",
-                MethodAttributes.Public,
-                MethodSignature.CreateInstance(module.CorLibTypeFactory.Void, parameters)) 
-            {
-                IsSpecialName = true,
-                IsRuntimeSpecialName = true
-            };
-        }
-        else
-        {
-            MethodAttributes attributes = 0;
-
-            if (_isPublic)
-                attributes |= MethodAttributes.Public;
-
-            if (_isStatic)
-                attributes |= MethodAttributes.Static;
-
-            newMethod = new MethodDefinition(targetName,
-                attributes,
-                _isStatic
-                    ? MethodSignature.CreateStatic(TypeSigUtils.GetTypeSignatureFor(module, _returnType.Text), parameters)
-                    : MethodSignature.CreateInstance(TypeSigUtils.GetTypeSignatureFor(module, _returnType.Text), parameters));
-        }
-
-        type.Methods.Add(newMethod);
-
-        newMethod.CilMethodBody = new(newMethod);
-
-        if (_isNative)
-            CilNativeFuncImpl.Emit(module, _moduleName.Text, newMethod);
-        else
-            _body.Emit(variables, module, type, newMethod, argts);
-
-        newMethod.CilMethodBody!.Instructions.Add(CilOpCodes.Ret);
-
-        return newMethod;
+        return null!;
     }
 
     // TODO: Constructor and instance methods
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var targetName = _name.Text;
-
         var argts = new List<MateriskMethodArgument>();
         var parameters = new List<LLVMTypeRef>();
 
         foreach (var arg in _args)
         {
-            var firstType = arg.Key.Item1.Text;
-            var secondType = arg.Key.Item2?.Text;
+            var firstType = arg.Key.Item1;
+            var secondType = arg.Key.Item2;
             var argType = TypeSigUtils.GetTypeSignatureFor(firstType, secondType);
             var pointerElementType = firstType switch
             {
-                "ptr" or "arr" when secondType is not null => TypeSigUtils.GetTypeSignatureFor(secondType),
+                "ptr" or "arr" when !string.IsNullOrEmpty(secondType) => TypeSigUtils.GetTypeSignatureFor(secondType),
                 "str" => LLVMTypeRef.Int8,
                 _ => null
             };
 
             parameters.Add(argType);
-            argts.Add(new(arg.Value.Text, argType, pointerElementType, firstType[0] is 'i'));
+            argts.Add(new(arg.Value, argType, pointerElementType, firstType[0] is 'i'));
         }
 
         var newMethod = new MateriskMethod(
             type,
-            targetName,
+            _name,
             LLVMTypeRef.CreateFunction(
-                TypeSigUtils.GetTypeSignatureFor(_returnType.Text, _secondReturnType?.Text),
+                TypeSigUtils.GetTypeSignatureFor(_returnType, _secondReturnType),
                 parameters.ToArray()),
             argts.ToArray());
 
@@ -135,7 +72,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
         if (!_isNative)
         {
             var lastValue = _body.Emit(module, type, newMethod, metadata);
-            if (lastValue is not null)
+            if (lastValue is not null) // TODO: Properly check for return
                 module.LlvmBuilder.BuildRetVoid();
         } else LlvmNativeFuncImpl.Emit(module, type.Name, newMethod);
 

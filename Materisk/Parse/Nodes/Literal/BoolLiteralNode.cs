@@ -9,11 +9,11 @@ public class BoolLiteralNode : SyntaxNode
 {
     public override NodeType Type => NodeType.BooleanLiteral;
 
-    public bool Value { get; }
+    private readonly bool _value;
 
     public BoolLiteralNode(bool value)
     {
-        Value = value;
+        _value = value;
     }
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
@@ -23,7 +23,7 @@ public class BoolLiteralNode : SyntaxNode
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var value = Value ? 1 : 0;
+        var value = _value ? 1 : 0;
         return LLVMValueRef.CreateConstInt(LLVMTypeRef.Int1, Convert.ToUInt64(value), true);
     }
 }

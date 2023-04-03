@@ -2,19 +2,18 @@
 using AsmResolver.DotNet.Code.Cil;
 using LLVMSharp.Interop;
 using MateriskLLVM;
-using Materisk.Lex;
 using Materisk.Utils;
 
 namespace Materisk.Parse.Nodes.Misc;
 
 internal class ArrayNode : SyntaxNode
 {
-    private readonly SyntaxToken _typeToken;
+    private readonly string _type;
     private readonly SyntaxNode _itemCountNode;
 
-    public ArrayNode(SyntaxToken typeToken, SyntaxNode itemCountNode)
+    public ArrayNode(string type, SyntaxNode itemCountNode)
     {
-        _typeToken = typeToken;
+        _type = type;
         _itemCountNode = itemCountNode;
     }
 
@@ -28,7 +27,7 @@ internal class ArrayNode : SyntaxNode
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var elementCount = (LLVMValueRef)_itemCountNode.Emit(module, type, method, metadata);
-        var arrayType = TypeSigUtils.GetTypeSignatureFor(_typeToken.Text);
+        var arrayType = TypeSigUtils.GetTypeSignatureFor(_type);
         return module.LlvmBuilder.BuildArrayAlloca(arrayType, elementCount);
     }
 

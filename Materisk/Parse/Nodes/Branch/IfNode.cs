@@ -39,7 +39,7 @@ internal class IfNode : SyntaxNode
             _blockNode.Emit(module, type, method, metadata);
 
             // To handle "break" and "continue"
-            if (metadata.Last() is not true)
+            if (metadata.Last() is not MateriskMetadataType.Break and not MateriskMetadataType.Continue)
             {
                 module.LlvmBuilder.BuildBr(nextBlock);
                 metadata.RemoveLast();
@@ -60,7 +60,7 @@ internal class IfNode : SyntaxNode
             _blockNode.Emit(module, type, method, metadata);
 
             // To handle "break" and "continue"
-            if (metadata.Last() is not true)
+            if (metadata.Last() is not MateriskMetadataType.Break and not MateriskMetadataType.Continue)
             {
                 module.LlvmBuilder.BuildBr(nextBlock);
                 metadata.RemoveLast();
@@ -70,7 +70,7 @@ internal class IfNode : SyntaxNode
             _elseBlockNode.Emit(module, type, method, metadata);
 
             // To handle "break" and "continue"
-            if (metadata.Last() is not true)
+            if (metadata.Last() is not MateriskMetadataType.Break and not MateriskMetadataType.Continue)
             {
                 module.LlvmBuilder.BuildBr(nextBlock);
                 metadata.RemoveLast();

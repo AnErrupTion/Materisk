@@ -24,11 +24,14 @@ internal class ReturnNode : SyntaxNode
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var value = _returnValueNode?.Emit(module, type, method, metadata);
+
         if (value is not null)
             module.LlvmBuilder.BuildRet(value is MateriskUnit unit ? unit.Load() : (LLVMValueRef)value);
         else
             module.LlvmBuilder.BuildRetVoid();
-        return null!;
+
+        metadata.AddMetadata(MateriskMetadataType.Return);
+        return null!; // TODO: Return
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

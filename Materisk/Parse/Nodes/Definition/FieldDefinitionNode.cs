@@ -2,7 +2,6 @@
 using AsmResolver.DotNet.Code.Cil;
 using LLVMSharp.Interop;
 using MateriskLLVM;
-using Materisk.Lex;
 using Materisk.Utils;
 
 namespace Materisk.Parse.Nodes.Definition;
@@ -10,16 +9,16 @@ namespace Materisk.Parse.Nodes.Definition;
 internal class FieldDefinitionNode : SyntaxNode
 {
     private readonly bool _isPublic;
-    private readonly SyntaxToken _nameToken;
-    private readonly SyntaxToken _typeToken;
-    private readonly SyntaxToken? _secondTypeToken;
+    private readonly string _name;
+    private readonly string _type;
+    private readonly string _secondType;
 
-    public FieldDefinitionNode(bool isPublic, SyntaxToken nameToken, SyntaxToken typeToken, SyntaxToken? secondTypeToken)
+    public FieldDefinitionNode(bool isPublic, string nameToken, string typeToken, string secondTypeToken)
     {
         _isPublic = isPublic;
-        _nameToken = nameToken;
-        _typeToken = typeToken;
-        _secondTypeToken = secondTypeToken;
+        _name = nameToken;
+        _type = typeToken;
+        _secondType = secondTypeToken;
     }
 
     public override NodeType Type => NodeType.FieldDefinition;
@@ -32,15 +31,15 @@ internal class FieldDefinitionNode : SyntaxNode
     // TODO: Non-static fields
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var pointerElementType = _typeToken.Text switch
+        var pointerElementType = _type switch
         {
-            "ptr" or "arr" when _secondTypeToken is not null => TypeSigUtils.GetTypeSignatureFor(_secondTypeToken.Text),
+            "ptr" or "arr" when !string.IsNullOrEmpty(_secondType) => TypeSigUtils.GetTypeSignatureFor(_secondType),
             "str" => LLVMTypeRef.Int8,
             _ => null
         };
 
-        var newField = new MateriskField(module.Types[0], _nameToken.Text,
-            TypeSigUtils.GetTypeSignatureFor(_typeToken.Text), pointerElementType, _typeToken.Text[0] is 'i');
+        var newField = new MateriskField(module.Types[0], _name,
+            TypeSigUtils.GetTypeSignatureFor(_type), pointerElementType, _type[0] is 'i');
         module.Types[0].Fields.Add(newField);
 
         return newField;

@@ -7,7 +7,8 @@ namespace Materisk.Parse.Nodes.Branch;
 
 internal class CallNode : SyntaxNode
 {
-    public SyntaxNode ToCallNode { get; }
+    public readonly SyntaxNode ToCallNode;
+
     private readonly List<SyntaxNode> _argumentNodes;
 
     public CallNode(SyntaxNode atomNode, List<SyntaxNode> argumentNodes)
@@ -27,17 +28,17 @@ internal class CallNode : SyntaxNode
     {
         var toCall = (MateriskMethod)ToCallNode.Emit(module, type, method, metadata);
         var args = EmitArgs(module, type, method, metadata);
-        return module.LlvmBuilder.BuildCall2(toCall.Type, toCall.LlvmMethod, args.ToArray());
+        return module.LlvmBuilder.BuildCall2(toCall.Type, toCall.LlvmMethod, args);
     }
 
-    public List<LLVMValueRef> EmitArgs(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public LLVMValueRef[] EmitArgs(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var args = new List<LLVMValueRef>();
+        var args = new LLVMValueRef[_argumentNodes.Count];
 
-        foreach (var n in _argumentNodes)
+        for (var i = 0; i < args.Length; i++)
         {
-            var value = n.Emit(module, type, method, metadata);
-            args.Add(value is MateriskUnit unit ? unit.Load() : (LLVMValueRef)value);
+            var value = _argumentNodes[i].Emit(module, type, method, metadata);
+            args[i] = value is MateriskUnit unit ? unit.Load() : (LLVMValueRef)value;
         }
 
         return args;

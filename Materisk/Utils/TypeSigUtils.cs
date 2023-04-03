@@ -51,12 +51,11 @@ internal static class TypeSigUtils
     }
 
     // TODO: Structs as types
-    public static LLVMTypeRef GetTypeSignatureFor(string name, string? secondName = null)
+    public static LLVMTypeRef GetTypeSignatureFor(string name, string secondName = "")
     {
         switch (name)
         {
-            case "arr" when secondName is not null:
-            case "ptr" when secondName is not null:
+            case "arr" or "ptr" when !string.IsNullOrEmpty(secondName):
             {
                 return secondName switch
                 {

@@ -2,23 +2,22 @@
 using AsmResolver.DotNet.Code.Cil;
 using LLVMSharp.Interop;
 using MateriskLLVM;
-using Materisk.Lex;
 
 namespace Materisk.Parse.Nodes.Identifier;
 
 internal class AssignExpressionNode : SyntaxNode
 {
-    public AssignExpressionNode(SyntaxToken ident, SyntaxNode expr)
+    public AssignExpressionNode(string identifier, SyntaxNode expr)
     {
-        Ident = ident;
+        Identifier = identifier;
         Expr = expr;
     }
 
     public override NodeType Type => NodeType.AssignExpression;
 
-    public SyntaxToken Ident { get; }
+    public readonly string Identifier;
 
-    public SyntaxNode Expr { get; }
+    public readonly SyntaxNode Expr;
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
@@ -27,16 +26,16 @@ internal class AssignExpressionNode : SyntaxNode
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var name = Ident.Text;
-        if (string.IsNullOrEmpty(name))
+        // TODO: Check in parser
+        if (string.IsNullOrEmpty(Identifier))
             throw new InvalidOperationException("Can not assign to a non-existent identifier!");
 
-        var variable = method.GetVariableByName(name);
+        var variable = method.GetVariableByName(Identifier);
 
         if (variable is null)
         {
             foreach (var field in method.ParentType.Fields)
-                if (field.Name == name)
+                if (field.Name == Identifier)
                 {
                     // TODO: Non-static fields
                     /*if (!field.IsStatic)

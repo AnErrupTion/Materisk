@@ -8,14 +8,14 @@ namespace Materisk.Parse.Nodes.Misc;
 
 internal class CastNode : SyntaxNode
 {
-    private readonly SyntaxToken _typeToken;
-    private readonly SyntaxToken? _secondTypeToken;
+    private readonly string _type;
+    private readonly string _secondType;
     private readonly SyntaxNode _node;
 
-    public CastNode(SyntaxToken typeToken, SyntaxToken? secondTypeToken, SyntaxNode node)
+    public CastNode(string type, string secondType, SyntaxNode node)
     {
-        _typeToken = typeToken;
-        _secondTypeToken = secondTypeToken;
+        _type = type;
+        _secondType = secondType;
         _node = node;
     }
 
@@ -31,7 +31,7 @@ internal class CastNode : SyntaxNode
     {
         var value = _node.Emit(module, type, method, metadata);
         var llvmValue = value is MateriskUnit unit ? unit.Load() : (LLVMValueRef)value;
-        var resultValue = _typeToken.Text switch
+        var resultValue = _type switch
         {
             "i8" or "u8" => module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Int8),
             "i16" or "u16" => module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Int16),
@@ -43,18 +43,18 @@ internal class CastNode : SyntaxNode
             "f64" => llvmValue.TypeOf == LLVMTypeRef.Float || llvmValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFPCast(llvmValue, LLVMTypeRef.Double)
                 : module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Double),
-            "ptr" when _secondTypeToken is not null => _secondTypeToken.Text switch
+            "ptr" when !string.IsNullOrEmpty(_secondType) => _secondType switch
             {
                 "i8" or "u8" => module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.BytePointer),
-                "i16" or "u16" => module.LlvmBuilder.BuildIntCast(llvmValue, LlvmUtils.ShortPointer),
-                "i32" or "u32" => module.LlvmBuilder.BuildIntCast(llvmValue, LlvmUtils.IntPointer),
-                "i64" or "u64" => module.LlvmBuilder.BuildIntCast(llvmValue, LlvmUtils.LongPointer),
-                "f32" => module.LlvmBuilder.BuildIntCast(llvmValue, LlvmUtils.FloatPointer),
-                "f64" => module.LlvmBuilder.BuildIntCast(llvmValue, LlvmUtils.DoublePointer),
+                "i16" or "u16" => module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.ShortPointer),
+                "i32" or "u32" => module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.IntPointer),
+                "i64" or "u64" => module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.LongPointer),
+                "f32" => module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.FloatPointer),
+                "f64" => module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.DoublePointer),
                 "void" => module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.VoidPointer),
-                _ => throw new InvalidOperationException($"Can not cast to pointer type: {_secondTypeToken.Text}")
+                _ => throw new InvalidOperationException($"Can not cast to pointer type: {_secondType}")
             },
-            _ => throw new InvalidOperationException($"Can not cast to type: {_typeToken.Text}")
+            _ => throw new InvalidOperationException($"Can not cast to type: {_type}")
         };
         return resultValue;
     }
