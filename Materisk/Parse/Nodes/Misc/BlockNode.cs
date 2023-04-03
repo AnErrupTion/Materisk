@@ -34,9 +34,4 @@ internal class BlockNode : SyntaxNode
     {
         foreach (var node in _nodes) yield return node;
     }
-
-    public override string ToString()
-    {
-        return "BlockNode:";
-    }
 }

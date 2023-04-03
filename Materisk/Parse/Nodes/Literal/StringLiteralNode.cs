@@ -42,14 +42,4 @@ internal class StringLiteralNode : SyntaxNode
 
         return llvmValue;
     }
-
-    public override IEnumerable<SyntaxNode> GetChildren()
-    {
-        return Enumerable.Empty<SyntaxNode>();
-    }
-
-    public override string ToString()
-    {
-        return "StrLitNode:";
-    }
 }

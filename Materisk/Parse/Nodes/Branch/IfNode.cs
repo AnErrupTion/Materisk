@@ -88,9 +88,4 @@ internal class IfNode : SyntaxNode
         yield return _blockNode;
         if (_elseBlockNode is not null) yield return _elseBlockNode;
     }
-
-    public override string ToString()
-    {
-        return "IfNode:";
-    }
 }

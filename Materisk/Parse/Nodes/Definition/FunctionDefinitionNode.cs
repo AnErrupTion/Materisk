@@ -4,7 +4,6 @@ using LLVMSharp.Interop;
 using MateriskLLVM;
 using Materisk.Lex;
 using Materisk.Native;
-using Materisk.Parse.Nodes.Misc;
 using Materisk.Utils;
 
 namespace Materisk.Parse.Nodes.Definition;
@@ -82,8 +81,6 @@ internal class FunctionDefinitionNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(_nameToken);
-        foreach (var t in _args) yield return new TokenNode(t.Value);
         yield return _block;
     }
 }

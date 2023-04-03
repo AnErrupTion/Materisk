@@ -25,14 +25,4 @@ internal class DoubleLiteralNode : SyntaxNode
     {
         return LLVMValueRef.CreateConstReal(LLVMTypeRef.Double, _value);
     }
-
-    public override IEnumerable<SyntaxNode> GetChildren()
-    {
-        return Enumerable.Empty<SyntaxNode>();
-    }
-
-    public override string ToString()
-    {
-        return "DoubleLitNode:";
-    }
 }

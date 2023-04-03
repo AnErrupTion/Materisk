@@ -35,9 +35,4 @@ internal class ReturnNode : SyntaxNode
     {
         if (_returnValueNode != null) yield return _returnValueNode;
     }
-
-    public override string ToString()
-    {
-        return "ReturnNode:";
-    }
 }

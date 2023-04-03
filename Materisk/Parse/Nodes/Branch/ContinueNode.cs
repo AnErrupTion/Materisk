@@ -25,14 +25,4 @@ internal class ContinueNode : SyntaxNode
 
         throw new InvalidOperationException($"Unable to find then block for method: {method.Name}");
     }
-
-    public override IEnumerable<SyntaxNode> GetChildren()
-    {
-        return Enumerable.Empty<SyntaxNode>();
-    }
-
-    public override string ToString()
-    {
-        return "ContinueNode:";
-    }
 }

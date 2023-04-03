@@ -172,9 +172,4 @@ internal class DotNode : SyntaxNode
         yield return _callNode;
         foreach (var node in NextNodes) yield return node;
     }
-
-    public override string ToString()
-    {
-        return "DotNode:";
-    }
 }

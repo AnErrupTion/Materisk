@@ -25,14 +25,4 @@ internal class BreakNode : SyntaxNode
 
         throw new InvalidOperationException($"Unable to find else block for method: {method.Name}");
     }
-
-    public override IEnumerable<SyntaxNode> GetChildren()
-    {
-        return Enumerable.Empty<SyntaxNode>();
-    }
-
-    public override string ToString()
-    {
-        return "BreakNode:";
-    }
 }

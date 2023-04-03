@@ -3,7 +3,6 @@ using AsmResolver.DotNet.Code.Cil;
 using LLVMSharp.Interop;
 using MateriskLLVM;
 using Materisk.Lex;
-using Materisk.Parse.Nodes.Misc;
 using Materisk.Utils;
 
 namespace Materisk.Parse.Nodes.Identifier;
@@ -74,14 +73,6 @@ internal class InitVariableNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(_identToken);
-        yield return new TokenNode(_typeToken);
-        if (_secondTypeToken is not null) yield return new TokenNode(_secondTypeToken);
         yield return _expr;
-    }
-
-    public override string ToString()
-    {
-        return "InitVariableNode:";
     }
 }

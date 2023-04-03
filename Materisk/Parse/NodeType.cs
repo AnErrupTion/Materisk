@@ -4,7 +4,6 @@ public enum NodeType
 {
     Return,
     BinaryExpression,
-    Token,
     BooleanLiteral,
     Block,
     Continue,
@@ -33,6 +32,5 @@ public enum NodeType
     ModuleFieldDefinition,
     Instantiate,
     ModuleDefinition,
-    ModuleFunctionDefinition,
-    Import
+    ModuleFunctionDefinition
 }

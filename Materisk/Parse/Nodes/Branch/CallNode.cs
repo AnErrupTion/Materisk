@@ -48,9 +48,4 @@ internal class CallNode : SyntaxNode
         yield return ToCallNode;
         foreach (var n in _argumentNodes) yield return n;
     }
-
-    public override string ToString()
-    {
-        return "CallNode:";
-    }
 }

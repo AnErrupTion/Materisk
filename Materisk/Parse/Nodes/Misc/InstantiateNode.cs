@@ -45,7 +45,6 @@ internal class InstantiateNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(_ident);
-        foreach (var node in _argumentNodes) yield return node;
+        return _argumentNodes;
     }
 }

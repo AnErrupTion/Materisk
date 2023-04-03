@@ -2,7 +2,6 @@
 using AsmResolver.DotNet.Code.Cil;
 using MateriskLLVM;
 using Materisk.Lex;
-using Materisk.Parse.Nodes.Misc;
 
 namespace Materisk.Parse.Nodes.Identifier;
 
@@ -54,15 +53,5 @@ internal class IdentifierNode : SyntaxNode
                 return variable;
 
         throw new InvalidOperationException($"Unable to find value for identifier: {name}");
-    }
-
-    public override IEnumerable<SyntaxNode> GetChildren()
-    {
-        yield return new TokenNode(Token);
-    }
-
-    public override string ToString()
-    {
-        return "IdentNode:";
     }
 }

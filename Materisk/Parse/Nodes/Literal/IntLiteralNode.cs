@@ -31,14 +31,4 @@ internal class IntLiteralNode : SyntaxNode
 
         return LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, Convert.ToUInt64(_value), true);
     }
-
-    public override IEnumerable<SyntaxNode> GetChildren()
-    {
-        return Enumerable.Empty<SyntaxNode>();
-    }
-
-    public override string ToString()
-    {
-        return "IntLitNode:";
-    }
 }

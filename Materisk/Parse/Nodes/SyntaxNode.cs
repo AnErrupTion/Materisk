@@ -12,5 +12,5 @@ public abstract class SyntaxNode
 
     public abstract object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata);
 
-    public abstract IEnumerable<SyntaxNode> GetChildren();
+    public virtual IEnumerable<SyntaxNode> GetChildren() => Enumerable.Empty<SyntaxNode>();
 }

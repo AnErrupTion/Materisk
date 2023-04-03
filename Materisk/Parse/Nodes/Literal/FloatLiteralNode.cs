@@ -25,14 +25,4 @@ internal class FloatLiteralNode : SyntaxNode
     {
         return LLVMValueRef.CreateConstReal(LLVMTypeRef.Float, Convert.ToDouble(_value));
     }
-
-    public override IEnumerable<SyntaxNode> GetChildren()
-    {
-        return Enumerable.Empty<SyntaxNode>();
-    }
-
-    public override string ToString()
-    {
-        return "FloatLitNode:";
-    }
 }

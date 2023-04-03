@@ -3,7 +3,6 @@ using AsmResolver.DotNet.Code.Cil;
 using LLVMSharp.Interop;
 using MateriskLLVM;
 using Materisk.Lex;
-using Materisk.Parse.Nodes.Misc;
 
 namespace Materisk.Parse.Nodes.Operator;
 
@@ -121,12 +120,6 @@ internal class BinaryExpressionNode : SyntaxNode
     public override IEnumerable<SyntaxNode> GetChildren()
     {
         yield return _left;
-        yield return new TokenNode(_operatorToken);
         yield return _right;
-    }
-
-    public override string ToString()
-    {
-        return "BinExprNode: op=" + _operatorToken.Type;
     }
 }

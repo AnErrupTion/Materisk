@@ -3,7 +3,6 @@ using AsmResolver.DotNet.Code.Cil;
 using LLVMSharp.Interop;
 using MateriskLLVM;
 using Materisk.Lex;
-using Materisk.Parse.Nodes.Misc;
 
 namespace Materisk.Parse.Nodes.Identifier;
 
@@ -58,12 +57,6 @@ internal class AssignExpressionNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(Ident);
         yield return Expr;
-    }
-
-    public override string ToString()
-    {
-        return "AssignVariableNode:";
     }
 }

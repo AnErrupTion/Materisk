@@ -2,7 +2,6 @@
 using AsmResolver.DotNet.Code.Cil;
 using MateriskLLVM;
 using Materisk.Lex;
-using Materisk.Parse.Nodes.Misc;
 
 namespace Materisk.Parse.Nodes.Definition;
 
@@ -45,7 +44,6 @@ internal class ModuleDefinitionNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(_className);
-        foreach (var n in _body) yield return n;
+        return _body;
     }
 }

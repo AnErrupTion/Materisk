@@ -34,12 +34,6 @@ internal class ArrayNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(_typeToken);
         yield return _itemCountNode;
-    }
-
-    public override string ToString()
-    {
-        return "ArrNode:";
     }
 }

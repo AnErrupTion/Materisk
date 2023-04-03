@@ -3,7 +3,6 @@ using AsmResolver.DotNet.Code.Cil;
 using LLVMSharp.Interop;
 using MateriskLLVM;
 using Materisk.Lex;
-using Materisk.Parse.Nodes.Misc;
 
 namespace Materisk.Parse.Nodes.Operator;
 
@@ -44,12 +43,6 @@ internal class UnaryExpressionNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return new TokenNode(_token);
         yield return _rhs;
-    }
-
-    public override string ToString()
-    {
-        return "UnaryExpressionNode:";
     }
 }

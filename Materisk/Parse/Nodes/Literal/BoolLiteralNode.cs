@@ -26,14 +26,4 @@ public class BoolLiteralNode : SyntaxNode
         var value = Value ? 1 : 0;
         return LLVMValueRef.CreateConstInt(LLVMTypeRef.Int1, Convert.ToUInt64(value), true);
     }
-
-    public override IEnumerable<SyntaxNode> GetChildren()
-    {
-        return Enumerable.Empty<SyntaxNode>();
-    }
-
-    public override string ToString()
-    {
-        return "BoolLitNode: " + Value;
-    }
 }

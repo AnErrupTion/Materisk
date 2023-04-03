@@ -3,7 +3,6 @@ using AsmResolver.DotNet.Code.Cil;
 using LLVMSharp.Interop;
 using MateriskLLVM;
 using Materisk.Lex;
-using Materisk.Parse.Nodes.Misc;
 using Materisk.Utils;
 
 namespace Materisk.Parse.Nodes.Definition;
@@ -46,11 +45,5 @@ internal class ModuleFieldDefinitionNode : SyntaxNode
         type.Fields.Add(newField);
 
         return newField;
-    }
-
-    public override IEnumerable<SyntaxNode> GetChildren()
-    {
-        yield return new TokenNode(_nameToken);
-        yield return new TokenNode(_typeToken);
     }
 }
