@@ -2,5 +2,5 @@ using "corelib.msk";
 
 fn pub main() void
 {
-	Console.println("Hello, World!");
+
 }

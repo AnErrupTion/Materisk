@@ -31,7 +31,7 @@ internal class ReturnNode : SyntaxNode
             module.LlvmBuilder.BuildRetVoid();
 
         metadata.AddMetadata(MateriskMetadataType.Return);
-        return null!; // TODO: Return
+        return value!;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

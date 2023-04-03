@@ -14,5 +14,15 @@ public sealed class MateriskMetadata
             Metadata.RemoveAt(Metadata.Count - 1);
     }
 
-    public object? Last() => Metadata.Count > 0 ? Metadata[^1] : null;
+    public object? Last()
+    {
+        if (Metadata.Count > 0)
+        {
+            var value = Metadata[^1];
+            RemoveLast();
+            return value;
+        }
+
+        return null;
+    }
 }
