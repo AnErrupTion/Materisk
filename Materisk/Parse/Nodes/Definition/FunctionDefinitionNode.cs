@@ -70,11 +70,9 @@ internal class FunctionDefinitionNode : SyntaxNode
         var mType = module.Types[0];
 
         if (!_isNative)
-        {
             _block.Emit(module, mType, newMethod, metadata);
-            if (metadata.Last() is not MateriskMetadataType.Return)
-                module.LlvmBuilder.BuildRetVoid();
-        } else LlvmNativeFuncImpl.Emit(module, mType.Name, newMethod);
+        else
+            LlvmNativeFuncImpl.Emit(module, mType.Name, newMethod);
 
         return newMethod;
     }

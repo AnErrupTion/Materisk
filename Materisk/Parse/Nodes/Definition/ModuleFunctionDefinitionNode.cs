@@ -71,11 +71,9 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
         type.Methods.Add(newMethod);
 
         if (!_isNative)
-        {
             _body.Emit(module, type, newMethod, metadata);
-            if (metadata.Last() is not MateriskMetadataType.Return)
-                module.LlvmBuilder.BuildRetVoid();
-        } else LlvmNativeFuncImpl.Emit(module, type.Name, newMethod);
+        else
+            LlvmNativeFuncImpl.Emit(module, type.Name, newMethod);
 
         return newMethod;
     }

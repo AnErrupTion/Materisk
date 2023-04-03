@@ -13,7 +13,10 @@ namespace Materisk.Parse;
 public class Parser
 {
     private readonly List<SyntaxToken> _tokens;
+
     private int _position;
+
+    private bool _hasReturnNode;
 
     public Parser(List<SyntaxToken> tokens)
     {
@@ -30,7 +33,7 @@ public class Parser
         return new BlockNode(nodes);
     }
 
-    private SyntaxNode ParseScopedStatements()
+    private BlockNode ParseScopedStatements()
     {
         MatchToken(SyntaxType.LBraces);
 
@@ -59,6 +62,7 @@ public class Parser
             {
                 _position += 2;
                 var ret = new ReturnNode();
+                _hasReturnNode = true;
                 MatchToken(SyntaxType.Semicolon);
                 return ret;
             }
@@ -66,6 +70,7 @@ public class Parser
             {
                 _position++;
                 var ret = new ReturnNode(ParseExpression(null!));
+                _hasReturnNode = true;
                 MatchToken(SyntaxType.Semicolon);
                 return ret;
             }
@@ -209,6 +214,11 @@ public class Parser
             }
 
             var body = ParseScopedStatements();
+
+            if (!_hasReturnNode)
+                body.Nodes.Add(new ReturnNode());
+            else
+                _hasReturnNode = false;
 
             nodes.Add(new ModuleFunctionDefinitionNode(name.Text, args, returnType.Text,
                 secondReturnType is null ? string.Empty : secondReturnType.Text, body, isStatic, isPublic, isNative));
@@ -634,6 +644,11 @@ public class Parser
         }
 
         var block = ParseScopedStatements();
+
+        if (!_hasReturnNode)
+            block.Nodes.Add(new ReturnNode());
+        else
+            _hasReturnNode = false;
 
         return new FunctionDefinitionNode(nameToken.Text, args, returnType.Text,
             secondReturnType is null ? string.Empty : secondReturnType.Text, block, isPublic, isNative);
