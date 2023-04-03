@@ -1,10 +1,15 @@
 using "stdlib.msk";
 
+mod pub Module
+{
+	fld test f64;
+}
+
 fn pub main() void
 {
-	var length mut f64 = (f64)4.2;
+	Module.test = (f64)4.2;
 
-	if (length == (f64)4.2)
+	if (Module.test == (f64)4.2)
 	{
 		Console.println("Correct!");
 	}

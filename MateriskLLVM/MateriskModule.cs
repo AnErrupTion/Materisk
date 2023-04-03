@@ -20,4 +20,6 @@ public sealed class MateriskModule : MateriskUnit
     }
 
     public override LLVMValueRef Load() => throw new NotImplementedException();
+
+    public override LLVMValueRef Store(LLVMValueRef value) => throw new NotImplementedException();
 }

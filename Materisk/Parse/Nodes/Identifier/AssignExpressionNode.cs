@@ -44,18 +44,15 @@ internal class AssignExpressionNode : SyntaxNode
                         throw new InvalidOperationException($"Field \"{name}\" is not static.");*/
 
                     var fieldValue = Expr.Emit(module, type, method, metadata);
-                    module.LlvmBuilder.BuildStore(fieldValue is MateriskUnit fieldUnit ? fieldUnit.Load() : (LLVMValueRef)fieldValue, field.LlvmField);
+                    field.Store(fieldValue is MateriskUnit fieldUnit ? fieldUnit.Load() : (LLVMValueRef)fieldValue);
                     return fieldValue;
                 }
 
             throw new InvalidOperationException("Can not assign to a non-existent identifier!");
         }
 
-        if (!variable.Mutable)
-            throw new InvalidOperationException("Can not assign to an immutable variable!");
-
         var varValue = Expr.Emit(module, type, method, metadata);
-        module.LlvmBuilder.BuildStore(varValue is MateriskUnit varUnit ? varUnit.Load() : (LLVMValueRef)varValue, variable.Value);
+        variable.Store(varValue is MateriskUnit varUnit ? varUnit.Load() : (LLVMValueRef)varValue);
         return varValue;
     }
 

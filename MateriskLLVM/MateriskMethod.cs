@@ -25,7 +25,10 @@ public sealed class MateriskMethod : MateriskUnit
         Variables = new();
 
         for (var i = 0; i < Arguments.Length; i++)
+        {
+            Arguments[i].ParentMethod = this;
             Arguments[i].Value = LlvmMethod.Params[i];
+        }
     }
 
     public MateriskLocalVariable? GetVariableByName(string name)
@@ -38,4 +41,6 @@ public sealed class MateriskMethod : MateriskUnit
     }
 
     public override LLVMValueRef Load() => throw new NotImplementedException();
+
+    public override LLVMValueRef Store(LLVMValueRef value) => throw new NotImplementedException();
 }

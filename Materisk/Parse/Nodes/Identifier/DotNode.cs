@@ -1,6 +1,7 @@
 ﻿using AsmResolver.DotNet;
 using AsmResolver.DotNet.Code.Cil;
 using AsmResolver.PE.DotNet.Cil;
+using LLVMSharp.Interop;
 using MateriskLLVM;
 using Materisk.Parse.Nodes.Branch;
 
@@ -21,129 +22,7 @@ internal class DotNode : SyntaxNode
 
     public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
     {
-        var currentValue = _callNode.Emit(variables, module, type, method, arguments);
-
-        foreach (var node in NextNodes)
-            switch (node)
-            {
-                case IdentifierNode rvn:
-                {
-                    var name = rvn.Token.Text;
-                    var typeName = currentValue is CilLocalVariable variable ? variable.VariableType.ToString() : method.DeclaringType?.ToString();
-
-                    FieldDefinition? fieldDef = null;
-
-                    foreach (var typeDef in module.TopLevelTypes)
-                        foreach (var field in typeDef.Fields)
-                            if (typeDef.FullName == typeName && field.Name == name)
-                            {
-                                fieldDef = field;
-                                break;
-                            }
-
-                    if (fieldDef == null)
-                    {
-                        typeName = currentValue.ToString();
-
-                        var index = 0;
-                        var found = false;
-
-                        foreach (var argument in arguments)
-                        {
-                            if (argument == typeName)
-                            {
-                                typeName = method.Parameters[index].ParameterType.Name;
-                                found = true;
-                                break;
-                            }
-
-                            index++;
-                        }
-
-                        if (!found)
-                            throw new InvalidOperationException($"Unable to find type for argument: {typeName}");
-
-                        foreach (var typeDef in module.TopLevelTypes)
-                            foreach (var field in typeDef.Fields)
-                                if (typeDef.Name == typeName && field.Name == name)
-                                {
-                                    fieldDef = field;
-                                    break;
-                                }
-
-                        if (fieldDef is null)
-                            throw new InvalidOperationException($"Unable to find field with name: {name}");
-                    }
-
-                    method.CilMethodBody!.Instructions.Add(fieldDef.IsStatic ? CilOpCodes.Ldsfld : CilOpCodes.Ldfld, fieldDef);
-                    currentValue = fieldDef;
-                    break;
-                }
-                case AssignExpressionNode aen:
-                {
-                    var name = aen.Ident.Text;
-                    var typeName = currentValue is CilLocalVariable variable ? variable.VariableType.ToString() : method.DeclaringType?.ToString();
-
-                    aen.Expr.Emit(variables, module, type, method, arguments);
-
-                    FieldDefinition? fieldDef = null;
-
-                    foreach (var typeDef in module.TopLevelTypes)
-                        foreach (var field in typeDef.Fields)
-                            if (typeDef.FullName == typeName && field.Name == name)
-                            {
-                                fieldDef = field;
-                                break;
-                            }
-
-                    if (fieldDef == null)
-                    {
-                        typeName = currentValue.ToString();
-
-                        var index = 0;
-                        var found = false;
-
-                        foreach (var argument in arguments)
-                        {
-                            if (argument == typeName)
-                            {
-                                typeName = method.Parameters[index].ParameterType.Name;
-                                found = true;
-                                break;
-                            }
-
-                            index++;
-                        }
-
-                        if (!found)
-                            throw new InvalidOperationException($"Unable to find type for argument: {typeName}");
-
-                        foreach (var typeDef in module.TopLevelTypes)
-                            foreach (var field in typeDef.Fields)
-                                if (typeDef.Name == typeName && field.Name == name)
-                                {
-                                    fieldDef = field;
-                                    break;
-                                }
-
-                        if (fieldDef is null)
-                            throw new InvalidOperationException($"Unable to find field with name: {name}");
-                    }
-
-                    method.CilMethodBody!.Instructions.Add(fieldDef.IsStatic ? CilOpCodes.Stsfld : CilOpCodes.Stfld, fieldDef);
-                    break;
-                }
-                case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:
-                {
-                    return null!;
-                }
-                case CallNode _:
-                    throw new Exception("Tried to call a non identifier in dot node stack.");
-                default:
-                    throw new Exception("Unexpected node in dot node stack!");
-            }
-
-        return currentValue;
+        return null!;
     }
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
@@ -153,13 +32,117 @@ internal class DotNode : SyntaxNode
         foreach (var node in NextNodes)
             switch (node)
             {
-                case IdentifierNode rvn: throw new NotImplementedException();
-                case AssignExpressionNode aen: throw new NotImplementedException();
+                case IdentifierNode rvn:
+                {
+                    var name = rvn.Token.Text;
+                    var typeName = currentValue switch
+                    {
+                        MateriskLocalVariable variable => variable.ParentMethod.ParentType.Name,
+                        MateriskType mType => mType.Name,
+                        _ => method.ParentType.Name
+                    };
+
+                    MateriskField? mField = null;
+
+                    foreach (var typeDef in module.Types)
+                        foreach (var field in typeDef.Fields)
+                            if (typeDef.Name == typeName && field.Name == name)
+                            {
+                                mField = field;
+                                break;
+                            }
+
+                    if (mField == null)
+                    {
+                        /*typeName = currentValue.ToString();
+
+                        var found = false;
+
+                        foreach (var argument in method.Arguments)
+                            if (argument.Name == typeName)
+                            {
+                                typeName = argument.ParentMethod.ParentType.Name;
+                                found = true;
+                                break;
+                            }
+
+                        if (!found)
+                            throw new InvalidOperationException($"Unable to find type for argument: {typeName}");
+
+                        foreach (var typeDef in module.Types)
+                            foreach (var field in typeDef.Fields)
+                                if (typeDef.Name == typeName && field.Name == name)
+                                {
+                                    mField = field;
+                                    break;
+                                }
+
+                        if (mField is null)*/
+                            throw new InvalidOperationException($"Unable to find field with name: {name}");
+                    }
+
+                    currentValue = mField.Load();
+                    break;
+                }
+                case AssignExpressionNode aen:
+                {
+                    var name = aen.Ident.Text;
+                    var typeName = currentValue switch
+                    {
+                        MateriskLocalVariable variable => variable.ParentMethod.ParentType.Name,
+                        MateriskType mType => mType.Name,
+                        _ => method.ParentType.Name
+                    };
+                    var value = aen.Expr.Emit(module, type, method, metadata);
+
+                    MateriskField? mField = null;
+
+                    foreach (var typeDef in module.Types)
+                        foreach (var field in typeDef.Fields)
+                            if (typeDef.Name == typeName && field.Name == name)
+                            {
+                                mField = field;
+                                break;
+                            }
+
+                    if (mField is null)
+                    {
+                        /*typeName = currentValue.ToString();
+
+                        var found = false;
+
+                        foreach (var argument in method.Arguments)
+                            if (argument.Name == typeName)
+                            {
+                                typeName = argument.ParentMethod.ParentType.Name;
+                                found = true;
+                                break;
+                            }
+
+                        if (!found)
+                            throw new InvalidOperationException($"Unable to find type for argument: {typeName}");
+
+                        foreach (var typeDef in module.Types)
+                            foreach (var field in typeDef.Fields)
+                                if (typeDef.Name == typeName && field.Name == name)
+                                {
+                                    mField = field;
+                                    break;
+                                }
+
+                        if (mField is null)*/
+                            throw new InvalidOperationException($"Unable to find field with name: {name}");
+                    }
+
+                    // TODO: Non-static fields
+                    mField.Store(value is MateriskUnit unit ? unit.Load() : (LLVMValueRef)value);
+                    break;
+                }
                 case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:
                 {
                     var name = cnIdentNode.Token.Text;
                     var typeName = currentValue is MateriskType mType ? mType.Name : currentValue.ToString();
-
+    
                     MateriskMethod? newMethod = null;
                     foreach (var typeDef in module.Types)
                         foreach (var meth in typeDef.Methods)

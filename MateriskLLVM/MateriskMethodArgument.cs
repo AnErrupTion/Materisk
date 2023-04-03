@@ -4,6 +4,7 @@ namespace MateriskLLVM;
 
 public sealed class MateriskMethodArgument : MateriskUnit
 {
+    public MateriskMethod ParentMethod;
     public readonly string Name;
     public LLVMValueRef Value;
 
@@ -15,4 +16,6 @@ public sealed class MateriskMethodArgument : MateriskUnit
     }
 
     public override LLVMValueRef Load() => Value;
+
+    public override LLVMValueRef Store(LLVMValueRef value) => throw new NotImplementedException();
 }
