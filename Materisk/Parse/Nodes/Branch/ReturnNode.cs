@@ -25,6 +25,8 @@ internal class ReturnNode : SyntaxNode
     {
         var value = _returnValueNode?.Emit(module, type, method, metadata);
 
+        metadata.AddMetadata(MateriskMetadataType.Return);
+
         return value is not null
             ? module.LlvmBuilder.BuildRet(value is MateriskUnit unit ? unit.Load() : (LLVMValueRef)value)
             : module.LlvmBuilder.BuildRetVoid();

@@ -3,5 +3,6 @@ namespace MateriskLLVM;
 public enum MateriskMetadataType
 {
     Break,
-    Continue
+    Continue,
+    Return
 }
