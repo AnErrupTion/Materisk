@@ -295,12 +295,13 @@ public class Lexer
             {
                 _position++;
 
-                _builder.Append(Peek() switch
+                current = Peek();
+                _builder.Append(current switch
                 {
                     '"' => "\"",
                     'n' => "\n",
                     '\\' => "\\",
-                    _ => throw new Exception("Invalid escape sequence")
+                    _ => throw new Exception($"Invalid escape sequence \"\\{current}\" at position: {_position}")
                 });
 
                 _position++;

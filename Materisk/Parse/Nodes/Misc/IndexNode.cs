@@ -37,7 +37,7 @@ internal class IndexNode : SyntaxNode
         var underlyingType = llvmValue.TypeOf.Kind;
 
         if (underlyingType is not LLVMTypeKind.LLVMPointerTypeKind)
-            throw new InvalidOperationException($"Catastrophic failure: variable is not pointer: {underlyingType}"); // This should never happen
+            throw new InvalidOperationException($"Catastrophic failure: value is not pointer: {underlyingType}"); // This should never happen
 
         var indexValue = _indexNode.Emit(module, type, method, metadata);
         var index = indexValue is MateriskUnit indexUnit ? indexUnit.Load() : (LLVMValueRef)indexValue;

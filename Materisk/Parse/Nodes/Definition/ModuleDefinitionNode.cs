@@ -31,12 +31,7 @@ internal class ModuleDefinitionNode : SyntaxNode
         module.Types.Add(newType);
 
         foreach (var bodyNode in _body)
-        {
-            if (bodyNode is not ModuleFunctionDefinitionNode and not ModuleFieldDefinitionNode)
-                throw new Exception($"Unexpected node in module definition: {bodyNode.GetType()}");
-
             bodyNode.Emit(module, newType, method, metadata);
-        }
 
         return newType;
     }

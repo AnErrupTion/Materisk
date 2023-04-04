@@ -52,9 +52,9 @@ internal class CastNode : SyntaxNode
                 "f32" => module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.FloatPointer),
                 "f64" => module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.DoublePointer),
                 "void" => module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.VoidPointer),
-                _ => throw new InvalidOperationException($"Can not cast to pointer type: {_secondType}")
+                _ => throw new InvalidOperationException($"Can not cast to pointer type \"{_secondType}\" in method: {module.Name}.{type.Name}.{method.Name}")
             },
-            _ => throw new InvalidOperationException($"Can not cast to type: {_type}")
+            _ => throw new InvalidOperationException($"Can not cast to type \"{_type}\" in method: {module.Name}.{type.Name}.{method.Name}")
         };
         return resultValue;
     }

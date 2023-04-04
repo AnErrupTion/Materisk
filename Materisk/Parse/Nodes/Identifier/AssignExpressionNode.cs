@@ -30,18 +30,18 @@ internal class AssignExpressionNode : SyntaxNode
 
         if (variable is null)
         {
-            foreach (var field in method.ParentType.Fields)
+            foreach (var field in type.Fields)
                 if (field.Name == Identifier)
                 {
                     if (!field.Attributes.HasFlag(MateriskAttributes.Static))
-                        throw new InvalidOperationException($"Field \"{Identifier}\" is not static.");
+                        throw new InvalidOperationException($"Field \"{module.Name}.{type.Name}.{Identifier}\" is not static.");
 
                     var fieldValue = Expr.Emit(module, type, method, metadata);
                     field.Store(fieldValue is MateriskUnit fieldUnit ? fieldUnit.Load() : (LLVMValueRef)fieldValue);
                     return fieldValue;
                 }
 
-            throw new InvalidOperationException("Can not assign to a non-existent identifier!");
+            throw new InvalidOperationException($"Can not assign to a non-existent identifier \"{Identifier}\" in method: {module.Name}.{type.Name}.{method.Name}");
         }
 
         var varValue = Expr.Emit(module, type, method, metadata);

@@ -33,7 +33,7 @@ internal class InitVariableNode : SyntaxNode
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         if (method.GetVariableByName(_name) is not null)
-            throw new InvalidOperationException("Can not initialize the same variable twice!");
+            throw new InvalidOperationException($"Can not initialize the same variable twice: {module.Name}.{type.Name}.{method.Name}.{_name}");
 
         var value = (LLVMValueRef)_expr.Emit(module, type, method, metadata);
         var valueType = value.TypeOf;

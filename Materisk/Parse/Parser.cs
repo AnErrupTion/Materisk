@@ -44,7 +44,7 @@ public class Parser
         while ((current = Peek()).Type != SyntaxType.RBraces)
         {
             if (current.Type == SyntaxType.Eof)
-                throw new Exception($"Unclosed block at position {current.Position}");
+                throw new Exception($"Unclosed block at position: {current.Position}");
 
             nodes.Add(ParseStatement());
         }
@@ -791,7 +791,7 @@ public class Parser
             return current;
         }
 
-        throw new Exception("Unexpected token " + current.Type + "; expected " + type);
+        throw new Exception($"Unexpected token \"{current.Type}\" at position {_position}, expected: {type} ");
     }
 
     private SyntaxToken MatchKeyword(string value)
@@ -804,6 +804,6 @@ public class Parser
             return current;
         }
 
-        throw new Exception("Unexpected token " + current.Type + "; expected Keyword with value " + value);
+        throw new Exception($"Unexpected token \"{current.Type}\" at position {_position}, expected Keyword with value: {value} ");
     }
 }

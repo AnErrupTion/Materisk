@@ -26,7 +26,7 @@ public sealed class MateriskLocalVariable : MateriskUnit
     public override LLVMValueRef Store(LLVMValueRef value)
     {
         if (!Mutable)
-            throw new InvalidOperationException("Can not assign to an immutable variable!");
+            throw new InvalidOperationException($"Can not assign to an immutable variable: {ParentMethod.ParentType.ParentModule.Name}.{ParentMethod.ParentType.Name}.{ParentMethod.Name}.{Name}");
 
         return ParentMethod.ParentType.ParentModule.LlvmBuilder.BuildStore(value, Value);
     }

@@ -60,7 +60,7 @@ public static class LlvmNativeFuncImpl
                 module.LlvmBuilder.BuildRetVoid();
                 return;
             }
-            default: throw new NotImplementedException($"Unimplemented native method: {typeName}.{method.Name}");
+            default: throw new NotImplementedException($"Unimplemented native method: {module.Name}.{typeName}.{method.Name}");
         }
     }
 }
