@@ -17,7 +17,7 @@ internal class AssignExpressionNode : SyntaxNode
 
     public readonly SyntaxNode Expr;
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var variable = method.GetVariableByName(Identifier);
 
@@ -30,7 +30,7 @@ internal class AssignExpressionNode : SyntaxNode
                         throw new InvalidOperationException($"Field \"{module.Name}.{type.Name}.{Identifier}\" is not static.");
 
                     var fieldValue = Expr.Emit(module, type, method, metadata);
-                    field.Store(fieldValue is MateriskUnit fieldUnit ? fieldUnit.Load() : (LLVMValueRef)fieldValue);
+                    field.Store(fieldValue.Load());
                     return fieldValue;
                 }
 
@@ -38,7 +38,7 @@ internal class AssignExpressionNode : SyntaxNode
         }
 
         var varValue = Expr.Emit(module, type, method, metadata);
-        variable.Store(varValue is MateriskUnit varUnit ? varUnit.Load() : (LLVMValueRef)varValue);
+        variable.Store(varValue.Load());
         return varValue;
     }
 

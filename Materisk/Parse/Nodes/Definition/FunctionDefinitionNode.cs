@@ -26,7 +26,7 @@ internal class FunctionDefinitionNode : SyntaxNode
 
     public override NodeType Type => NodeType.FunctionDefinition;
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var mType = module.Types[0];
         var newMethod = MateriskHelpers.AddMethod(module, mType, Name, Args, IsPublic, true, IsNative, false, ReturnType, SecondReturnType);

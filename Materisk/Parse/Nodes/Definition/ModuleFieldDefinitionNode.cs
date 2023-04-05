@@ -23,7 +23,7 @@ internal class ModuleFieldDefinitionNode : SyntaxNode
 
     public override NodeType Type => NodeType.ModuleFieldDefinition;
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var pointerElementType = _type switch
         {

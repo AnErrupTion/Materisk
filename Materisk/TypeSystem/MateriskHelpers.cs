@@ -7,6 +7,11 @@ namespace Materisk.TypeSystem;
 
 internal static class MateriskHelpers
 {
+    public static MateriskValue ToMateriskValue(this LLVMValueRef value)
+    {
+        return new(value);
+    }
+
     public static void CreateModuleEmit(string name, SyntaxNode rootNode)
     {
         if (!Directory.Exists("output")) Directory.CreateDirectory("output");

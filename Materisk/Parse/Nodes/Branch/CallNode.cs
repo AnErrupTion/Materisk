@@ -17,11 +17,11 @@ internal class CallNode : SyntaxNode
 
     public override NodeType Type => NodeType.Call;
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var toCall = (MateriskMethod)ToCallNode.Emit(module, type, method, metadata);
         var args = EmitArgs(module, type, method, metadata);
-        return module.LlvmBuilder.BuildCall2(toCall.Type, toCall.LlvmMethod, args);
+        return module.LlvmBuilder.BuildCall2(toCall.Type, toCall.LlvmMethod, args).ToMateriskValue();
     }
 
     public LLVMValueRef[] EmitArgs(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
@@ -31,7 +31,7 @@ internal class CallNode : SyntaxNode
         for (var i = 0; i < args.Length; i++)
         {
             var value = _argumentNodes[i].Emit(module, type, method, metadata);
-            args[i] = value is MateriskUnit unit ? unit.Load() : (LLVMValueRef)value;
+            args[i] = value.Load();
         }
 
         return args;

@@ -23,12 +23,12 @@ internal class InitVariableNode : SyntaxNode
 
     public override NodeType Type => NodeType.InitVariable;
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         if (method.GetVariableByName(_name) is not null)
             throw new InvalidOperationException($"Can not initialize the same variable twice: {module.Name}.{type.Name}.{method.Name}.{_name}");
 
-        var value = (LLVMValueRef)_expr.Emit(module, type, method, metadata);
+        var value = _expr.Emit(module, type, method, metadata).Load();
         var valueType = value.TypeOf;
 
         LLVMTypeRef pointerElementType = null;
@@ -55,8 +55,9 @@ internal class InitVariableNode : SyntaxNode
             module.LlvmBuilder.BuildStore(constValue, value);
         }
 
-        method.Variables.Add(new(method, _name, _mutable, valueType, pointerElementType, _type[0] is 'i', value));
-        return value;
+        var variable = new MateriskLocalVariable(method, _name, _mutable, valueType, pointerElementType, _type[0] is 'i', value);
+        method.Variables.Add(variable);
+        return variable;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

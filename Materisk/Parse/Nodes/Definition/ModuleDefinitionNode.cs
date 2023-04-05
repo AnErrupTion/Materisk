@@ -17,7 +17,7 @@ internal class ModuleDefinitionNode : SyntaxNode
 
     public override NodeType Type => NodeType.ModuleDefinition;
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var newType = new MateriskType(module, Name, MateriskAttributesUtils.CreateAttributes(IsPublic, false, false, false));
 

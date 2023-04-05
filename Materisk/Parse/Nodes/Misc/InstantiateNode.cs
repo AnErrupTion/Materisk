@@ -15,7 +15,7 @@ internal class InstantiateNode : SyntaxNode
 
     public override NodeType Type => NodeType.Instantiate;
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         /*var name = _ident.Text;
 

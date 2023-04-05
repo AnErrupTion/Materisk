@@ -17,7 +17,7 @@ internal class UsingDefinitionNode : SyntaxNode
 
     public override NodeType Type => NodeType.UsingDefinition;
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         WalkTree(RootNode, module);
 

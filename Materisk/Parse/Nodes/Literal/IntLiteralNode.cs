@@ -15,14 +15,14 @@ internal class IntLiteralNode : SyntaxNode
 
     public override NodeType Type => NodeType.IntLiteral;
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         if (_value < 0)
         {
             var llvmValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, Convert.ToUInt64(Math.Abs(_value)), true);
-            return LLVMValueRef.CreateConstSub(LlvmUtils.IntZero, llvmValue);
+            return LLVMValueRef.CreateConstSub(LlvmUtils.IntZero, llvmValue).ToMateriskValue();
         }
 
-        return LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, Convert.ToUInt64(_value), true);
+        return LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, Convert.ToUInt64(_value), true).ToMateriskValue();
     }
 }

@@ -14,14 +14,14 @@ internal class BlockNode : SyntaxNode
 
     public override NodeType Type => NodeType.Block;
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        object? lastValue = null;
+        MateriskUnit? lastValue = null;
 
         foreach (var node in Nodes)
             lastValue = node.Emit(module, type, method, metadata);
 
-        return lastValue ?? LlvmUtils.VoidNull;
+        return lastValue ?? LlvmUtils.VoidNull.ToMateriskValue();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

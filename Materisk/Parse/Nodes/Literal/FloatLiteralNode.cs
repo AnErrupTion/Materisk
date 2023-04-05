@@ -14,8 +14,8 @@ internal class FloatLiteralNode : SyntaxNode
 
     public override NodeType Type => NodeType.FloatLiteral;
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        return LLVMValueRef.CreateConstReal(LLVMTypeRef.Float, Convert.ToDouble(_value));
+        return LLVMValueRef.CreateConstReal(LLVMTypeRef.Float, Convert.ToDouble(_value)).ToMateriskValue();
     }
 }

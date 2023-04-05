@@ -19,43 +19,18 @@ internal class BinaryExpressionNode : SyntaxNode
 
     public override NodeType Type => NodeType.BinaryExpression;
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var lhs = _left.Emit(module, type, method, metadata);
         var rhs = _right.Emit(module, type, method, metadata);
 
-        LLVMValueRef leftValue, rightValue;
-        bool leftSigned, rightSigned;
-
-        if (lhs is MateriskUnit leftUnit)
-        {
-            leftValue = leftUnit.Load();
-            leftSigned = leftUnit.Signed;
-        }
-        else
-        {
-            leftValue = (LLVMValueRef)lhs;
-            leftSigned = false; // We can't guess!
-        }
-
-        if (rhs is MateriskUnit rightUnit)
-        {
-            rightValue = rightUnit.Load();
-            rightSigned = rightUnit.Signed;
-        }
-        else
-        {
-            rightValue = (LLVMValueRef)rhs;
-            rightSigned = false; // We can't guess!
-        }
-
-        if (leftSigned && !rightSigned || !leftSigned && rightSigned)
+        if (lhs.Signed && !rhs.Signed || !lhs.Signed && rhs.Signed)
             throw new InvalidOperationException("Both operands need to be either signed or unsigned!");
 
-        return EmitOperation(module, leftValue, rightValue, leftSigned);
+        return EmitOperation(module, lhs.Load(), rhs.Load(), lhs.Signed);
     }
 
-    private LLVMValueRef EmitOperation(MateriskModule module, LLVMValueRef leftValue, LLVMValueRef rightValue, bool leftSigned)
+    private MateriskValue EmitOperation(MateriskModule module, LLVMValueRef leftValue, LLVMValueRef rightValue, bool leftSigned)
     {
         var resultValue = _operator switch
         {
@@ -107,7 +82,7 @@ internal class BinaryExpressionNode : SyntaxNode
             _ => throw new InvalidOperationException($"Trying to do a binary expression on: \"{_operator}\"")
         };
 
-        return resultValue;
+        return resultValue.ToMateriskValue();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

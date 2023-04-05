@@ -13,7 +13,7 @@ internal class IdentifierNode : SyntaxNode
 
     public override NodeType Type => NodeType.Identifier;
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         // TODO: Instantiation support
         /*if (name is "self" && method.DeclaringType is not null && method.Parameters.ThisParameter is not null)

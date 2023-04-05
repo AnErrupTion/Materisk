@@ -15,14 +15,14 @@ internal class ShortLiteralNode : SyntaxNode
 
     public override NodeType Type => NodeType.ShortLiteral;
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         if (_value < 0)
         {
             var llvmValue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int16, Convert.ToUInt64(Math.Abs(_value)), true);
-            return LLVMValueRef.CreateConstSub(LlvmUtils.ShortZero, llvmValue);
+            return LLVMValueRef.CreateConstSub(LlvmUtils.ShortZero, llvmValue).ToMateriskValue();
         }
 
-        return LLVMValueRef.CreateConstInt(LLVMTypeRef.Int16, Convert.ToUInt64(_value), true);
+        return LLVMValueRef.CreateConstInt(LLVMTypeRef.Int16, Convert.ToUInt64(_value), true).ToMateriskValue();
     }
 }

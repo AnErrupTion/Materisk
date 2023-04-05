@@ -29,7 +29,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
     public override NodeType Type => NodeType.ModuleFunctionDefinition;
 
     // TODO: Constructor and instance methods
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var newMethod = MateriskHelpers.AddMethod(module, type, Name, Args, IsPublic, IsStatic, IsNative, false, ReturnType, SecondReturnType);
 

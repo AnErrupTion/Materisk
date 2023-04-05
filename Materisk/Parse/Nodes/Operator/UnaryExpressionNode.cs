@@ -17,9 +17,9 @@ internal class UnaryExpressionNode : SyntaxNode
 
     public override NodeType Type => NodeType.UnaryExpression;
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var value = (LLVMValueRef)_rhs.Emit(module, type, method, metadata);
+        var value = _rhs.Emit(module, type, method, metadata).Load();
         var resultValue = _operator switch
         {
             "!" => value.TypeOf == LLVMTypeRef.Float || value.TypeOf == LLVMTypeRef.Double
@@ -31,7 +31,7 @@ internal class UnaryExpressionNode : SyntaxNode
             "+" => value,
             _ => throw new InvalidOperationException($"Trying to do a unary expression on: \"{_operator}\"")
         };
-        return resultValue;
+        return resultValue.ToMateriskValue();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

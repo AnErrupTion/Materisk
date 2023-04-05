@@ -19,7 +19,7 @@ internal class DotNode : SyntaxNode
 
     public override NodeType Type => NodeType.Dot;
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var currentValue = _callNode.Emit(module, type, method, metadata);
 
@@ -46,7 +46,7 @@ internal class DotNode : SyntaxNode
                                 break;
                             }
 
-                    if (mField == null)
+                    if (mField is null)
                     {
                         // TODO?
                         /*typeName = currentValue.ToString();
@@ -76,7 +76,7 @@ internal class DotNode : SyntaxNode
                             throw new InvalidOperationException($"Unable to find field with name: {name}");
                     }
 
-                    currentValue = mField.Load();
+                    currentValue = mField;
                     break;
                 }
                 case AssignExpressionNode aen:
@@ -131,7 +131,7 @@ internal class DotNode : SyntaxNode
                     }
 
                     // TODO: Non-static fields
-                    mField.Store(value is MateriskUnit unit ? unit.Load() : (LLVMValueRef)value);
+                    mField.Store(value.Load());
                     break;
                 }
                 case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:
@@ -152,7 +152,7 @@ internal class DotNode : SyntaxNode
                         throw new InvalidOperationException($"Unable to find method with name: {name}");
 
                     var args = cn.EmitArgs(module, type, method, metadata);
-                    currentValue = module.LlvmBuilder.BuildCall2(newMethod.Type, newMethod.LlvmMethod, args);
+                    currentValue = module.LlvmBuilder.BuildCall2(newMethod.Type, newMethod.LlvmMethod, args).ToMateriskValue();
                     break;
                 }
                 case CallNode: throw new Exception("Tried to call a non identifier in dot node stack.");

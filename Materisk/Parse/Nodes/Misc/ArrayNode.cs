@@ -17,11 +17,11 @@ internal class ArrayNode : SyntaxNode
 
     public override NodeType Type => NodeType.Array;
 
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var elementCount = (LLVMValueRef)_itemCountNode.Emit(module, type, method, metadata);
+        var elementCount = _itemCountNode.Emit(module, type, method, metadata).Load();
         var arrayType = TypeSigUtils.GetTypeSignatureFor(module, _type);
-        return module.LlvmBuilder.BuildArrayAlloca(arrayType, elementCount);
+        return module.LlvmBuilder.BuildArrayAlloca(arrayType, elementCount).ToMateriskValue();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

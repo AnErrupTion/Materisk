@@ -20,10 +20,9 @@ internal class CastNode : SyntaxNode
     public override NodeType Type => NodeType.Cast;
 
     // TODO: Struct casts
-    public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var value = _node.Emit(module, type, method, metadata);
-        var llvmValue = value is MateriskUnit unit ? unit.Load() : (LLVMValueRef)value;
+        var llvmValue = _node.Emit(module, type, method, metadata).Load();
         var resultValue = _type switch
         {
             "i8" or "u8" => module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Int8),
@@ -49,7 +48,7 @@ internal class CastNode : SyntaxNode
             },
             _ => throw new InvalidOperationException($"Can not cast to type \"{_type}\" in method: {module.Name}.{type.Name}.{method.Name}")
         };
-        return resultValue;
+        return resultValue.ToMateriskValue();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()
