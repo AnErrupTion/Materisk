@@ -3,11 +3,17 @@ using "corelib.msk";
 fn pub main() void
 {
 	var string str = "My String";
-	var string2 mut arr u8 = [lenof(string) + 1];
 
-	copy(string2, string);
+	if (StringUtils.equals(string, "Hello, World!") == true) 
+	{
+		Console.println("Same string");
+	}
+	else 
+	{
+		Console.println("Not the same string");
+	}
 
-	if (equals(string2, string) == true) 
+	if (StringUtils.equals(string, "My String") == true) 
 	{
 		Console.println("Same string");
 	}
