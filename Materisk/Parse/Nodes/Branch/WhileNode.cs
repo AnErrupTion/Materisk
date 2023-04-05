@@ -1,6 +1,4 @@
-﻿using AsmResolver.DotNet;
-using AsmResolver.DotNet.Code.Cil;
-using LLVMSharp.Interop;
+﻿using LLVMSharp.Interop;
 using MateriskLLVM;
 
 namespace Materisk.Parse.Nodes.Branch;
@@ -17,11 +15,6 @@ internal class WhileNode : SyntaxNode
     }
 
     public override NodeType Type => NodeType.While;
-
-    public override object Emit(Dictionary<string, CilLocalVariable> variables, ModuleDefinition module, TypeDefinition type, MethodDefinition method, List<string> arguments)
-    {
-        return null!;
-    }
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
