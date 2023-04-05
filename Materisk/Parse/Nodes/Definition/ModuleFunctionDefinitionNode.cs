@@ -40,10 +40,10 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
         {
             var firstType = arg.Type;
             var secondType = arg.SecondType;
-            var argType = TypeSigUtils.GetTypeSignatureFor(firstType, secondType);
+            var argType = TypeSigUtils.GetTypeSignatureFor(module, firstType, secondType);
             var pointerElementType = firstType switch
             {
-                "ptr" or "arr" when !string.IsNullOrEmpty(secondType) => TypeSigUtils.GetTypeSignatureFor(secondType),
+                "ptr" or "arr" when !string.IsNullOrEmpty(secondType) => TypeSigUtils.GetTypeSignatureFor(module, secondType),
                 "str" => LLVMTypeRef.Int8,
                 _ => null
             };
@@ -57,7 +57,7 @@ internal class ModuleFunctionDefinitionNode : SyntaxNode
             _name,
             MateriskAttributesUtils.CreateAttributes(_isPublic, _isStatic, _isNative),
             LLVMTypeRef.CreateFunction(
-                TypeSigUtils.GetTypeSignatureFor(_returnType, _secondReturnType),
+                TypeSigUtils.GetTypeSignatureFor(module, _returnType, _secondReturnType),
                 parameters.ToArray()),
             argts.ToArray());
 

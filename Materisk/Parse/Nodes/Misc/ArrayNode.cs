@@ -20,7 +20,7 @@ internal class ArrayNode : SyntaxNode
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         var elementCount = (LLVMValueRef)_itemCountNode.Emit(module, type, method, metadata);
-        var arrayType = TypeSigUtils.GetTypeSignatureFor(_type);
+        var arrayType = TypeSigUtils.GetTypeSignatureFor(module, _type);
         return module.LlvmBuilder.BuildArrayAlloca(arrayType, elementCount);
     }
 

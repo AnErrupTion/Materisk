@@ -38,7 +38,7 @@ internal class InitVariableNode : SyntaxNode
             case "ptr" or "arr" when !string.IsNullOrEmpty(_secondType):
             {
                 value = module.LlvmBuilder.BuildIntToPtr(value, LLVMTypeRef.CreatePointer(valueType, 0));
-                pointerElementType = TypeSigUtils.GetTypeSignatureFor(_secondType);
+                pointerElementType = TypeSigUtils.GetTypeSignatureFor(module, _secondType);
                 break;
             }
             case "str":

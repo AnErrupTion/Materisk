@@ -27,14 +27,14 @@ internal class ModuleFieldDefinitionNode : SyntaxNode
     {
         var pointerElementType = _type switch
         {
-            "ptr" or "arr" when !string.IsNullOrEmpty(_secondType) => TypeSigUtils.GetTypeSignatureFor(_secondType),
+            "ptr" or "arr" when !string.IsNullOrEmpty(_secondType) => TypeSigUtils.GetTypeSignatureFor(module, _secondType),
             "str" => LLVMTypeRef.Int8,
             _ => null
         };
 
         var newField = new MateriskField(type, _name,
             MateriskAttributesUtils.CreateAttributes(_isPublic, _isStatic, false),
-            TypeSigUtils.GetTypeSignatureFor(_type), pointerElementType, _type[0] is 'i');
+            TypeSigUtils.GetTypeSignatureFor(module, _type), pointerElementType, _type[0] is 'i');
 
         type.Fields.Add(newField);
 

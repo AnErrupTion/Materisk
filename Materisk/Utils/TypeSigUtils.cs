@@ -1,11 +1,11 @@
 using LLVMSharp.Interop;
+using MateriskLLVM;
 
 namespace Materisk.Utils;
 
 internal static class TypeSigUtils
 {
-    // TODO: Structs as types
-    public static LLVMTypeRef GetTypeSignatureFor(string name, string secondName = "")
+    public static LLVMTypeRef GetTypeSignatureFor(MateriskModule module, string name, string secondName = "")
     {
         switch (name)
         {
@@ -67,9 +67,10 @@ internal static class TypeSigUtils
             }
             default:
             {
-                /*foreach (var type in module.TopLevelTypes)
+                foreach (var type in module.Types)
                     if (type.Name == name)
-                        return type.ToTypeSignature();*/
+                        return type.Type;
+
                 throw new NotImplementedException($"Unimplemented type: {name}");
             }
         }
