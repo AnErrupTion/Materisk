@@ -1,6 +1,7 @@
 using LLVMSharp.Interop;
+using Materisk.Utils;
 
-namespace MateriskLLVM;
+namespace Materisk.TypeSystem;
 
 public sealed class MateriskMethod : MateriskUnit
 {

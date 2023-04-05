@@ -1,4 +1,4 @@
-﻿using MateriskLLVM;
+﻿using Materisk.TypeSystem;
 
 namespace Materisk.Parse.Nodes;
 

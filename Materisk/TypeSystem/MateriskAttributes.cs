@@ -1,4 +1,4 @@
-namespace MateriskLLVM;
+namespace Materisk.TypeSystem;
 
 [Flags]
 public enum MateriskAttributes

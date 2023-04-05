@@ -1,6 +1,6 @@
 ﻿using LLVMSharp.Interop;
-using MateriskLLVM;
 using Materisk.Parse.Nodes.Branch;
+using Materisk.TypeSystem;
 
 namespace Materisk.Parse.Nodes.Identifier;
 

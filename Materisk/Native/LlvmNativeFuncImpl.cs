@@ -1,5 +1,6 @@
 using LLVMSharp.Interop;
-using MateriskLLVM;
+using Materisk.TypeSystem;
+using Materisk.Utils;
 
 namespace Materisk.Native;
 

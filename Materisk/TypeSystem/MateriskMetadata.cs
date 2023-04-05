@@ -1,4 +1,4 @@
-namespace MateriskLLVM;
+namespace Materisk.TypeSystem;
 
 public sealed class MateriskMetadata
 {

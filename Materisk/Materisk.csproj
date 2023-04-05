@@ -10,11 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\MateriskLLVM\MateriskLLVM.csproj" />
+    <PackageReference Include="LLVMSharp" Version="15.0.0-beta1" />
   </ItemGroup>
 
 </Project>

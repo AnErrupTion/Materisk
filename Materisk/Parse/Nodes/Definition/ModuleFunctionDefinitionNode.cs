@@ -1,6 +1,6 @@
 ﻿using LLVMSharp.Interop;
-using MateriskLLVM;
 using Materisk.Native;
+using Materisk.TypeSystem;
 using Materisk.Utils;
 
 namespace Materisk.Parse.Nodes.Definition;

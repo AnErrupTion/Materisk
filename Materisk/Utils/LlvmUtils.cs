@@ -1,6 +1,6 @@
 using LLVMSharp.Interop;
 
-namespace MateriskLLVM;
+namespace Materisk.Utils;
 
 public static class LlvmUtils
 {
