@@ -15,6 +15,7 @@ public sealed class MateriskMethod : MateriskUnit
     public MateriskMethod(MateriskType type, string name, MateriskAttributes attributes, LLVMTypeRef methodType, MateriskMethodArgument[] arguments)
     {
         LlvmMethod = type.ParentModule.LlvmModule.AddFunction(name is "main" ? LlvmUtils.MainFunctionNameOverride : $"{type.Name}_{name}", methodType);
+
         if (!attributes.HasFlag(MateriskAttributes.External))
         {
             var entryBlock = LlvmMethod.AppendBasicBlock("entry");

@@ -1,4 +1,5 @@
 using LLVMSharp.Interop;
+using Materisk.Utils;
 
 namespace Materisk.TypeSystem;
 
@@ -14,6 +15,9 @@ public sealed class MateriskModule : MateriskUnit
     {
         LlvmModule = LLVMModuleRef.CreateWithName(name);
         LlvmBuilder = LLVMBuilderRef.Create(LLVMContextRef.Global);
+
+        unsafe { LLVM.SetModuleDataLayout(LlvmModule, LlvmUtils.DataLayout); }
+        LlvmModule.Target = LlvmUtils.TargetTriple;
 
         Name = name;
         Types = new();

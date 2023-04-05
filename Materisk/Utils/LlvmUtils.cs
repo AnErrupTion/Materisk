@@ -23,4 +23,22 @@ public static class LlvmUtils
     public static string TargetTriple;
     public static LLVMTargetMachineRef TargetMachine;
     public static LLVMTargetDataRef DataLayout;
+
+    public static void Initialize(string targetTriple, string cpu, string features)
+    {
+        LLVM.InitializeAllTargetInfos();
+        LLVM.InitializeAllTargets();
+        LLVM.InitializeAllTargetMCs();
+        LLVM.InitializeAllAsmParsers();
+        LLVM.InitializeAllAsmPrinters();
+
+        TargetTriple = targetTriple;
+        TargetMachine = LLVMTargetRef.GetTargetFromTriple(targetTriple).CreateTargetMachine(
+            targetTriple,
+            cpu, features,
+            LLVMCodeGenOptLevel.LLVMCodeGenLevelNone,
+            LLVMRelocMode.LLVMRelocDefault,
+            LLVMCodeModel.LLVMCodeModelDefault);
+        DataLayout = TargetMachine.CreateTargetDataLayout();
+    }
 }

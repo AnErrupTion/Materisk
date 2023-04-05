@@ -1,7 +1,5 @@
-﻿using LLVMSharp.Interop;
-using Materisk.Native;
+﻿using Materisk.Native;
 using Materisk.TypeSystem;
-using Materisk.Utils;
 
 namespace Materisk.Parse.Nodes.Definition;
 
@@ -30,37 +28,10 @@ internal class FunctionDefinitionNode : SyntaxNode
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var argts = new List<MateriskMethodArgument>();
-        var parameters = new List<LLVMTypeRef>();
-
-        foreach (var arg in Args)
-        {
-            var firstType = arg.Type;
-            var secondType = arg.SecondType;
-            var argType = TypeSigUtils.GetTypeSignatureFor(module, firstType, secondType);
-            var pointerElementType = firstType switch
-            {
-                "ptr" or "arr" when !string.IsNullOrEmpty(secondType) => TypeSigUtils.GetTypeSignatureFor(module, secondType),
-                "str" => LLVMTypeRef.Int8,
-                _ => null
-            };
-
-            parameters.Add(argType);
-            argts.Add(new(arg.Name, argType, pointerElementType, firstType[0] is 'i'));
-        }
-
-        var newMethod = new MateriskMethod(
-            module.Types[0],
-            Name,
-            MateriskAttributesUtils.CreateAttributes(IsPublic, true, IsNative, false),
-            LLVMTypeRef.CreateFunction(
-                TypeSigUtils.GetTypeSignatureFor(module, ReturnType, SecondReturnType),
-                parameters.ToArray()),
-            argts.ToArray());
+        var mType = module.Types[0];
+        var newMethod = MateriskHelpers.AddMethod(module, mType, Name, Args, IsPublic, true, IsNative, false, ReturnType, SecondReturnType);
 
         module.Types[0].Methods.Add(newMethod);
-
-        var mType = module.Types[0];
 
         if (!IsNative)
             Block.Emit(module, mType, newMethod, metadata);

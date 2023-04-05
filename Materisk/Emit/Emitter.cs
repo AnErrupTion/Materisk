@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Text;
-using LLVMSharp.Interop;
 using Materisk.Parse.Nodes;
 using Materisk.TypeSystem;
 using Materisk.Utils;
@@ -23,46 +22,13 @@ public class Emitter
         if (noStdLib)
             LlvmUtils.MainFunctionNameOverride = "_start";
 
-        if (!Directory.Exists("output"))
-            Directory.CreateDirectory("output");
+        // Initialize LLVM
+        LlvmUtils.Initialize(targetTriple, cpu, features);
 
-        LLVM.InitializeAllTargetInfos();
-        LLVM.InitializeAllTargets();
-        LLVM.InitializeAllTargetMCs();
-        LLVM.InitializeAllAsmParsers();
-        LLVM.InitializeAllAsmPrinters();
+        // Create module and emit LLVM IR + native code
+        MateriskHelpers.CreateModuleEmit(_moduleName, _rootNode);
 
-        var target = LLVMTargetRef.GetTargetFromTriple(targetTriple);
-        LlvmUtils.TargetTriple = targetTriple;
-        LlvmUtils.TargetMachine = target.CreateTargetMachine(
-            targetTriple,
-            cpu, features,
-            LLVMCodeGenOptLevel.LLVMCodeGenLevelNone,
-            LLVMRelocMode.LLVMRelocDefault,
-            LLVMCodeModel.LLVMCodeModelDefault);
-        LlvmUtils.DataLayout = LlvmUtils.TargetMachine.CreateTargetDataLayout();
-
-        var module = new MateriskModule(_moduleName);
-        unsafe { LLVM.SetModuleDataLayout(module.LlvmModule, LlvmUtils.DataLayout); }
-        module.LlvmModule.Target = targetTriple;
-
-        var type = new MateriskType(
-            module,
-            "Program",
-            MateriskAttributesUtils.CreateAttributes(true, false, false, false));
-        module.Types.Add(type);
-
-        var metadata = new MateriskMetadata();
-        _rootNode.Emit(module, type, null!, metadata);
-
-        module.LlvmModule.Dump();
-        module.LlvmModule.Verify(LLVMVerifierFailureAction.LLVMAbortProcessAction);
-
-        LlvmUtils.TargetMachine.EmitToFile(
-            module.LlvmModule,
-            $"output/{_moduleName}.o",
-            LLVMCodeGenFileType.LLVMObjectFile);
-
+        // Link all ELF object files into one executable file
         var args = new StringBuilder();
         foreach (var file in Directory.GetFiles("output"))
             args.Append(file).Append(' ');
