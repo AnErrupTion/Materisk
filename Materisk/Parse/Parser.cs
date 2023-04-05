@@ -179,7 +179,7 @@ public class Parser
             }
 
             if (Peek().Type == SyntaxType.Equals)
-                throw new InvalidOperationException("Can not initialize a field directly!");
+                throw new InvalidOperationException($"Can not initialize a field directly: {nameToken.Text}");
 
             MatchToken(SyntaxType.Semicolon);
             nodes.Add(new ModuleFieldDefinitionNode(isPublic, isStatic, nameToken.Text, type.Text, secondType is null ? string.Empty : secondType.Text));
@@ -260,7 +260,7 @@ public class Parser
             if (current.Type is SyntaxType.Identifier)
                 secondType = MatchToken(SyntaxType.Identifier);
             else if (current.Type is not SyntaxType.Equals)
-                throw new InvalidOperationException("Variable initialization needs an expression!");
+                throw new InvalidOperationException($"Variable initialization needs an expression: {ident.Text}");
 
             _position++;
             var expr = ParseExpression(secondType);
@@ -707,7 +707,7 @@ public class Parser
         }
 
         if (Peek().Type == SyntaxType.Equals)
-            throw new InvalidOperationException("Can not initialize a field directly!");
+            throw new InvalidOperationException($"Can not initialize a field directly: {nameToken.Text}");
 
         return new FieldDefinitionNode(isPublic, nameToken.Text, type.Text,
             secondType is null ? string.Empty : secondType.Text);

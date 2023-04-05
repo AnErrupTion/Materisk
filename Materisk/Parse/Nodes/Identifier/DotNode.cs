@@ -73,7 +73,7 @@ internal class DotNode : SyntaxNode
                                 }
 
                         if (mField is null)*/
-                            throw new InvalidOperationException($"Unable to find field with name: {name}");
+                            throw new InvalidOperationException($"Unable to find field with name \"{name}\" in module: {module.Name}");
                     }
 
                     currentValue = mField;
@@ -127,7 +127,7 @@ internal class DotNode : SyntaxNode
                                 }
 
                         if (mField is null)*/
-                            throw new InvalidOperationException($"Unable to find field with name: {name}");
+                        throw new InvalidOperationException($"Unable to find field with name \"{name}\" in module: {module.Name}");
                     }
 
                     // TODO: Non-static fields
@@ -149,7 +149,7 @@ internal class DotNode : SyntaxNode
                             }
 
                     if (newMethod == null)
-                        throw new InvalidOperationException($"Unable to find method with name: {name}");
+                        throw new InvalidOperationException($"Unable to find method with name \"{name}\" in module: {module.Name}");
 
                     var args = cn.EmitArgs(module, type, method, metadata);
                     currentValue = module.LlvmBuilder.BuildCall2(newMethod.Type, newMethod.LlvmMethod, args).ToMateriskValue();

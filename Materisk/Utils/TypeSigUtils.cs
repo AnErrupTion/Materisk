@@ -22,7 +22,7 @@ internal static class TypeSigUtils
                     "str" => LLVMTypeRef.CreatePointer(LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0), 0),
                     "bool" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Int1, 0),
                     "void" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Void, 0),
-                    _ => throw new InvalidOperationException("Unable to make a pointer for a custom type!")
+                    _ => throw new InvalidOperationException($"Unable to make a pointer for a custom type: {secondName}")
                 };
             }
             case "i8":
