@@ -2,7 +2,7 @@ namespace MateriskLLVM;
 
 public static class MateriskAttributesUtils
 {
-    public static MateriskAttributes CreateAttributes(bool isPublic, bool isStatic, bool isNative)
+    public static MateriskAttributes CreateAttributes(bool isPublic, bool isStatic, bool isNative, bool isExternal)
     {
         var attributes = MateriskAttributes.None;
 
@@ -14,6 +14,9 @@ public static class MateriskAttributesUtils
 
         if (isNative)
             attributes |= MateriskAttributes.Native;
+
+        if (isExternal)
+            attributes |= MateriskAttributes.External;
 
         return attributes;
     }

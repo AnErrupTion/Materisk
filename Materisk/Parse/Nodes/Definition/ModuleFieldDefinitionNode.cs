@@ -33,7 +33,7 @@ internal class ModuleFieldDefinitionNode : SyntaxNode
         };
 
         var newField = new MateriskField(type, _name,
-            MateriskAttributesUtils.CreateAttributes(_isPublic, _isStatic, false),
+            MateriskAttributesUtils.CreateAttributes(_isPublic, _isStatic, false, false),
             TypeSigUtils.GetTypeSignatureFor(module, _type), pointerElementType, _type[0] is 'i');
 
         type.Fields.Add(newField);

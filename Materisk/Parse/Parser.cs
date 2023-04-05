@@ -90,17 +90,17 @@ public class Parser
             {
                 _position++;
 
-                var path = MatchToken(SyntaxType.String);
+                var path = MatchToken(SyntaxType.String).Text;
                 MatchToken(SyntaxType.Semicolon);
 
-                if (!File.Exists(path.Text))
-                    throw new Exception($"Failed to import \"{path.Text}\": File not found");
+                if (!File.Exists(path))
+                    throw new Exception($"Failed to import \"{path}\": File not found");
 
-                var lexer = new Lexer(File.ReadAllText(path.Text));
-                var lexedTokens = lexer.Lex();
+                var lexer = new Lexer(File.ReadAllText(path)); 
+                var lexedTokens = lexer.Lex(); 
+                var parser = new Parser(lexedTokens); 
 
-                var parser = new Parser(lexedTokens);
-                return parser.Parse();
+                return new UsingDefinitionNode(path, parser.Parse());
             }
             case { Type: SyntaxType.Keyword, Text: "fn" }:
             {

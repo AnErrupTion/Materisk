@@ -4,26 +4,26 @@ namespace Materisk.Parse.Nodes.Definition;
 
 internal class ModuleDefinitionNode : SyntaxNode
 {
-    private readonly string _name;
-    private readonly IEnumerable<SyntaxNode> _body;
-    private readonly bool _isPublic;
+    public readonly string Name;
+    public readonly IEnumerable<SyntaxNode> Body;
+    public readonly bool IsPublic;
 
     public ModuleDefinitionNode(string name, IEnumerable<SyntaxNode> body, bool isPublic)
     {
-        _name = name;
-        _body = body;
-        _isPublic = isPublic;
+        Name = name;
+        Body = body;
+        IsPublic = isPublic;
     }
 
     public override NodeType Type => NodeType.ModuleDefinition;
 
     public override object Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
-        var newType = new MateriskType(module, _name, MateriskAttributesUtils.CreateAttributes(_isPublic, false, false));
+        var newType = new MateriskType(module, Name, MateriskAttributesUtils.CreateAttributes(IsPublic, false, false, false));
 
         module.Types.Add(newType);
 
-        foreach (var bodyNode in _body)
+        foreach (var bodyNode in Body)
             bodyNode.Emit(module, newType, method, metadata);
 
         return newType;
@@ -31,6 +31,6 @@ internal class ModuleDefinitionNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        return _body;
+        return Body;
     }
 }

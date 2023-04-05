@@ -63,17 +63,11 @@ public static class Program
 
     private static void PrintTree(SyntaxNode node, int ident = 0)
     {
-        Console.WriteLine($"{Ident(ident)}{node}");
+        if (ident > 0)
+            Console.Write(new string(' ', ident));
+        Console.WriteLine(node);
 
         foreach (var n in node.GetChildren())
             PrintTree(n, ident + 2);
-    }
-
-    private static string Ident(int ident)
-    {
-        var sb = new StringBuilder();
-        for (var i = 0; i < ident; i++)
-            sb.Append(' ');
-        return sb.ToString();
     }
 }

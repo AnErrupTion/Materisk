@@ -20,4 +20,7 @@ public static class LlvmUtils
     public static readonly LLVMValueRef VoidNull = LLVMValueRef.CreateConstNull(LLVMTypeRef.Void);
 
     public static string MainFunctionNameOverride = "main";
+    public static string TargetTriple;
+    public static LLVMTargetMachineRef TargetMachine;
+    public static LLVMTargetDataRef DataLayout;
 }

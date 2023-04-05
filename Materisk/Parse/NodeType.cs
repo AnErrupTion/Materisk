@@ -31,6 +31,7 @@ public enum NodeType
     For,
     Cast,
     While,
+    UsingDefinition,
     FunctionDefinition,
     FieldDefinition,
     ModuleFieldDefinition,

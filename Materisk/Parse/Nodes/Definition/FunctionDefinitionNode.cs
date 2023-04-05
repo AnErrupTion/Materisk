@@ -7,23 +7,23 @@ namespace Materisk.Parse.Nodes.Definition;
 
 internal class FunctionDefinitionNode : SyntaxNode
 {
-    private readonly string _name;
-    private readonly List<MethodArgument> _args;
-    private readonly string _returnType;
-    private readonly string _secondReturnType;
-    private readonly SyntaxNode _block;
-    private readonly bool _isPublic;
-    private readonly bool _isNative;
+    public readonly string Name;
+    public readonly List<MethodArgument> Args;
+    public readonly string ReturnType;
+    public readonly string SecondReturnType;
+    public readonly SyntaxNode Block;
+    public readonly bool IsPublic;
+    public readonly bool IsNative;
 
     public FunctionDefinitionNode(string name, List<MethodArgument> args, string returnType, string secondReturnType, SyntaxNode block, bool isPublic, bool isNative)
     {
-        _name = name;
-        _args = args;
-        _returnType = returnType;
-        _secondReturnType = secondReturnType;
-        _block = block;
-        _isPublic = isPublic;
-        _isNative = isNative;
+        Name = name;
+        Args = args;
+        ReturnType = returnType;
+        SecondReturnType = secondReturnType;
+        Block = block;
+        IsPublic = isPublic;
+        IsNative = isNative;
     }
 
     public override NodeType Type => NodeType.FunctionDefinition;
@@ -33,7 +33,7 @@ internal class FunctionDefinitionNode : SyntaxNode
         var argts = new List<MateriskMethodArgument>();
         var parameters = new List<LLVMTypeRef>();
 
-        foreach (var arg in _args)
+        foreach (var arg in Args)
         {
             var firstType = arg.Type;
             var secondType = arg.SecondType;
@@ -51,10 +51,10 @@ internal class FunctionDefinitionNode : SyntaxNode
 
         var newMethod = new MateriskMethod(
             module.Types[0],
-            _name,
-            MateriskAttributesUtils.CreateAttributes(_isPublic, true, _isNative),
+            Name,
+            MateriskAttributesUtils.CreateAttributes(IsPublic, true, IsNative, false),
             LLVMTypeRef.CreateFunction(
-                TypeSigUtils.GetTypeSignatureFor(module, _returnType, _secondReturnType),
+                TypeSigUtils.GetTypeSignatureFor(module, ReturnType, SecondReturnType),
                 parameters.ToArray()),
             argts.ToArray());
 
@@ -62,8 +62,8 @@ internal class FunctionDefinitionNode : SyntaxNode
 
         var mType = module.Types[0];
 
-        if (!_isNative)
-            _block.Emit(module, mType, newMethod, metadata);
+        if (!IsNative)
+            Block.Emit(module, mType, newMethod, metadata);
         else
             LlvmNativeFuncImpl.Emit(module, mType.Name, newMethod);
 
@@ -72,6 +72,6 @@ internal class FunctionDefinitionNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return _block;
+        yield return Block;
     }
 }

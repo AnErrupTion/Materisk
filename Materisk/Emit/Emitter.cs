@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text;
 using LLVMSharp.Interop;
 using MateriskLLVM;
 using Materisk.Parse.Nodes;
@@ -20,7 +21,10 @@ public class Emitter
     {
         if (noStdLib)
             LlvmUtils.MainFunctionNameOverride = "_start";
-        
+
+        if (!Directory.Exists("output"))
+            Directory.CreateDirectory("output");
+
         LLVM.InitializeAllTargetInfos();
         LLVM.InitializeAllTargets();
         LLVM.InitializeAllTargetMCs();
@@ -28,19 +32,23 @@ public class Emitter
         LLVM.InitializeAllAsmPrinters();
 
         var target = LLVMTargetRef.GetTargetFromTriple(targetTriple);
-        var targetMachine = target.CreateTargetMachine(
+        LlvmUtils.TargetTriple = targetTriple;
+        LlvmUtils.TargetMachine = target.CreateTargetMachine(
             targetTriple,
             cpu, features,
             LLVMCodeGenOptLevel.LLVMCodeGenLevelNone,
             LLVMRelocMode.LLVMRelocDefault,
             LLVMCodeModel.LLVMCodeModelDefault);
-        var dataLayout = targetMachine.CreateTargetDataLayout();
+        LlvmUtils.DataLayout = LlvmUtils.TargetMachine.CreateTargetDataLayout();
 
         var module = new MateriskModule(_moduleName);
-        unsafe { LLVM.SetModuleDataLayout(module.LlvmModule, dataLayout); }
+        unsafe { LLVM.SetModuleDataLayout(module.LlvmModule, LlvmUtils.DataLayout); }
         module.LlvmModule.Target = targetTriple;
 
-        var type = new MateriskType(module, "Program", MateriskAttributesUtils.CreateAttributes(true, false, false));
+        var type = new MateriskType(
+            module,
+            "Program",
+            MateriskAttributesUtils.CreateAttributes(true, false, false, false));
         module.Types.Add(type);
 
         var metadata = new MateriskMetadata();
@@ -49,8 +57,18 @@ public class Emitter
         module.LlvmModule.Dump();
         module.LlvmModule.Verify(LLVMVerifierFailureAction.LLVMAbortProcessAction);
 
-        var path = $"{_moduleName}.o";
-        targetMachine.EmitToFile(module.LlvmModule, path, LLVMCodeGenFileType.LLVMObjectFile);
-        Process.Start("clang", $"{path} -o {_moduleName}{(noStdLib ? " -nostdlib" : string.Empty)}").WaitForExit();
+        LlvmUtils.TargetMachine.EmitToFile(
+            module.LlvmModule,
+            $"output/{_moduleName}.o",
+            LLVMCodeGenFileType.LLVMObjectFile);
+
+        var args = new StringBuilder();
+        foreach (var file in Directory.GetFiles("output"))
+            args.Append(file).Append(' ');
+        args.Append("-o ").Append(_moduleName);
+        if (noStdLib)
+            args.Append(" -nostdlib");
+
+        Process.Start("clang", args.ToString()).WaitForExit();
     }
 }
