@@ -319,14 +319,29 @@ public class Lexer
 
     private SyntaxToken ParseNumber()
     {
-        char current;
-
         _builder.Clear();
 
-        while ((char.IsDigit(current = Peek()) || current == '.') && current != '\0')
+        while (true)
         {
-            _builder.Append(current);
-            _position++;
+            var current = Peek();
+
+            if ((char.IsDigit(current) || current is '.') && current is not '\0')
+            {
+                _builder.Append(current);
+                _position++;
+                continue;
+            }
+
+            var lookAhead = Peek(1);
+
+            if (char.IsLetter(current) && char.IsLetter(lookAhead))
+            {
+                _builder.Append(current);
+                _builder.Append(lookAhead);
+                _position += 2;
+            }
+
+            break;
         }
 
         return new(SyntaxType.Number, _position - 1, _builder.ToString());

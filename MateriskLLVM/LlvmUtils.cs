@@ -5,6 +5,7 @@ namespace MateriskLLVM;
 public static class LlvmUtils
 {
     public static readonly LLVMValueRef ByteZero = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int8, 0, true);
+    public static readonly LLVMValueRef ShortZero = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int16, 0, true);
     public static readonly LLVMValueRef IntZero = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, 0, true);
     public static readonly LLVMValueRef LongZero = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int64, 0, true);
 

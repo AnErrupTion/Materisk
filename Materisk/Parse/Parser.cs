@@ -461,6 +461,30 @@ public class Parser
 
                 var numberText = current.Text;
 
+                if (numberText.EndsWith("SB") && sbyte.TryParse(numberText[..^2], CultureInfo.InvariantCulture, out var sbyteNumber))
+                    return new SByteLiteralNode(sbyteNumber);
+
+                if (numberText.EndsWith("UB") && byte.TryParse(numberText[..^2], CultureInfo.InvariantCulture, out var byteNumber))
+                    return new ByteLiteralNode(byteNumber);
+
+                if (numberText.EndsWith("SS") && short.TryParse(numberText[..^2], CultureInfo.InvariantCulture, out var shortNumber))
+                    return new ShortLiteralNode(shortNumber);
+
+                if (numberText.EndsWith("US") && ushort.TryParse(numberText[..^2], CultureInfo.InvariantCulture, out var ushortNumber))
+                    return new UShortLiteralNode(ushortNumber);
+
+                if (numberText.EndsWith("SI") && int.TryParse(numberText[..^2], CultureInfo.InvariantCulture, out var intNumberExplicit))
+                    return new IntLiteralNode(intNumberExplicit);
+
+                if (numberText.EndsWith("UI") && uint.TryParse(numberText[..^2], CultureInfo.InvariantCulture, out var uintNumberExplicit))
+                    return new UIntLiteralNode(uintNumberExplicit);
+
+                if (numberText.EndsWith("SL") && long.TryParse(numberText[..^2], CultureInfo.InvariantCulture, out var longNumberExplicit))
+                    return new LongLiteralNode(longNumberExplicit);
+
+                if (numberText.EndsWith("UL") && ulong.TryParse(numberText[..^2], CultureInfo.InvariantCulture, out var ulongNumberExplicit))
+                    return new ULongLiteralNode(ulongNumberExplicit);
+
                 if (uint.TryParse(numberText, CultureInfo.InvariantCulture, out var uintNumber))
                     return new UIntLiteralNode(uintNumber);
 
