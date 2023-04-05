@@ -46,7 +46,7 @@ public class Parser
             if (current.Type == SyntaxType.Eof)
                 throw new Exception($"Unclosed block at position: {current.Position}");
 
-            nodes.Add(ParseStatement());
+            nodes.Add(ParseStatement(false));
         }
 
         MatchToken(SyntaxType.RBraces);
@@ -54,7 +54,7 @@ public class Parser
         return new BlockNode(nodes);
     }
 
-    private SyntaxNode ParseStatement()
+    private SyntaxNode ParseStatement(bool semiColon = true)
     {
         switch (Peek())
         {
@@ -113,7 +113,11 @@ public class Parser
         }
 
         var exprNode = ParseExpression(null!);
-        MatchToken(SyntaxType.Semicolon);
+
+        if (semiColon)
+            MatchToken(SyntaxType.Semicolon);
+        else if (Peek().Type is SyntaxType.Semicolon)
+            _position++;
 
         return exprNode;
     }
