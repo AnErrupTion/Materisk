@@ -277,7 +277,7 @@ public class Lexer
         }
 
         var text = _builder.ToString();
-        var token = new SyntaxToken(SyntaxFacts.IsKeyword(text) ? SyntaxType.Keyword : SyntaxType.Identifier, _position, text);
+        var token = new SyntaxToken(IsKeyword(text) ? SyntaxType.Keyword : SyntaxType.Identifier, _position, text);
 
         return token;
     }
@@ -346,4 +346,12 @@ public class Lexer
 
         return new(SyntaxType.Number, _position - 1, _builder.ToString());
     }
+
+    private static bool IsKeyword(string text) => text
+        is "return" or "continue" or "break"
+        or "if" or "elif" or "else"
+        or "for" or "while" or "fn" or "var" or "fld" or "mut"
+        or "using" or "native" or "new"
+        or "mod" or "dyn" or "pub"
+        or "true" or "false";
 }
