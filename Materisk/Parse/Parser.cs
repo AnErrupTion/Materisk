@@ -297,6 +297,9 @@ public sealed class Parser
                 or "f32" or "f64"
                 or "str" or "ptr" or "arr")
         {
+            if (lookAhead.Text is "arr")
+                throw new InvalidOperationException("Can not cast type to array!");
+
             _position += 2;
 
             SyntaxToken? nextTypeToken = null;
