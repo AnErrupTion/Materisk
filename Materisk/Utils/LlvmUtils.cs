@@ -9,9 +9,6 @@ internal static class LlvmUtils
     public static readonly LLVMValueRef IntZero = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, 0, true);
     public static readonly LLVMValueRef LongZero = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int64, 0, true);
 
-    public static readonly LLVMValueRef BoolTrue = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int1, 1, true);
-    public static readonly LLVMValueRef BoolFalse = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int1, 0, true);
-
     public static readonly LLVMTypeRef BytePointer = LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0);
     public static readonly LLVMTypeRef ShortPointer = LLVMTypeRef.CreatePointer(LLVMTypeRef.Int16, 0);
     public static readonly LLVMTypeRef IntPointer = LLVMTypeRef.CreatePointer(LLVMTypeRef.Int32, 0);
