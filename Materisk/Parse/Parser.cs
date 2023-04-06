@@ -721,23 +721,6 @@ public sealed class Parser
         return args;
     }
 
-    /*private SyntaxNode BinaryOperation(Func<SyntaxNode> leftParse, SyntaxType[] allowedTypes, Func<SyntaxNode>? rightParse = null)
-    {
-        SyntaxToken current;
-        
-        var left = leftParse();
-
-        while (allowedTypes.Contains((current = Peek()).Type))
-        {
-            _position++;
-            var right = (rightParse ?? leftParse)();
-
-            left = new BinaryExpressionNode(left, current.Text, right);
-        }
-
-        return left;
-    }*/
-
     private SyntaxToken Peek(int off = 0)
     {
         var offset = _position + off;
@@ -759,14 +742,14 @@ public sealed class Parser
         throw new Exception($"Unexpected token \"{current.Type}\" at position {_position}, expected: {type} ");
     }
 
-    private SyntaxToken MatchKeyword(string value)
+    private void MatchKeyword(string value)
     {
         var current = Peek();
 
         if (current.Type == SyntaxType.Keyword && current.Text == value)
         {
             _position++;
-            return current;
+            return;
         }
 
         throw new Exception($"Unexpected token \"{current.Type}\" at position {_position}, expected Keyword with value: {value} ");
