@@ -18,14 +18,9 @@ internal static class MateriskHelpers
         if (!Directory.Exists("llvm")) Directory.CreateDirectory("llvm");
 
         var module = new MateriskModule(name);
-        var type = new MateriskType(
-            module,
-            name,
-            MateriskAttributesUtils.CreateAttributes(true, false, false, false));
-        module.Types.Add(type);
 
         var metadata = new MateriskMetadata();
-        rootNode.Emit(module, type, null!, metadata);
+        rootNode.Emit(module, null!, null!, metadata);
 
         module.LlvmModule.WriteBitcodeToFile($"llvm/{name}.ir");
         module.LlvmModule.Verify(LLVMVerifierFailureAction.LLVMAbortProcessAction);

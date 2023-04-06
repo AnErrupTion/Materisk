@@ -7,19 +7,21 @@ namespace Materisk.Parse.Nodes.Definition;
 internal class FieldDefinitionNode : SyntaxNode
 {
     private readonly bool _isPublic;
+    private readonly bool _isStatic;
     private readonly string _name;
     private readonly string _type;
     private readonly string _secondType;
 
-    public FieldDefinitionNode(bool isPublic, string nameToken, string typeToken, string secondTypeToken)
+    public FieldDefinitionNode(bool isPublic, bool isStatic, string name, string type, string secondType)
     {
         _isPublic = isPublic;
-        _name = nameToken;
-        _type = typeToken;
-        _secondType = secondTypeToken;
+        _isStatic = isStatic;
+        _name = name;
+        _type = type;
+        _secondType = secondType;
     }
 
-    public override NodeType Type => NodeType.FieldDefinition;
+    public override NodeType Type => NodeType.ModuleFieldDefinition;
 
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
@@ -30,10 +32,11 @@ internal class FieldDefinitionNode : SyntaxNode
             _ => null
         };
 
-        var newField = new MateriskField(module.Types[0], _name,
-            MateriskAttributesUtils.CreateAttributes(_isPublic, true, false, false),
+        var newField = new MateriskField(type, _name,
+            MateriskAttributesUtils.CreateAttributes(_isPublic, _isStatic, false, false),
             TypeSigUtils.GetTypeSignatureFor(module, _type), pointerElementType, _type[0] is 'i');
-        module.Types[0].Fields.Add(newField);
+
+        type.Fields.Add(newField);
 
         return newField;
     }

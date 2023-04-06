@@ -11,9 +11,9 @@ internal static class LlvmNativeFuncImpl
 
     public static void Emit(MateriskModule module, string typeName, MateriskMethod method)
     {
-        switch (method.Name)
+        switch (typeName)
         {
-            case "allocate":
+            case "Memory" when method.Name is "allocate":
             {
                 MallocType = LLVMTypeRef.CreateFunction(LlvmUtils.VoidPointer, new[] { LLVMTypeRef.Int32 });
                 Malloc = module.LlvmModule.AddFunction("malloc", MallocType);
@@ -23,7 +23,7 @@ internal static class LlvmNativeFuncImpl
                 module.LlvmBuilder.BuildRet(pointer);
                 return;
             }
-            case "free":
+            case "Memory" when method.Name is "free":
             {
                 FreeType = LLVMTypeRef.CreateFunction(LLVMTypeRef.Void,  new[] { LlvmUtils.VoidPointer });
                 Free = module.LlvmModule.AddFunction("free", FreeType);
@@ -33,9 +33,6 @@ internal static class LlvmNativeFuncImpl
                 module.LlvmBuilder.BuildRetVoid();
                 return;
             }
-        }
-        switch (typeName)
-        {
             case "File" when method.Name is "readText":
             {
                 module.LlvmBuilder.BuildRetVoid();

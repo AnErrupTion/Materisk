@@ -41,37 +41,20 @@ internal class UsingDefinitionNode : SyntaxNode
                 module.Types.Add(newType);
                 break;
             }
-            case ModuleFunctionDefinitionNode modFuncNode:
+            case FunctionDefinitionNode funcNode:
             {
                 var newMethod = MateriskHelpers.AddMethod(
                     module,
                     _lastType,
-                    modFuncNode.Name,
-                    modFuncNode.Args,
-                    modFuncNode.IsPublic,
-                    modFuncNode.IsStatic,
-                    modFuncNode.IsNative,
-                    true,
-                    modFuncNode.ReturnType,
-                    modFuncNode.SecondReturnType);
-                _lastType.Methods.Add(newMethod);
-                break;
-            }
-            case FunctionDefinitionNode funcNode:
-            {
-                var mType = module.Types[0];
-                var newMethod = MateriskHelpers.AddMethod(
-                    module,
-                    mType,
                     funcNode.Name,
                     funcNode.Args,
                     funcNode.IsPublic,
-                    true,
+                    funcNode.IsStatic,
                     funcNode.IsNative,
                     true,
                     funcNode.ReturnType,
                     funcNode.SecondReturnType);
-                module.Types[0].Methods.Add(newMethod);
+                _lastType.Methods.Add(newMethod);
                 break;
             }
         }

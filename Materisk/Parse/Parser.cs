@@ -103,9 +103,13 @@ public sealed class Parser
 
                 return new UsingDefinitionNode(path, parser.Parse());
             }
+            case { Type: SyntaxType.Keyword, Text: "fld" }:
+            {
+                return ParseFieldExpression(true);
+            }
             case { Type: SyntaxType.Keyword, Text: "fn" }:
             {
-                return ParseFunctionDefinition();
+                return ParseFunctionDefinition(true);
             }
             case { Type: SyntaxType.Keyword, Text: "mod" }:
             {
@@ -156,78 +160,10 @@ public sealed class Parser
         var nodes = new List<SyntaxNode>();
 
         while (Peek() is { Type: SyntaxType.Keyword, Text: "fld" })
-        {
-            _position++;
-
-            var isPublic = false;
-
-            if (Peek() is { Type: SyntaxType.Keyword, Text: "pub" })
-            {
-                _position++;
-                isPublic = true;
-            }
-
-            var nameToken = MatchToken(SyntaxType.Identifier);
-            var type = MatchToken(SyntaxType.Identifier);
-
-            SyntaxToken? secondType = null;
-
-            var current = Peek();
-            if (current.Type is SyntaxType.Identifier)
-            {
-                _position++;
-                secondType = current;
-            }
-
-            if (Peek().Type == SyntaxType.Equals)
-                throw new InvalidOperationException($"Can not initialize a field directly: {nameToken.Text}");
-
-            MatchToken(SyntaxType.Semicolon);
-            nodes.Add(new ModuleFieldDefinitionNode(isPublic, isStatic, nameToken.Text, type.Text, secondType is null ? string.Empty : secondType.Text));
-        }
+            nodes.Add(ParseFieldExpression(isStatic));
 
         while (Peek() is { Type: SyntaxType.Keyword, Text: "fn" })
-        {
-            _position++;
-
-            var isNative = false;
-            var isPublic = false;
-
-            if (Peek() is { Type: SyntaxType.Keyword, Text: "native" })
-            {
-                _position++;
-                isNative = true;
-            }
-
-            if (Peek() is { Type: SyntaxType.Keyword, Text: "pub" })
-            {
-                _position++;
-                isPublic = true;
-            }
-
-            var name = MatchToken(SyntaxType.Identifier);
-            var args = ParseFunctionArgs();
-            var returnType = MatchToken(SyntaxType.Identifier);
-
-            SyntaxToken? secondReturnType = null;
-
-            var current = Peek();
-            if (current.Type is SyntaxType.Identifier)
-            {
-                _position++;
-                secondReturnType = current;
-            }
-
-            var body = ParseScopedStatements();
-
-            if (!_hasReturnNode)
-                body.Nodes.Add(new ReturnNode());
-            else
-                _hasReturnNode = false;
-
-            nodes.Add(new ModuleFunctionDefinitionNode(name.Text, args, returnType.Text,
-                secondReturnType is null ? string.Empty : secondReturnType.Text, body, isStatic, isPublic, isNative));
-        }
+            nodes.Add(ParseFunctionDefinition(isStatic));
 
         return nodes;
     }
@@ -552,7 +488,6 @@ public sealed class Parser
         {
             SyntaxType.Keyword when current.Text == "for" => ParseForExpression(secondTypeToken),
             SyntaxType.Keyword when current.Text == "while" => ParseWhileExpression(secondTypeToken),
-            SyntaxType.Keyword when current.Text == "fld" => ParseFieldExpression(),
             SyntaxType.Keyword when current.Text == "new" => ParseInstantiateExpression(secondTypeToken),
             _ => throw new Exception($"Unexpected token {Peek().Type} at position {Peek().Position} in atom expression!")
         };
@@ -641,7 +576,7 @@ public sealed class Parser
         return new WhileNode(condNode, block);
     }
 
-    private SyntaxNode ParseFunctionDefinition()
+    private SyntaxNode ParseFunctionDefinition(bool isStatic)
     {
         MatchKeyword("fn");
 
@@ -681,10 +616,10 @@ public sealed class Parser
             _hasReturnNode = false;
 
         return new FunctionDefinitionNode(nameToken.Text, args, returnType.Text,
-            secondReturnType is null ? string.Empty : secondReturnType.Text, block, isPublic, isNative);
+            secondReturnType is null ? string.Empty : secondReturnType.Text, block, isPublic, isStatic, isNative);
     }
 
-    private SyntaxNode ParseFieldExpression()
+    private SyntaxNode ParseFieldExpression(bool isStatic)
     {
         MatchKeyword("fld");
 
@@ -711,7 +646,7 @@ public sealed class Parser
         if (Peek().Type == SyntaxType.Equals)
             throw new InvalidOperationException($"Can not initialize a field directly: {nameToken.Text}");
 
-        return new FieldDefinitionNode(isPublic, nameToken.Text, type.Text,
+        return new FieldDefinitionNode(isPublic, isStatic, nameToken.Text, type.Text,
             secondType is null ? string.Empty : secondType.Text);
     }
 
