@@ -20,7 +20,7 @@ mod pub Program
 			Console.println("Fail 2!");
 		}
 
-		if (StringUtils.equals(string, "Hello, World!") == false) 
+		if (!StringUtils.equals(string, "Hello, World!")) 
 		{
 			Console.println("Pass!");
 		}
@@ -29,7 +29,7 @@ mod pub Program
 			Console.println("Fail!");
 		}
 
-		if (StringUtils.equals(string, "My String") == true) 
+		if (StringUtils.equals(string, "My String")) 
 		{
 			Console.println("Pass!");
 		}

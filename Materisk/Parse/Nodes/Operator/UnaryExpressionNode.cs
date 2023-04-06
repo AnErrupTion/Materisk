@@ -22,9 +22,9 @@ internal class UnaryExpressionNode : SyntaxNode
         var value = _rhs.Emit(module, type, method, thenBlock, elseBlock).Load();
         var resultValue = _operator switch
         {
-            "!" => value.TypeOf == LLVMTypeRef.Float || value.TypeOf == LLVMTypeRef.Double
-                ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOEQ, value, LlvmUtils.IntZero)
-                : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ, value, LlvmUtils.IntZero),
+            "!" => value.TypeOf == LLVMTypeRef.Int1
+                ? module.LlvmBuilder.BuildNot(value)
+                : throw new InvalidOperationException($"Trying to do a unary bang expression on: {value.TypeOf}"),
             "-" => value.TypeOf == LLVMTypeRef.Float || value.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFNeg(value)
                 : module.LlvmBuilder.BuildNeg(value),
