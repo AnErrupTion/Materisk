@@ -6,17 +6,10 @@ public static class MateriskAttributesUtils
     {
         var attributes = MateriskAttributes.None;
 
-        if (isPublic)
-            attributes |= MateriskAttributes.Public;
-
-        if (isStatic)
-            attributes |= MateriskAttributes.Static;
-
-        if (isNative)
-            attributes |= MateriskAttributes.Native;
-
-        if (isExternal)
-            attributes |= MateriskAttributes.External;
+        if (isPublic) attributes |= MateriskAttributes.Public;
+        if (isStatic) attributes |= MateriskAttributes.Static;
+        if (isNative) attributes |= MateriskAttributes.Native;
+        if (isExternal) attributes |= MateriskAttributes.External;
 
         return attributes;
     }

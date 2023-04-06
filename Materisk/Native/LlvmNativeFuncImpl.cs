@@ -53,11 +53,6 @@ internal static class LlvmNativeFuncImpl
                 module.LlvmBuilder.BuildRetVoid();
                 return;
             }
-            case "Int" when method.Name is "toString":
-            {
-                module.LlvmBuilder.BuildRetVoid();
-                return;
-            }
             default: throw new NotImplementedException($"Unimplemented native method: {module.Name}.{typeName}.{method.Name}");
         }
     }

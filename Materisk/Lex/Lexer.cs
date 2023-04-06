@@ -349,7 +349,7 @@ public sealed class Lexer
     private static bool IsKeyword(string text) => text
         is "return" or "continue" or "break"
         or "if" or "elif" or "else"
-        or "for" or "while" or "fn" or "var" or "fld" or "mut"
+        or "for" or "while" or "fn" or "var" or "fld" or "mut" or "as"
         or "using" or "native" or "ext" or "impl" or "new"
         or "mod" or "dyn" or "pub"
         or "true" or "false";

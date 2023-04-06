@@ -16,8 +16,9 @@ internal class FunctionDefinitionNode : SyntaxNode
     public readonly bool IsPublic;
     public readonly bool IsNative;
     public readonly bool IsExternal;
+    public readonly bool IsNativeImpl;
 
-    public FunctionDefinitionNode(string name, List<MethodArgument> args, string returnType, string secondReturnType, SyntaxNode body, bool isStatic, bool isPublic, bool isNative, bool isExternal)
+    public FunctionDefinitionNode(string name, List<MethodArgument> args, string returnType, string secondReturnType, SyntaxNode body, bool isStatic, bool isPublic, bool isNative, bool isExternal, bool isNativeImpl)
     {
         Name = name;
         Args = args;
@@ -28,6 +29,7 @@ internal class FunctionDefinitionNode : SyntaxNode
         IsPublic = isPublic;
         IsNative = isNative;
         IsExternal = isExternal;
+        IsNativeImpl = isNativeImpl;
     }
 
     public override NodeType Type => NodeType.ModuleFunctionDefinition;
@@ -35,7 +37,26 @@ internal class FunctionDefinitionNode : SyntaxNode
     // TODO: Constructor and instance methods
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
-        var newMethod = MateriskHelpers.AddMethod(module, type, Name, Args, IsPublic, IsStatic, IsNative, IsExternal, ReturnType, SecondReturnType);
+        if (IsNativeImpl)
+        {
+            var names = Name.Split('_');
+            var typeName = names[0];
+            var methodName = names[1];
+
+            foreach (var mType in module.Types)
+                foreach (var mMethod in mType.Methods)
+                    if (mType.Name == typeName && mMethod.Name == methodName)
+                    {
+                        var entryBlock = mMethod.LlvmMethod.AppendBasicBlock("entry");
+                        module.LlvmBuilder.PositionAtEnd(entryBlock);
+                        Body.Emit(module, type, mMethod, thenBlock, elseBlock);
+                        return mMethod;
+                    }
+
+            throw new InvalidOperationException($"Unable to find native function for implementation: {module.Name}.{typeName}.{methodName}");
+        }
+
+        var newMethod = MateriskHelpers.AddMethod(module, type, Name, Args, IsPublic, IsStatic, IsNative, IsNative || IsExternal, ReturnType, SecondReturnType);
 
         type.Methods.Add(newMethod);
 

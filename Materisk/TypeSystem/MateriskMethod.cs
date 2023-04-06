@@ -20,7 +20,7 @@ public sealed class MateriskMethod : MateriskUnit
         {
             var entryBlock = LlvmMethod.AppendBasicBlock("entry");
             type.ParentModule.LlvmBuilder.PositionAtEnd(entryBlock);
-        } else LlvmMethod.Linkage = LLVMLinkage.LLVMExternalLinkage;
+        }
 
         ParentType = type;
         Name = name;

@@ -1,5 +1,12 @@
 using "corelib.msk";
 
+mod pub NativeImpl
+{
+	fn impl pub Memory_allocate(u32 size) ptr void { return (ptr void)0; }
+	fn impl pub Memory_free(ptr void pointer) void {}
+	fn impl pub Console_print(str text) void {}
+}
+
 mod pub Program
 {
 	fn pub main() void

@@ -268,7 +268,7 @@ public sealed class Parser
             _position++;
             var expr = ParseBinaryExpression(secondTypeToken, unaryPrecedence);
             left = new UnaryExpressionNode(current.Text, expr);
-        } else left = ParseParenthesizedExpression(secondTypeToken);
+        } else left = ParseCastExpression(secondTypeToken);
 
         for (;;)
         {
@@ -284,6 +284,38 @@ public sealed class Parser
         }
 
         return left;
+    }
+
+    private SyntaxNode ParseCastExpression(SyntaxToken? secondTypeToken)
+    {
+        var current = Peek();
+        var lookAhead = Peek(1);
+        
+        if (current.Type is SyntaxType.LParen && lookAhead.Text
+                is "u8" or "u16" or "u32" or "u64"
+                or "i8" or "i16" or "i32" or "i64"
+                or "f32" or "f64"
+                or "str" or "ptr" or "arr")
+        {
+            _position += 2;
+
+            SyntaxToken? nextTypeToken = null;
+
+            current = Peek();
+
+            if (current.Type is SyntaxType.Identifier)
+            {
+                _position++;
+                nextTypeToken = current;
+            }
+
+            MatchToken(SyntaxType.RParen);
+
+            var node = ParseCastExpression(secondTypeToken);
+            return new CastNode(lookAhead.Text, nextTypeToken is null ? string.Empty : nextTypeToken.Text, node);
+        }
+
+        return ParseParenthesizedExpression(secondTypeToken);
     }
 
     private SyntaxNode ParseParenthesizedExpression(SyntaxToken? secondTypeToken)
@@ -336,7 +368,7 @@ public sealed class Parser
 
     private SyntaxNode ParseCallExpression(SyntaxToken? secondTypeToken)
     {
-        var atomNode = ParseCastExpression(secondTypeToken);
+        var atomNode = ParseAtomExpression(secondTypeToken);
 
         if (Peek().Type is SyntaxType.LParen)
         {
@@ -361,31 +393,6 @@ public sealed class Parser
         }
 
         return atomNode;
-    }
-
-    private SyntaxNode ParseCastExpression(SyntaxToken? secondTypeToken)
-    {
-        if (Peek().Type is SyntaxType.LParen)
-        {
-            MatchToken(SyntaxType.LParen);
-            var typeToken = MatchToken(SyntaxType.Identifier);
-
-            SyntaxToken? nextTypeToken = null;
-
-            var current = Peek();
-            if (current.Type is SyntaxType.Identifier)
-            {
-                _position++;
-                nextTypeToken = current;
-            }
-
-            MatchToken(SyntaxType.RParen);
-
-            var node = ParseCastExpression(secondTypeToken);
-            return new CastNode(typeToken.Text, nextTypeToken is null ? string.Empty : nextTypeToken.Text, node);
-        }
-
-        return ParseAtomExpression(secondTypeToken);
     }
 
     private SyntaxNode ParseAtomExpression(SyntaxToken? secondTypeToken)
@@ -586,6 +593,7 @@ public sealed class Parser
         var isNative = false;
         var isExternal = false;
         var isPublic = false;
+        var isNativeImpl = false;
 
         if (Peek() is { Type: SyntaxType.Keyword, Text: "native" })
         {
@@ -597,6 +605,12 @@ public sealed class Parser
         {
             _position++;
             isExternal = true;
+        }
+
+        if (Peek() is { Type: SyntaxType.Keyword, Text: "impl" })
+        {
+            _position++;
+            isNativeImpl = true;
         }
 
         if (Peek() is { Type: SyntaxType.Keyword, Text: "pub" })
@@ -621,7 +635,7 @@ public sealed class Parser
         var block = ParseScopedStatements(true);
 
         return new FunctionDefinitionNode(nameToken.Text, args, returnType.Text,
-            secondReturnType is null ? string.Empty : secondReturnType.Text, block, isPublic, isStatic, isNative, isExternal);
+            secondReturnType is null ? string.Empty : secondReturnType.Text, block, isPublic, isStatic, isNative, isExternal, isNativeImpl);
     }
 
     private SyntaxNode ParseFieldExpression(bool isStatic)
