@@ -56,6 +56,11 @@ internal class FunctionDefinitionNode : SyntaxNode
             throw new InvalidOperationException($"Unable to find native function for implementation: {module.Name}.{typeName}.{methodName}");
         }
 
+        foreach (var mType in module.Types)
+            foreach (var mMethod in mType.Methods)
+                if (mType.Name == type.Name && mMethod.Name == Name)
+                    throw new InvalidOperationException($"Method already exists: {module.Name}.{type.Name}.{Name}");
+
         var newMethod = MateriskHelpers.AddMethod(module, type, Name, Args, IsPublic, IsStatic, IsNative, (IsNative && LlvmUtils.NoStdLib) || IsExternal, ReturnType, SecondReturnType);
 
         type.Methods.Add(newMethod);
