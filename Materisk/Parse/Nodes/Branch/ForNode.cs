@@ -20,29 +20,28 @@ internal class ForNode : SyntaxNode
 
     public override NodeType Type => NodeType.For;
 
-    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
         var ifBlock = method.LlvmMethod.AppendBasicBlock("if");
-        var thenBlock = method.LlvmMethod.AppendBasicBlock("then");
-        var elseBlock = method.LlvmMethod.AppendBasicBlock("else");
+        var llvmThenBlock = method.LlvmMethod.AppendBasicBlock("then");
+        var llvmElseBlock = method.LlvmMethod.AppendBasicBlock("else");
 
-        _initialExpressionNode.Emit(module, type, method, metadata);
+        _initialExpressionNode.Emit(module, type, method, llvmThenBlock, llvmElseBlock);
         module.LlvmBuilder.BuildBr(ifBlock);
 
         module.LlvmBuilder.PositionAtEnd(ifBlock);
-        var ifValue = _condNode.Emit(module, type, method, metadata).Load();
-        var conditionValue = module.LlvmBuilder.BuildCondBr(ifValue, thenBlock, elseBlock);
+        var ifValue = _condNode.Emit(module, type, method, llvmThenBlock, llvmElseBlock).Load();
+        var conditionValue = module.LlvmBuilder.BuildCondBr(ifValue, llvmThenBlock, llvmElseBlock);
 
-        module.LlvmBuilder.PositionAtEnd(thenBlock);
-        _stepNode.Emit(module, type, method, metadata);
-        metadata.AddMetadata(Tuple.Create(method, thenBlock, elseBlock));
-        var lastValue = _block.Emit(module, type, method, metadata).Load();
+        module.LlvmBuilder.PositionAtEnd(llvmThenBlock);
+        _stepNode.Emit(module, type, method, llvmThenBlock, llvmElseBlock);
+        _block.Emit(module, type, method, llvmThenBlock, llvmElseBlock).Load();
 
         // To handle "break", "continue" and "return"
-        if (lastValue is { InstructionOpcode: not LLVMOpcode.LLVMBr and not LLVMOpcode.LLVMRet })
+        if (module.LlvmBuilder.InsertBlock.LastInstruction is { InstructionOpcode: not LLVMOpcode.LLVMBr and not LLVMOpcode.LLVMRet })
             module.LlvmBuilder.BuildBr(ifBlock);
 
-        module.LlvmBuilder.PositionAtEnd(elseBlock);
+        module.LlvmBuilder.PositionAtEnd(llvmElseBlock);
 
         return conditionValue.ToMateriskValue();
     }

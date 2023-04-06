@@ -17,9 +17,9 @@ internal class UnaryExpressionNode : SyntaxNode
 
     public override NodeType Type => NodeType.UnaryExpression;
 
-    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
-        var value = _rhs.Emit(module, type, method, metadata).Load();
+        var value = _rhs.Emit(module, type, method, thenBlock, elseBlock).Load();
         var resultValue = _operator switch
         {
             "!" => value.TypeOf == LLVMTypeRef.Float || value.TypeOf == LLVMTypeRef.Double

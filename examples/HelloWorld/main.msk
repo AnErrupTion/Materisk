@@ -4,23 +4,38 @@ mod pub Program
 {
 	fn pub main() void
 	{
+		var string str = "My String";
 		var result u32 = (2 + 9) * 4;
 
 		if (result == 22)
 		{
 			Console.println("Fail 1!");
 		}
+		else if (result != 69)
+		{
+			Console.println("Pass!");
+		}
 		else
 		{
-			if (result != 69)
-			{
-				Console.println("Pass!");
-			}
-			else
-			{
-				Console.println("Fail 2!");
-			}
-			return;
+			Console.println("Fail 2!");
+		}
+
+		if (StringUtils.equals(string, "Hello, World!") == false) 
+		{
+			Console.println("Pass!");
+		}
+		else 
+		{
+			Console.println("Fail!");
+		}
+
+		if (StringUtils.equals(string, "My String") == true) 
+		{
+			Console.println("Pass!");
+		}
+		else 
+		{
+			Console.println("Fail!");
 		}
 	}
 }

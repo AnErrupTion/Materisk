@@ -1,4 +1,5 @@
-﻿using Materisk.TypeSystem;
+﻿using LLVMSharp.Interop;
+using Materisk.TypeSystem;
 
 namespace Materisk.Parse.Nodes.Branch;
 
@@ -13,9 +14,9 @@ internal class ReturnNode : SyntaxNode
 
     public override NodeType Type => NodeType.Return;
 
-    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
-        var value = _returnValueNode?.Emit(module, type, method, metadata);
+        var value = _returnValueNode?.Emit(module, type, method, thenBlock, elseBlock);
 
         return (value is not null
             ? module.LlvmBuilder.BuildRet(value.Load())

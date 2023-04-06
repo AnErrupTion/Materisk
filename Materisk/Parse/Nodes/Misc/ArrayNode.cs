@@ -17,9 +17,9 @@ internal class ArrayNode : SyntaxNode
 
     public override NodeType Type => NodeType.Array;
 
-    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
-        var elementCount = _itemCountNode.Emit(module, type, method, metadata).Load();
+        var elementCount = _itemCountNode.Emit(module, type, method, thenBlock, elseBlock).Load();
         var arrayType = TypeSigUtils.GetTypeSignatureFor(module, _type);
         return module.LlvmBuilder.BuildArrayAlloca(arrayType, elementCount).ToMateriskValue();
     }

@@ -19,9 +19,9 @@ internal class DotNode : SyntaxNode
 
     public override NodeType Type => NodeType.Dot;
 
-    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
-        var currentValue = _callNode.Emit(module, type, method, metadata);
+        var currentValue = _callNode.Emit(module, type, method, thenBlock, elseBlock);
 
         foreach (var node in NextNodes)
             switch (node)
@@ -88,7 +88,7 @@ internal class DotNode : SyntaxNode
                         MateriskType mType => mType.Name,
                         _ => method.ParentType.Name
                     };
-                    var value = aen.Expr.Emit(module, type, method, metadata);
+                    var value = aen.Expr.Emit(module, type, method, thenBlock, elseBlock);
 
                     MateriskField? mField = null;
 
@@ -151,7 +151,7 @@ internal class DotNode : SyntaxNode
                     if (newMethod == null)
                         throw new InvalidOperationException($"Unable to find method with name \"{name}\" in module: {module.Name}");
 
-                    var args = cn.EmitArgs(module, type, method, metadata);
+                    var args = cn.EmitArgs(module, type, method, thenBlock, elseBlock);
                     currentValue = module.LlvmBuilder.BuildCall2(newMethod.Type, newMethod.LlvmMethod, args).ToMateriskValue();
                     break;
                 }

@@ -19,8 +19,7 @@ internal static class MateriskHelpers
 
         var module = new MateriskModule(name);
 
-        var metadata = new MateriskMetadata();
-        rootNode.Emit(module, null!, null!, metadata);
+        rootNode.Emit(module, null!, null!, null!, null!);
 
         module.LlvmModule.WriteBitcodeToFile($"llvm/{name}.ir");
         module.LlvmModule.Dump();

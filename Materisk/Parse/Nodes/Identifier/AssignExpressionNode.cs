@@ -17,7 +17,7 @@ internal class AssignExpressionNode : SyntaxNode
 
     public readonly SyntaxNode Expr;
 
-    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
         var variable = method.GetVariableByName(Identifier);
 
@@ -29,7 +29,7 @@ internal class AssignExpressionNode : SyntaxNode
                     if (!field.Attributes.HasFlag(MateriskAttributes.Static))
                         throw new InvalidOperationException($"Field \"{module.Name}.{type.Name}.{Identifier}\" is not static.");
 
-                    var fieldValue = Expr.Emit(module, type, method, metadata);
+                    var fieldValue = Expr.Emit(module, type, method, thenBlock, elseBlock);
                     field.Store(fieldValue.Load());
                     return fieldValue;
                 }
@@ -37,7 +37,7 @@ internal class AssignExpressionNode : SyntaxNode
             throw new InvalidOperationException($"Can not assign to a non-existent identifier \"{Identifier}\" in method: {module.Name}.{type.Name}.{method.Name}");
         }
 
-        var varValue = Expr.Emit(module, type, method, metadata);
+        var varValue = Expr.Emit(module, type, method, thenBlock, elseBlock);
         variable.Store(varValue.Load());
         return varValue;
     }

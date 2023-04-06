@@ -15,7 +15,7 @@ internal class StringLiteralNode : SyntaxNode
 
     public override NodeType Type => NodeType.StringLiteral;
 
-    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
         var llvmType = LLVMTypeRef.Int8;
         var llvmValue = module.LlvmBuilder.BuildAlloca(LLVMTypeRef.CreateArray(llvmType, (uint)(_text.Length + 1)));

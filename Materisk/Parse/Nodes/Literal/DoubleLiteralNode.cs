@@ -14,7 +14,7 @@ internal class DoubleLiteralNode : SyntaxNode
 
     public override NodeType Type => NodeType.DoubleLiteral;
 
-    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
         return LLVMValueRef.CreateConstReal(LLVMTypeRef.Double, _value).ToMateriskValue();
     }

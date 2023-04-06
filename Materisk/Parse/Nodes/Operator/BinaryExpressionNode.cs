@@ -19,10 +19,10 @@ internal class BinaryExpressionNode : SyntaxNode
 
     public override NodeType Type => NodeType.BinaryExpression;
 
-    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
-        var lhs = _left.Emit(module, type, method, metadata);
-        var rhs = _right.Emit(module, type, method, metadata);
+        var lhs = _left.Emit(module, type, method, thenBlock, elseBlock);
+        var rhs = _right.Emit(module, type, method, thenBlock, elseBlock);
 
         if (lhs.Signed && !rhs.Signed || !lhs.Signed && rhs.Signed)
             throw new InvalidOperationException("Both operands need to be either signed or unsigned!");

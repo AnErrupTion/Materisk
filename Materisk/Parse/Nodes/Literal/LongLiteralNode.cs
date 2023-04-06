@@ -15,7 +15,7 @@ internal class LongLiteralNode : SyntaxNode
 
     public override NodeType Type => NodeType.LongLiteral;
 
-    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
         if (_value < 0)
         {

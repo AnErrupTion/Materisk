@@ -20,9 +20,9 @@ internal class CastNode : SyntaxNode
     public override NodeType Type => NodeType.Cast;
 
     // TODO: Struct casts
-    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
-        var llvmValue = _node.Emit(module, type, method, metadata).Load();
+        var llvmValue = _node.Emit(module, type, method, thenBlock, elseBlock).Load();
         var resultValue = _type switch
         {
             "i8" or "u8" => module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Int8),

@@ -1,4 +1,5 @@
-﻿using Materisk.Native;
+﻿using LLVMSharp.Interop;
+using Materisk.Native;
 using Materisk.TypeSystem;
 
 namespace Materisk.Parse.Nodes.Definition;
@@ -29,14 +30,14 @@ internal class FunctionDefinitionNode : SyntaxNode
     public override NodeType Type => NodeType.ModuleFunctionDefinition;
 
     // TODO: Constructor and instance methods
-    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
         var newMethod = MateriskHelpers.AddMethod(module, type, Name, Args, IsPublic, IsStatic, IsNative, false, ReturnType, SecondReturnType);
 
         type.Methods.Add(newMethod);
 
         if (!IsNative)
-            Body.Emit(module, type, newMethod, metadata);
+            Body.Emit(module, type, newMethod, thenBlock, elseBlock);
         else
             LlvmNativeFuncImpl.Emit(module, type.Name, newMethod);
 

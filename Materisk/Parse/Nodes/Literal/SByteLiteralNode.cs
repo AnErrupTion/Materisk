@@ -15,7 +15,7 @@ internal class SByteLiteralNode : SyntaxNode
 
     public override NodeType Type => NodeType.SByteLiteral;
 
-    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
         if (_value < 0)
         {

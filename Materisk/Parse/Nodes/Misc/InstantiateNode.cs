@@ -1,4 +1,5 @@
-﻿using Materisk.TypeSystem;
+﻿using LLVMSharp.Interop;
+using Materisk.TypeSystem;
 
 namespace Materisk.Parse.Nodes.Misc;
 
@@ -15,7 +16,7 @@ internal class InstantiateNode : SyntaxNode
 
     public override NodeType Type => NodeType.Instantiate;
 
-    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
         /*var name = _ident.Text;
 

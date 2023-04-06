@@ -1,4 +1,5 @@
-﻿using Materisk.TypeSystem;
+﻿using LLVMSharp.Interop;
+using Materisk.TypeSystem;
 
 namespace Materisk.Parse.Nodes.Definition;
 
@@ -17,14 +18,14 @@ internal class ModuleDefinitionNode : SyntaxNode
 
     public override NodeType Type => NodeType.ModuleDefinition;
 
-    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
         var newType = new MateriskType(module, Name, MateriskAttributesUtils.CreateAttributes(IsPublic, false, false, false));
 
         module.Types.Add(newType);
 
         foreach (var bodyNode in Body)
-            bodyNode.Emit(module, newType, method, metadata);
+            bodyNode.Emit(module, newType, method, thenBlock, elseBlock);
 
         return newType;
     }

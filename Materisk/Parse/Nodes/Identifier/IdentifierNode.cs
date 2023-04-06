@@ -1,4 +1,5 @@
-﻿using Materisk.TypeSystem;
+﻿using LLVMSharp.Interop;
+using Materisk.TypeSystem;
 
 namespace Materisk.Parse.Nodes.Identifier;
 
@@ -13,7 +14,7 @@ internal class IdentifierNode : SyntaxNode
 
     public override NodeType Type => NodeType.Identifier;
 
-    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
+    public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
         // TODO: Instantiation support
         /*if (name is "self" && method.DeclaringType is not null && method.Parameters.ThisParameter is not null)
