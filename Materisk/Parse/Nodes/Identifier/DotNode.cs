@@ -52,7 +52,7 @@ internal class DotNode : SyntaxNode
                         }
 
                     if (mField is null)
-                        throw new InvalidOperationException($"Unable to find field with name \"{name}\" in module: {module.Name}");
+                        throw new InvalidOperationException($"Unable to find field with name \"{name}\" in type: {module.Name}.{typeName}");
 
                     if (currentValue is MateriskMethodArgument { Name: "self" } arg)
                         currentValue = mField.LoadInstance(arg.Load(), mFieldIndex).ToMateriskValue();
