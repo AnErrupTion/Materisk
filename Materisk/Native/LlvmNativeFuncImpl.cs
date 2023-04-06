@@ -4,7 +4,7 @@ using Materisk.Utils;
 
 namespace Materisk.Native;
 
-public static class LlvmNativeFuncImpl
+internal static class LlvmNativeFuncImpl
 {
     public static LLVMTypeRef MallocType, FreeType, PrintfType;
     public static LLVMValueRef Malloc, Free, Printf;

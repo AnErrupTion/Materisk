@@ -18,5 +18,5 @@ public sealed class MateriskMethodArgument : MateriskUnit
 
     public override LLVMValueRef Load() => Value;
 
-    public override LLVMValueRef Store(LLVMValueRef value) => throw new NotImplementedException();
+    public override LLVMValueRef Store(LLVMValueRef value) => throw new NotSupportedException();
 }

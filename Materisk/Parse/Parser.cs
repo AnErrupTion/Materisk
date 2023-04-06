@@ -10,7 +10,7 @@ using Materisk.Parse.Nodes.Operator;
 
 namespace Materisk.Parse;
 
-public class Parser
+public sealed class Parser
 {
     private readonly List<SyntaxToken> _tokens;
 

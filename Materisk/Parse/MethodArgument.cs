@@ -1,6 +1,6 @@
 namespace Materisk.Parse;
 
-public sealed class MethodArgument
+internal sealed class MethodArgument
 {
     public readonly string Type;
     public readonly string SecondType;

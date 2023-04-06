@@ -2,7 +2,7 @@ using LLVMSharp.Interop;
 
 namespace Materisk.Utils;
 
-public static class LlvmUtils
+internal static class LlvmUtils
 {
     public static readonly LLVMValueRef ByteZero = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int8, 0, true);
     public static readonly LLVMValueRef ShortZero = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int16, 0, true);

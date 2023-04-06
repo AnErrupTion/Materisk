@@ -2,7 +2,7 @@
 
 namespace Materisk.Lex;
 
-public class Lexer
+public sealed class Lexer
 {
     private readonly StringBuilder _builder;
     private readonly string _code;
