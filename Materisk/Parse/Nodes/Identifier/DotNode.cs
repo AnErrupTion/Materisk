@@ -31,52 +31,33 @@ internal class DotNode : SyntaxNode
                     var name = rvn.Name;
                     var typeName = currentValue switch
                     {
+                        MateriskMethodArgument argument => argument.ParentMethod.ParentType.Name,
                         MateriskLocalVariable variable => variable.ParentMethod.ParentType.Name,
                         MateriskType mType => mType.Name,
                         _ => method.ParentType.Name
                     };
 
+                    var mFieldIndex = 0U;
                     MateriskField? mField = null;
 
                     foreach (var typeDef in module.Types)
                         foreach (var field in typeDef.Fields)
+                        {
                             if (typeDef.Name == typeName && field.Name == name)
                             {
                                 mField = field;
                                 break;
                             }
+                            mFieldIndex++;
+                        }
 
                     if (mField is null)
-                    {
-                        // TODO?
-                        /*typeName = currentValue.ToString();
+                        throw new InvalidOperationException($"Unable to find field with name \"{name}\" in module: {module.Name}");
 
-                        var found = false;
-
-                        foreach (var argument in method.Arguments)
-                            if (argument.Name == typeName)
-                            {
-                                typeName = argument.ParentMethod.ParentType.Name;
-                                found = true;
-                                break;
-                            }
-
-                        if (!found)
-                            throw new InvalidOperationException($"Unable to find type for argument: {typeName}");
-
-                        foreach (var typeDef in module.Types)
-                            foreach (var field in typeDef.Fields)
-                                if (typeDef.Name == typeName && field.Name == name)
-                                {
-                                    mField = field;
-                                    break;
-                                }
-
-                        if (mField is null)*/
-                            throw new InvalidOperationException($"Unable to find field with name \"{name}\" in module: {module.Name}");
-                    }
-
-                    currentValue = mField;
+                    if (currentValue is MateriskMethodArgument { Name: "self" } arg)
+                        currentValue = mField.LoadInstance(arg.Load(), mFieldIndex).ToMateriskValue();
+                    else
+                        currentValue = mField;
                     break;
                 }
                 case AssignExpressionNode aen:
@@ -90,47 +71,27 @@ internal class DotNode : SyntaxNode
                     };
                     var value = aen.Expr.Emit(module, type, method, thenBlock, elseBlock);
 
+                    var mFieldIndex = 0U;
                     MateriskField? mField = null;
 
                     foreach (var typeDef in module.Types)
                         foreach (var field in typeDef.Fields)
+                        {
                             if (typeDef.Name == typeName && field.Name == name)
                             {
                                 mField = field;
                                 break;
                             }
+                            mFieldIndex++;
+                        }
 
                     if (mField is null)
-                    {
-                        // TODO?
-                        /*typeName = currentValue.ToString();
-
-                        var found = false;
-
-                        foreach (var argument in method.Arguments)
-                            if (argument.Name == typeName)
-                            {
-                                typeName = argument.ParentMethod.ParentType.Name;
-                                found = true;
-                                break;
-                            }
-
-                        if (!found)
-                            throw new InvalidOperationException($"Unable to find type for argument: {typeName}");
-
-                        foreach (var typeDef in module.Types)
-                            foreach (var field in typeDef.Fields)
-                                if (typeDef.Name == typeName && field.Name == name)
-                                {
-                                    mField = field;
-                                    break;
-                                }
-
-                        if (mField is null)*/
                         throw new InvalidOperationException($"Unable to find field with name \"{name}\" in module: {module.Name}");
-                    }
 
-                    mField.Store(value.Load());
+                    if (currentValue is MateriskMethodArgument { Name: "self" } arg)
+                        mField.StoreInstance(arg.Load(), mFieldIndex, value.Load());
+                    else
+                        mField.Store(value.Load());
                     break;
                 }
                 case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:

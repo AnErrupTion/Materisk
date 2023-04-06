@@ -34,14 +34,6 @@ internal static class MateriskHelpers
         var argts = new List<MateriskMethodArgument>();
         var parameters = new List<LLVMTypeRef>();
 
-        if (!isStatic)
-        {
-            var argType = TypeSigUtils.GetTypeSignatureFor(module, "ptr", type.Name);
-            var pointerElementType = TypeSigUtils.GetTypeSignatureFor(module, type.Name);
-            parameters.Add(argType);
-            argts.Add(new("self", argType, pointerElementType, false));
-        }
-
         foreach (var arg in args)
         {
             var firstType = arg.Type;

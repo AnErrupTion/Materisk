@@ -155,7 +155,7 @@ public sealed class Parser
         var body = ParseModuleBody(isStatic);
         MatchToken(SyntaxType.RBraces);
 
-        return new ModuleDefinitionNode(moduleName.Text, body, isPublic);
+        return new ModuleDefinitionNode(moduleName.Text, body, isPublic, isStatic);
     }
 
     private List<SyntaxNode> ParseModuleBody(bool isStatic)
@@ -499,7 +499,7 @@ public sealed class Parser
         {
             SyntaxType.Keyword when current.Text == "for" => ParseForExpression(secondTypeToken),
             SyntaxType.Keyword when current.Text == "while" => ParseWhileExpression(secondTypeToken),
-            SyntaxType.Keyword when current.Text == "new" => ParseInstantiateExpression(secondTypeToken),
+            SyntaxType.Keyword when current.Text == "alloc" => ParseInstantiateExpression(secondTypeToken),
             _ => throw new InvalidOperationException($"Unexpected token {Peek().Type} at position {Peek().Position} in atom expression!")
         };
     }

@@ -4,14 +4,19 @@ mod dyn Test
 {
 	fld pub x u32;
 
-	fn pub ctor() void {}
+	fn pub ctor(ptr Test self) void
+	{
+		var value u32 = self.x;
+		self.x = 9;
+	}
 }
 
 mod pub Program
 {
 	fn pub main() void
 	{
-		var test Test = new Test();
+		var test ptr Test = alloc Test();
+		//var x u32 = test.x;
 
 		Console.println("Hello, World!");
 	}

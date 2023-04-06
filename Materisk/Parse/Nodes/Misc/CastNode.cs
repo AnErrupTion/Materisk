@@ -19,35 +19,50 @@ internal class CastNode : SyntaxNode
 
     public override NodeType Type => NodeType.Cast;
 
-    // TODO: Struct casts
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
         var llvmValue = _node.Emit(module, type, method, thenBlock, elseBlock).Load();
-        var resultValue = _type switch
+        LLVMValueRef resultValue;
+        switch (_type)
         {
-            "i8" or "u8" => module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Int8),
-            "i16" or "u16" => module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Int16),
-            "i32" or "u32" => module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Int32),
-            "i64" or "u64" => module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Int64),
-            "f32" => llvmValue.TypeOf == LLVMTypeRef.Float || llvmValue.TypeOf == LLVMTypeRef.Double
-                ? module.LlvmBuilder.BuildFPCast(llvmValue, LLVMTypeRef.Float)
-                : module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Float),
-            "f64" => llvmValue.TypeOf == LLVMTypeRef.Float || llvmValue.TypeOf == LLVMTypeRef.Double
-                ? module.LlvmBuilder.BuildFPCast(llvmValue, LLVMTypeRef.Double)
-                : module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Double),
-            "ptr" when !string.IsNullOrEmpty(_secondType) => _secondType switch
-            {
-                "i8" or "u8" => module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.BytePointer),
-                "i16" or "u16" => module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.ShortPointer),
-                "i32" or "u32" => module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.IntPointer),
-                "i64" or "u64" => module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.LongPointer),
-                "f32" => module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.FloatPointer),
-                "f64" => module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.DoublePointer),
-                "void" => module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.VoidPointer),
-                _ => throw new InvalidOperationException($"Can not cast to pointer type \"{_secondType}\" in method: {module.Name}.{type.Name}.{method.Name}")
-            },
-            _ => throw new InvalidOperationException($"Can not cast to type \"{_type}\" in method: {module.Name}.{type.Name}.{method.Name}")
-        };
+            case "i8" or "u8": resultValue = module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Int8); break;
+            case "i16" or "u16": resultValue = module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Int16); break;
+            case "i32" or "u32": resultValue = module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Int32); break;
+            case "i64" or "u64": resultValue = module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Int64); break;
+            case "f32":
+                resultValue = llvmValue.TypeOf == LLVMTypeRef.Float || llvmValue.TypeOf == LLVMTypeRef.Double
+                    ? module.LlvmBuilder.BuildFPCast(llvmValue, LLVMTypeRef.Float)
+                    : module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Float);
+                break;
+            case "f64":
+                resultValue = llvmValue.TypeOf == LLVMTypeRef.Float || llvmValue.TypeOf == LLVMTypeRef.Double
+                    ? module.LlvmBuilder.BuildFPCast(llvmValue, LLVMTypeRef.Double)
+                    : module.LlvmBuilder.BuildIntCast(llvmValue, LLVMTypeRef.Double);
+                break;
+            case "ptr" when !string.IsNullOrEmpty(_secondType):
+                switch (_secondType)
+                {
+                    case "i8" or "u8": resultValue = module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.BytePointer); break;
+                    case "i16" or "u16": resultValue = module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.ShortPointer); break;
+                    case "i32" or "u32": resultValue = module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.IntPointer); break;
+                    case "i64" or "u64": resultValue = module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.LongPointer); break;
+                    case "f32": resultValue = module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.FloatPointer); break;
+                    case "f64": resultValue = module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.DoublePointer); break;
+                    case "void": resultValue = module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.VoidPointer); break;
+                    default:
+                    {
+                        foreach (var mType in module.Types)
+                            if (mType.Name == _secondType)
+                                return module.LlvmBuilder.BuildPointerCast(llvmValue,
+                                    LLVMTypeRef.CreatePointer(mType.Type, 0)).ToMateriskValue();
+
+                        throw new InvalidOperationException($"Can not cast to pointer type \"{_secondType}\" in method: {module.Name}.{type.Name}.{method.Name}");
+                    }
+                }
+                break;
+            default: throw new InvalidOperationException($"Can not cast to type \"{_type}\" in method: {module.Name}.{type.Name}.{method.Name}");
+        }
+
         return resultValue.ToMateriskValue();
     }
 

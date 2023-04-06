@@ -25,11 +25,23 @@ public sealed class MateriskField : MateriskUnit
         Signed = signed;
     }
 
-    public override LLVMValueRef Load() => ParentType.ParentModule.LlvmBuilder.BuildLoad2(Type,
-        ParentType.Attributes.HasFlag(MateriskAttributes.Static)
-        ? ParentType.ParentModule.LlvmBuilder.BuildStructGEP2(Type, ParentType.Load(), 0)
-        : LlvmField);
+    public override LLVMValueRef Load() => !ParentType.Attributes.HasFlag(MateriskAttributes.Static)
+        ? throw new NotSupportedException()
+        : ParentType.ParentModule.LlvmBuilder.BuildLoad2(Type, LlvmField);
 
-    public override LLVMValueRef Store(LLVMValueRef value) =>
-        ParentType.ParentModule.LlvmBuilder.BuildStore(value, LlvmField);
+    public override LLVMValueRef Store(LLVMValueRef value) => !ParentType.Attributes.HasFlag(MateriskAttributes.Static)
+        ? throw new NotSupportedException()
+        : ParentType.ParentModule.LlvmBuilder.BuildStore(value, LlvmField);
+
+    public LLVMValueRef LoadInstance(LLVMValueRef instance, uint index)
+    {
+        return ParentType.ParentModule.LlvmBuilder.BuildLoad2(Type,
+            ParentType.ParentModule.LlvmBuilder.BuildStructGEP2(Type, instance, index));
+    }
+
+    public LLVMValueRef StoreInstance(LLVMValueRef instance, uint index, LLVMValueRef value)
+    {
+        return ParentType.ParentModule.LlvmBuilder.BuildStore(value,
+            ParentType.ParentModule.LlvmBuilder.BuildStructGEP2(Type, instance, index));
+    }
 }

@@ -1,11 +1,11 @@
 # Materisk
 
 Materisk is a programming language (originally a fork of spaghetto by GoldenretrieverYT) designed for high performance, low overhead programs, with the following principles:
-- No hidden allocations (except for one language feature!)
+- No hidden allocations
 - Concise and consistent syntax
 - Extremely fast, ahead-of-time compiled code
 - Excellent portability for other systems
-- Excellent interoperability with other natively compiled languages such as C, Rust, etc...
+- Good interoperability with other natively compiled languages such as C, Rust, etc...
 - OOP-style features without actually being OOP
 
 Materisk achieves these in part thanks to LLVM, which is a core dependency to the project. Without it, Materisk certainly wouldn't exist in its current form!
