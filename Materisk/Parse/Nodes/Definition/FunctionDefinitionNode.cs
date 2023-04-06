@@ -34,7 +34,6 @@ internal class FunctionDefinitionNode : SyntaxNode
 
     public override NodeType Type => NodeType.ModuleFunctionDefinition;
 
-    // TODO: Constructor and instance methods
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
         if (IsNativeImpl)

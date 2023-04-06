@@ -16,12 +16,8 @@ internal class IdentifierNode : SyntaxNode
 
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
-        // TODO: Instantiation support
-        /*if (name is "self" && method.DeclaringType is not null && method.Parameters.ThisParameter is not null)
-        {
-            method.CilMethodBody!.Instructions.Add(CilOpCodes.Ldarg, method.Parameters.ThisParameter);
-            return method.DeclaringType;
-        }*/
+        if (Name is "self" && !method.Attributes.HasFlag(MateriskAttributes.Static))
+            return method.Arguments[0];
 
         foreach (var typeDef in module.Types)
             if (typeDef.Name == Name)

@@ -11,19 +11,26 @@ internal static class TypeSigUtils
         {
             case "arr" or "ptr" when !string.IsNullOrEmpty(secondName):
             {
-                return secondName switch
+                switch (secondName)
                 {
-                    "i8" or "u8" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0),
-                    "i16" or "u16" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Int16, 0),
-                    "i32" or "u32" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Int32, 0),
-                    "i64" or "u64" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Int64, 0),
-                    "f32" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Float, 0),
-                    "f64" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Double, 0),
-                    "str" => LLVMTypeRef.CreatePointer(LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0), 0),
-                    "bool" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Int1, 0),
-                    "void" => LLVMTypeRef.CreatePointer(LLVMTypeRef.Void, 0),
-                    _ => throw new InvalidOperationException($"Unable to make a pointer for a custom type: {secondName}")
-                };
+                    case "i8" or "u8": return LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0);
+                    case "i16" or "u16": return LLVMTypeRef.CreatePointer(LLVMTypeRef.Int16, 0);
+                    case "i32" or "u32": return LLVMTypeRef.CreatePointer(LLVMTypeRef.Int32, 0);
+                    case "i64" or "u64": return LLVMTypeRef.CreatePointer(LLVMTypeRef.Int64, 0);
+                    case "f32": return LLVMTypeRef.CreatePointer(LLVMTypeRef.Float, 0);
+                    case "f64": return LLVMTypeRef.CreatePointer(LLVMTypeRef.Double, 0);
+                    case "str": return LLVMTypeRef.CreatePointer(LLVMTypeRef.CreatePointer(LLVMTypeRef.Int8, 0), 0);
+                    case "bool": return LLVMTypeRef.CreatePointer(LLVMTypeRef.Int1, 0);
+                    case "void": return LLVMTypeRef.CreatePointer(LLVMTypeRef.Void, 0);
+                    default:
+                    {
+                        foreach (var type in module.Types)
+                            if (type.Name == secondName)
+                                return LLVMTypeRef.CreatePointer(type.Type, 0);
+
+                        throw new InvalidOperationException($"Unable to make a pointer for a custom type: {secondName}");
+                    }
+                }
             }
             case "i8":
             case "u8":

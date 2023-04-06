@@ -18,21 +18,36 @@ internal class InstantiateNode : SyntaxNode
 
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
-        /*var name = _ident.Text;
+        MateriskType? constructorType = null;
+        MateriskMethod? constructor = null;
 
-        var constructorType = module.TopLevelTypes.FirstOrDefault(x => x.Name == name);
-        if (constructorType == null)
-            throw new InvalidOperationException($"Unable to find type with name: {name}");
+        foreach (var mType in module.Types)
+            foreach (var mMethod in mType.Methods)
+                if (mType.Name == _identifier && mMethod.Name is "ctor")
+                {
+                    constructorType = mType;
+                    constructor = mMethod;
+                    break;
+                }
 
-        var constructor = constructorType.Methods.FirstOrDefault(x => x.Name == ".ctor");
-        if (constructor is null)
-            throw new InvalidOperationException($"Unable to find constructor of type: {name}");
+        if (constructorType is null || constructor is null)
+            throw new InvalidOperationException($"Unable to find constructor for type: {module.Name}.{_identifier}");
 
-        foreach (var arg in _argumentNodes)
-            arg.Emit(variables, module, type, method, arguments);
+        // Allocate a new struct
+        // TODO: Use Memory.allocate()
+        var newStruct = module.LlvmBuilder.BuildAlloca(constructorType.Type);
 
-        method.CilMethodBody!.Instructions.Add(CilOpCodes.Newobj, constructor);*/
-        throw new NotImplementedException();
+        // Construct arguments
+        var args = new LLVMValueRef[_argumentNodes.Count + 1];
+        args[0] = newStruct;
+
+        for (var i = 1; i < args.Length; i++)
+            args[i] = _argumentNodes[i].Emit(module, type, method, thenBlock, elseBlock).Load();
+
+        // Call constructor
+        module.LlvmBuilder.BuildCall2(constructor.Type, constructor.Load(), args);
+
+        return newStruct.ToMateriskValue();
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

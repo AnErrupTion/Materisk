@@ -45,7 +45,7 @@ public sealed class MateriskMethod : MateriskUnit
         return null;
     }
 
-    public override LLVMValueRef Load() => throw new NotSupportedException();
+    public override LLVMValueRef Load() => LlvmMethod;
 
     public override LLVMValueRef Store(LLVMValueRef value) => throw new NotSupportedException();
 }

@@ -1,9 +1,18 @@
 using "corelib.msk";
 
+mod dyn Test
+{
+	fld pub x u32;
+
+	fn pub ctor() void {}
+}
+
 mod pub Program
 {
 	fn pub main() void
 	{
+		var test Test = new Test();
+
 		Console.println("Hello, World!");
 	}
 }

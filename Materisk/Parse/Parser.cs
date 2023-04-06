@@ -638,7 +638,7 @@ public sealed class Parser
         var block = ParseScopedStatements(true);
 
         return new FunctionDefinitionNode(nameToken.Text, args, returnType.Text,
-            secondReturnType is null ? string.Empty : secondReturnType.Text, block, isPublic, isStatic, isNative, isExternal, isNativeImpl);
+            secondReturnType is null ? string.Empty : secondReturnType.Text, block, isStatic, isPublic, isNative, isExternal, isNativeImpl);
     }
 
     private SyntaxNode ParseFieldExpression(bool isStatic)
@@ -665,8 +665,10 @@ public sealed class Parser
             secondType = current;
         }
 
-        if (Peek().Type == SyntaxType.Equals)
+        if (Peek().Type is SyntaxType.Equals)
             throw new InvalidOperationException($"Can not initialize a field directly: {nameToken.Text}");
+
+        MatchToken(SyntaxType.Semicolon);
 
         return new FieldDefinitionNode(isPublic, isStatic, nameToken.Text, type.Text,
             secondType is null ? string.Empty : secondType.Text);

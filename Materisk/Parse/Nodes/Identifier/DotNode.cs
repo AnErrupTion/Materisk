@@ -130,7 +130,6 @@ internal class DotNode : SyntaxNode
                         throw new InvalidOperationException($"Unable to find field with name \"{name}\" in module: {module.Name}");
                     }
 
-                    // TODO: Non-static fields
                     mField.Store(value.Load());
                     break;
                 }
@@ -152,7 +151,7 @@ internal class DotNode : SyntaxNode
                         throw new InvalidOperationException($"Unable to find method with name \"{name}\" in module: {module.Name}");
 
                     var args = cn.EmitArgs(module, type, method, thenBlock, elseBlock);
-                    currentValue = module.LlvmBuilder.BuildCall2(newMethod.Type, newMethod.LlvmMethod, args).ToMateriskValue();
+                    currentValue = module.LlvmBuilder.BuildCall2(newMethod.Type, newMethod.Load(), args).ToMateriskValue();
                     break;
                 }
                 case CallNode: throw new InvalidOperationException("Tried to call a non identifier in dot node stack.");

@@ -23,9 +23,16 @@ internal class ModuleDefinitionNode : SyntaxNode
         var newType = new MateriskType(module, Name, MateriskAttributesUtils.CreateAttributes(IsPublic, false, false, false));
 
         module.Types.Add(newType);
+        
+        foreach (var node in Body)
+            if (node is FieldDefinitionNode)
+                node.Emit(module, newType, method, thenBlock, elseBlock);
+        
+        newType.BuildStruct();
 
-        foreach (var bodyNode in Body)
-            bodyNode.Emit(module, newType, method, thenBlock, elseBlock);
+        foreach (var node in Body)
+            if (node is not FieldDefinitionNode)
+                node.Emit(module, newType, method, thenBlock, elseBlock);
 
         return newType;
     }
