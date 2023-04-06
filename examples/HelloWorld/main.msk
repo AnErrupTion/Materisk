@@ -6,7 +6,6 @@ mod dyn Test
 
 	fn pub ctor(ptr Test self) void
 	{
-		var value u32 = self.x;
 		self.x = 9;
 	}
 }

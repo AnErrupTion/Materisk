@@ -36,12 +36,12 @@ public sealed class MateriskField : MateriskUnit
     public LLVMValueRef LoadInstance(LLVMValueRef instance, uint index)
     {
         return ParentType.ParentModule.LlvmBuilder.BuildLoad2(Type,
-            ParentType.ParentModule.LlvmBuilder.BuildStructGEP2(Type, instance, index));
+            ParentType.ParentModule.LlvmBuilder.BuildStructGEP2(ParentType.Type, instance, index));
     }
 
     public LLVMValueRef StoreInstance(LLVMValueRef instance, uint index, LLVMValueRef value)
     {
         return ParentType.ParentModule.LlvmBuilder.BuildStore(value,
-            ParentType.ParentModule.LlvmBuilder.BuildStructGEP2(Type, instance, index));
+            ParentType.ParentModule.LlvmBuilder.BuildStructGEP2(ParentType.Type, instance, index));
     }
 }
