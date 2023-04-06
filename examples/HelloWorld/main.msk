@@ -1,48 +1,9 @@
 using "corelib.msk";
 
-mod pub NativeImpl
-{
-	fn impl pub Memory_allocate(u32 size) ptr void { return (ptr void)0; }
-	fn impl pub Memory_free(ptr void pointer) void {}
-	fn impl pub Console_print(str text) void {}
-}
-
 mod pub Program
 {
 	fn pub main() void
 	{
-		var string str = "My String";
-		var result u32 = (2 + 9) * 4;
-
-		if (result == 22)
-		{
-			Console.println("Fail 1!");
-		}
-		else if (result != 69 && result < 407)
-		{
-			Console.println("Pass!");
-		}
-		else
-		{
-			Console.println("Fail 2!");
-		}
-
-		if (!StringUtils.equals(string, "Hello, World!")) 
-		{
-			Console.println("Pass!");
-		}
-		else 
-		{
-			Console.println("Fail!");
-		}
-
-		if (StringUtils.equals(string, "My String")) 
-		{
-			Console.println("Pass!");
-		}
-		else
-		{
-			Console.println("Fail!");
-		}
+		Console.println("Hello, World!");
 	}
 }
