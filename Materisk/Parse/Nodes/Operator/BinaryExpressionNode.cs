@@ -63,22 +63,16 @@ internal class BinaryExpressionNode : SyntaxNode
                 ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOLT, leftValue, rightValue)
                 : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntULT, leftValue, rightValue),
             "<=" => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
-                ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOEQ,
-                    module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOGT, leftValue, rightValue),
-                    LlvmUtils.IntZero)
-                : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ,
-                    module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntUGT, leftValue, rightValue),
-                    LlvmUtils.IntZero),
+                ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOLE, leftValue, rightValue)
+                : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntULE, leftValue, rightValue),
             ">" => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOGT, leftValue, rightValue)
                 : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntUGT, leftValue, rightValue),
             ">=" => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
-                ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOEQ,
-                    module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOLT, leftValue, rightValue),
-                    LlvmUtils.IntZero)
-                : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntEQ,
-                    module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntULT, leftValue, rightValue),
-                    LlvmUtils.IntZero),
+                ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOGE, leftValue, rightValue)
+                : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntUGE, leftValue, rightValue),
+            "&&" => module.LlvmBuilder.BuildAnd(leftValue, rightValue),
+            "||" => module.LlvmBuilder.BuildOr(leftValue, rightValue),
             _ => throw new InvalidOperationException($"Trying to do a binary expression on: \"{_operator}\"")
         };
 

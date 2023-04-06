@@ -10,7 +10,9 @@ public static class PrecedenceUtils
         {
             SyntaxType.Mul or SyntaxType.Div => 5,
             SyntaxType.Plus or SyntaxType.Minus => 4,
-            SyntaxType.EqualsEquals or SyntaxType.BangEquals => 3,
+            SyntaxType.EqualsEquals or SyntaxType.BangEquals or SyntaxType.LessThan or SyntaxType.LessThanEqu or SyntaxType.GreaterThan or SyntaxType.GreaterThanEqu => 3,
+            SyntaxType.AndAnd => 2,
+            SyntaxType.OrOr => 1,
             _ => 0
         };
     }

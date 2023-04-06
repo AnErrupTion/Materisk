@@ -275,12 +275,12 @@ public sealed class Parser
             current = Peek();
 
             var binaryPrecedence = current.Type.GetBinaryOperatorPrecedence();
+
             if (binaryPrecedence is 0 || binaryPrecedence <= parentPrecedence)
                 break;
 
             _position++;
-            var right = ParseBinaryExpression(secondTypeToken, binaryPrecedence);
-            left = new BinaryExpressionNode(left, current.Text, right);
+            left = new BinaryExpressionNode(left, current.Text, ParseBinaryExpression(secondTypeToken, binaryPrecedence));
         }
 
         return left;
@@ -288,9 +288,7 @@ public sealed class Parser
 
     private SyntaxNode ParseParenthesizedExpression(SyntaxToken? secondTypeToken)
     {
-        var current = Peek();
-
-        if (current.Type is SyntaxType.LParen)
+        if (Peek().Type is SyntaxType.LParen)
         {
             _position++;
             var expr = ParseExpression(secondTypeToken);
