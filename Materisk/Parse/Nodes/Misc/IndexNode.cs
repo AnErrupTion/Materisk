@@ -24,10 +24,6 @@ internal class IndexNode : SyntaxNode
         var llvmElementType = name.PointerElementType;
         var llvmValue = name.Load();
         var underlyingType = llvmValue.TypeOf.Kind;
-
-        if (underlyingType is not LLVMTypeKind.LLVMPointerTypeKind)
-            throw new InvalidOperationException($"Catastrophic failure: value is not pointer: {underlyingType}"); // This should never happen
-
         var index = _indexNode.Emit(module, type, method, metadata).Load();
 
         switch (underlyingType)
@@ -43,9 +39,11 @@ internal class IndexNode : SyntaxNode
                 var llvmPtr = module.LlvmBuilder.BuildGEP2(llvmElementType, llvmValue, new[] { index });
                 return module.LlvmBuilder.BuildLoad2(llvmElementType, llvmPtr).ToMateriskValue();
             }
+            default:
+            {
+                throw new InvalidOperationException($"Catastrophic failure: value is not pointer: {underlyingType}");
+            }
         }
-
-        return null!;
     }
 
     public override IEnumerable<SyntaxNode> GetChildren()

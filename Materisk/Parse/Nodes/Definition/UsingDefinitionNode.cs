@@ -20,11 +20,7 @@ internal class UsingDefinitionNode : SyntaxNode
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, MateriskMetadata metadata)
     {
         WalkTree(RootNode, module);
-
-        var moduleName = System.IO.Path.GetFileNameWithoutExtension(Path);
-        MateriskHelpers.CreateModuleEmit(moduleName, RootNode);
-
-        return null!;
+        return MateriskHelpers.CreateModuleEmit(System.IO.Path.GetFileNameWithoutExtension(Path), RootNode);
     }
     
     private void WalkTree(SyntaxNode node, MateriskModule module)

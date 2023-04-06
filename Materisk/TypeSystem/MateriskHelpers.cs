@@ -12,7 +12,7 @@ internal static class MateriskHelpers
         return new(value);
     }
 
-    public static void CreateModuleEmit(string name, SyntaxNode rootNode)
+    public static MateriskModule CreateModuleEmit(string name, SyntaxNode rootNode)
     {
         if (!Directory.Exists("output")) Directory.CreateDirectory("output");
         if (!Directory.Exists("llvm")) Directory.CreateDirectory("llvm");
@@ -26,6 +26,7 @@ internal static class MateriskHelpers
         module.LlvmModule.Verify(LLVMVerifierFailureAction.LLVMAbortProcessAction);
 
         LlvmUtils.TargetMachine.EmitToFile(module.LlvmModule, $"output/{name}.o", LLVMCodeGenFileType.LLVMObjectFile);
+        return module;
     }
 
     public static MateriskMethod AddMethod(MateriskModule module, MateriskType type, string name, List<MethodArgument> args, bool isPublic, bool isStatic, bool isNative, bool isExternal, string returnType, string secondReturnType)
