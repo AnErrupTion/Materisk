@@ -7,6 +7,7 @@ using Materisk.Parse.Nodes.Identifier;
 using Materisk.Parse.Nodes.Literal;
 using Materisk.Parse.Nodes.Misc;
 using Materisk.Parse.Nodes.Operator;
+using Materisk.Utils;
 
 namespace Materisk.Parse;
 
@@ -233,7 +234,9 @@ public sealed class Parser
 
     private SyntaxNode ParseExpression(SyntaxToken? secondTypeToken)
     {
-        if (Peek() is { Type: SyntaxType.Keyword, Text: "var" })
+        var current = Peek();
+
+        if (current is { Type: SyntaxType.Keyword, Text: "var" })
         {
             _position++;
 
@@ -243,7 +246,8 @@ public sealed class Parser
                 throw new InvalidOperationException("Can not assign to a non-existent identifier!");
 
             var mutable = false;
-            var current = Peek();
+
+            current = Peek();
 
             if (current.Type is SyntaxType.Keyword)
             {
@@ -267,7 +271,7 @@ public sealed class Parser
             return new InitVariableNode(mutable, ident.Text, type.Text, secondType is null ? string.Empty : secondType.Text, expr);
         }
 
-        if (Peek().Type == SyntaxType.Identifier && Peek(1).Type
+        if (current.Type == SyntaxType.Identifier && Peek(1).Type
                 is SyntaxType.Equals
                 or SyntaxType.PlusEquals or SyntaxType.PlusPlus
                 or SyntaxType.MinusEquals or SyntaxType.MinusMinus
@@ -281,7 +285,7 @@ public sealed class Parser
             if (string.IsNullOrEmpty(ident.Text))
                 throw new InvalidOperationException("Can not assign to a non-existent identifier!");
 
-            var current = Peek();
+            current = Peek();
 
             switch (current.Type)
             {
@@ -311,53 +315,51 @@ public sealed class Parser
             return new AssignExpressionNode(ident.Text, expr);
         }
 
-        return ParseCompExpression(secondTypeToken);
+        return ParseBinaryExpression(secondTypeToken);
     }
 
-    private SyntaxNode ParseCompExpression(SyntaxToken? secondTypeToken)
+    private SyntaxNode ParseBinaryExpression(SyntaxToken? secondTypeToken, int parentPrecedence = 0)
+    {
+        var current = Peek();
+        var unaryPrecedence = current.Type.GetUnaryOperatorPrecedence();
+
+        SyntaxNode left;
+        if (unaryPrecedence is not 0 && unaryPrecedence >= parentPrecedence)
+        {
+            _position++;
+            var expr = ParseBinaryExpression(secondTypeToken, unaryPrecedence);
+            left = new UnaryExpressionNode(current.Text, expr);
+        } else left = ParseParenthesizedExpression(secondTypeToken);
+
+        for (;;)
+        {
+            current = Peek();
+
+            var binaryPrecedence = current.Type.GetBinaryOperatorPrecedence();
+            if (binaryPrecedence is 0 || binaryPrecedence <= parentPrecedence)
+                break;
+
+            _position++;
+            var right = ParseBinaryExpression(secondTypeToken, binaryPrecedence);
+            left = new BinaryExpressionNode(left, current.Text, right);
+        }
+
+        return left;
+    }
+
+    private SyntaxNode ParseParenthesizedExpression(SyntaxToken? secondTypeToken)
     {
         var current = Peek();
 
-        if (current.Type == SyntaxType.Bang)
+        if (current.Type is SyntaxType.LParen)
         {
             _position++;
-            return new UnaryExpressionNode(current.Text, ParseCompExpression(secondTypeToken));
+            var expr = ParseExpression(secondTypeToken);
+            MatchToken(SyntaxType.RParen);
+            return expr;
         }
 
-        return BinaryOperation(() => ParseArithmeticExpression(secondTypeToken),
-            new[]
-            {
-                SyntaxType.BangEquals, SyntaxType.EqualsEquals, SyntaxType.LessThan, SyntaxType.LessThanEqu, SyntaxType.GreaterThan, SyntaxType.GreaterThanEqu
-            });
-    }
-
-    private SyntaxNode ParseArithmeticExpression(SyntaxToken? secondTypeToken)
-    {
-        return BinaryOperation(() => ParseTermExpression(secondTypeToken), new[] { SyntaxType.Plus, SyntaxType.Minus });
-    }
-
-    private SyntaxNode ParseTermExpression(SyntaxToken? secondTypeToken)
-    {
-        return BinaryOperation(() => ParseFactorExpression(secondTypeToken), new[] { SyntaxType.Mul, SyntaxType.Div, SyntaxType.Mod });
-    }
-
-    private SyntaxNode ParseFactorExpression(SyntaxToken? secondTypeToken)
-    {
-        var current = Peek();
-
-        if (current.Type is SyntaxType.Plus or SyntaxType.Minus or SyntaxType.Bang)
-        {
-            _position++;
-            var factor = ParseFactorExpression(secondTypeToken);
-            return new UnaryExpressionNode(current.Text, factor);
-        }
-
-        return ParsePowerExpression(secondTypeToken);
-    }
-
-    private SyntaxNode ParsePowerExpression(SyntaxToken? secondTypeToken)
-    {
-        return BinaryOperation(() => ParseDotExpression(secondTypeToken), new[] { SyntaxType.Pow }, () => ParseFactorExpression(secondTypeToken));
+        return ParseDotExpression(secondTypeToken);
     }
 
     private SyntaxNode ParseDotExpression(SyntaxToken? secondTypeToken)
@@ -784,7 +786,7 @@ public sealed class Parser
         return args;
     }
 
-    private SyntaxNode BinaryOperation(Func<SyntaxNode> leftParse, SyntaxType[] allowedTypes, Func<SyntaxNode>? rightParse = null)
+    /*private SyntaxNode BinaryOperation(Func<SyntaxNode> leftParse, SyntaxType[] allowedTypes, Func<SyntaxNode>? rightParse = null)
     {
         SyntaxToken current;
         
@@ -799,7 +801,7 @@ public sealed class Parser
         }
 
         return left;
-    }
+    }*/
 
     private SyntaxToken Peek(int off = 0)
     {

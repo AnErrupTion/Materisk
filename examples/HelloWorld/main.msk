@@ -3,6 +3,16 @@ using "corelib.msk";
 fn pub main() void
 {
 	var string str = "My String";
+	var result u32 = (2 + 9) * 4;
+
+	if (result == 44)
+	{
+		Console.println("Pass!");
+	}
+	else
+	{
+		Console.println("Fail!");
+	}
 
 	if (StringUtils.equals(string, "Hello, World!") == true) 
 	{

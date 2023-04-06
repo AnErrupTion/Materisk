@@ -38,7 +38,7 @@ public static class Program
 
         if (settings.ShowLexOutput)
             foreach (var tok in lexedTokens)
-                Console.WriteLine($"  {tok}");
+                Console.WriteLine(tok.ToString());
 
         var parser = new Parser(lexedTokens);
 
