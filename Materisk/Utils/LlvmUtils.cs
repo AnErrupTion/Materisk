@@ -23,8 +23,9 @@ internal static class LlvmUtils
     public static string TargetTriple;
     public static LLVMTargetMachineRef TargetMachine;
     public static LLVMTargetDataRef DataLayout;
+    public static bool NoStdLib;
 
-    public static void Initialize(string targetTriple, string cpu, string features)
+    public static void Initialize(string targetTriple, string cpu, string features, bool noStdLib)
     {
         LLVM.InitializeAllTargetInfos();
         LLVM.InitializeAllTargets();
@@ -40,5 +41,6 @@ internal static class LlvmUtils
             LLVMRelocMode.LLVMRelocDefault,
             LLVMCodeModel.LLVMCodeModelDefault);
         DataLayout = TargetMachine.CreateTargetDataLayout();
+        NoStdLib = noStdLib;
     }
 }

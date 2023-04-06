@@ -584,12 +584,19 @@ public sealed class Parser
         MatchKeyword("fn");
 
         var isNative = false;
+        var isExternal = false;
         var isPublic = false;
 
         if (Peek() is { Type: SyntaxType.Keyword, Text: "native" })
         {
             _position++;
             isNative = true;
+        }
+
+        if (Peek() is { Type: SyntaxType.Keyword, Text: "ext" })
+        {
+            _position++;
+            isExternal = true;
         }
 
         if (Peek() is { Type: SyntaxType.Keyword, Text: "pub" })
@@ -614,7 +621,7 @@ public sealed class Parser
         var block = ParseScopedStatements(true);
 
         return new FunctionDefinitionNode(nameToken.Text, args, returnType.Text,
-            secondReturnType is null ? string.Empty : secondReturnType.Text, block, isPublic, isStatic, isNative);
+            secondReturnType is null ? string.Empty : secondReturnType.Text, block, isPublic, isStatic, isNative, isExternal);
     }
 
     private SyntaxNode ParseFieldExpression(bool isStatic)
