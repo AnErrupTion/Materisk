@@ -155,8 +155,8 @@ internal class DotNode : SyntaxNode
                     currentValue = module.LlvmBuilder.BuildCall2(newMethod.Type, newMethod.LlvmMethod, args).ToMateriskValue();
                     break;
                 }
-                case CallNode: throw new Exception("Tried to call a non identifier in dot node stack.");
-                default: throw new Exception("Unexpected node in dot node stack!");
+                case CallNode: throw new InvalidOperationException("Tried to call a non identifier in dot node stack.");
+                default: throw new InvalidOperationException("Unexpected node in dot node stack!");
             }
 
         return currentValue;

@@ -44,7 +44,7 @@ public sealed class Parser
         while ((current = Peek()).Type != SyntaxType.RBraces)
         {
             if (current.Type == SyntaxType.Eof)
-                throw new Exception($"Unclosed block at position: {current.Position}");
+                throw new InvalidOperationException($"Unclosed block at position: {current.Position}");
 
             var statement = ParseStatement(false);
             if (checkForReturn && statement is ReturnNode)
@@ -98,7 +98,7 @@ public sealed class Parser
                 MatchToken(SyntaxType.Semicolon);
 
                 if (!File.Exists(path))
-                    throw new Exception($"Failed to import \"{path}\": File not found");
+                    throw new InvalidOperationException($"Failed to import \"{path}\": File not found");
 
                 var lexer = new Lexer(File.ReadAllText(path)); 
                 var lexedTokens = lexer.Lex(); 
@@ -490,7 +490,7 @@ public sealed class Parser
             SyntaxType.Keyword when current.Text == "for" => ParseForExpression(secondTypeToken),
             SyntaxType.Keyword when current.Text == "while" => ParseWhileExpression(secondTypeToken),
             SyntaxType.Keyword when current.Text == "new" => ParseInstantiateExpression(secondTypeToken),
-            _ => throw new Exception($"Unexpected token {Peek().Type} at position {Peek().Position} in atom expression!")
+            _ => throw new InvalidOperationException($"Unexpected token {Peek().Type} at position {Peek().Position} in atom expression!")
         };
     }
 
@@ -737,7 +737,7 @@ public sealed class Parser
             return current;
         }
 
-        throw new Exception($"Unexpected token \"{current.Type}\" at position {_position}, expected: {type} ");
+        throw new InvalidOperationException($"Unexpected token \"{current.Type}\" at position {_position}, expected: {type} ");
     }
 
     private void MatchKeyword(string value)
@@ -750,6 +750,6 @@ public sealed class Parser
             return;
         }
 
-        throw new Exception($"Unexpected token \"{current.Type}\" at position {_position}, expected Keyword with value: {value} ");
+        throw new InvalidOperationException($"Unexpected token \"{current.Type}\" at position {_position}, expected Keyword with value: {value} ");
     }
 }

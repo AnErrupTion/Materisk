@@ -236,7 +236,7 @@ public sealed class Lexer
                 else if (char.IsWhiteSpace(current))
                     _position++;
                 else
-                    throw new Exception($"Bad token at position {_position} with text: {current}");
+                    throw new InvalidOperationException($"Bad token at position {_position} with text: {current}");
 
                 continue;
             }
@@ -300,7 +300,7 @@ public sealed class Lexer
                     '"' => "\"",
                     'n' => "\n",
                     '\\' => "\\",
-                    _ => throw new Exception($"Invalid escape sequence \"\\{current}\" at position: {_position}")
+                    _ => throw new InvalidOperationException($"Invalid escape sequence \"\\{current}\" at position: {_position}")
                 });
 
                 _position++;

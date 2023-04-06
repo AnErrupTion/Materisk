@@ -44,8 +44,8 @@ internal class BinaryExpressionNode : SyntaxNode
                 ? module.LlvmBuilder.BuildFDiv(leftValue, rightValue)
                 : leftSigned
                     ? module.LlvmBuilder.BuildSDiv(leftValue, rightValue)
-                    : module.LlvmBuilder.BuildUDiv(leftValue, rightValue),
-           "*=" or "*" => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
+                    : module.LlvmBuilder.BuildUDiv(leftValue, rightValue), 
+            "*=" or "*" => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFMul(leftValue, rightValue)
                 : module.LlvmBuilder.BuildMul(leftValue, rightValue),
             "%=" or "%" => leftValue.TypeOf == LLVMTypeRef.Float || leftValue.TypeOf == LLVMTypeRef.Double
