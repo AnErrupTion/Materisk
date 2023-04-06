@@ -5,11 +5,11 @@ namespace Materisk.Parse.Nodes.Misc;
 
 internal class BlockNode : SyntaxNode
 {
-    public readonly List<SyntaxNode> Nodes;
+    private readonly List<SyntaxNode> _nodes;
 
     public BlockNode(List<SyntaxNode> nodes)
     {
-        Nodes = nodes;
+        _nodes = nodes;
     }
 
     public override NodeType Type => NodeType.Block;
@@ -18,7 +18,7 @@ internal class BlockNode : SyntaxNode
     {
         MateriskUnit? lastValue = null;
 
-        foreach (var node in Nodes)
+        foreach (var node in _nodes)
             lastValue = node.Emit(module, type, method, metadata);
 
         return lastValue ?? LlvmUtils.VoidNull.ToMateriskValue();
@@ -26,6 +26,6 @@ internal class BlockNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        return Nodes;
+        return _nodes;
     }
 }

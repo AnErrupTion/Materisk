@@ -17,8 +17,6 @@ public sealed class Parser
 
     private int _position;
 
-    private bool _hasReturnNode;
-
     public Parser(List<SyntaxToken> tokens)
     {
         _tokens = tokens;
@@ -34,23 +32,31 @@ public sealed class Parser
         return new BlockNode(nodes);
     }
 
-    private BlockNode ParseScopedStatements()
+    private BlockNode ParseScopedStatements(bool checkForReturn = false)
     {
         MatchToken(SyntaxType.LBraces);
 
         SyntaxToken current;
 
         var nodes = new List<SyntaxNode>();
+        var hasReturn = false;
 
         while ((current = Peek()).Type != SyntaxType.RBraces)
         {
             if (current.Type == SyntaxType.Eof)
                 throw new Exception($"Unclosed block at position: {current.Position}");
 
-            nodes.Add(ParseStatement(false));
+            var statement = ParseStatement(false);
+            if (checkForReturn && statement is ReturnNode)
+                hasReturn = true;
+
+            nodes.Add(statement);
         }
 
         MatchToken(SyntaxType.RBraces);
+
+        if (checkForReturn && !hasReturn)
+            nodes.Add(new ReturnNode());
 
         return new BlockNode(nodes);
     }
@@ -63,15 +69,12 @@ public sealed class Parser
             {
                 _position += 2;
                 var ret = new ReturnNode();
-                _hasReturnNode = true;
-                MatchToken(SyntaxType.Semicolon);
                 return ret;
             }
             case { Type: SyntaxType.Keyword, Text: "return" }:
             {
                 _position++;
                 var ret = new ReturnNode(ParseExpression(null!));
-                _hasReturnNode = true;
                 MatchToken(SyntaxType.Semicolon);
                 return ret;
             }
@@ -521,7 +524,7 @@ public sealed class Parser
         if (Peek().Type == SyntaxType.RSqBracket)
             throw new InvalidOperationException("Array length not specified!");
 
-        var expr = ParseExpression(null!); // TODO: Is this right?
+        var expr = ParseExpression(null!);
         MatchToken(SyntaxType.RSqBracket);
 
         return new ArrayNode(secondTypeToken.Text, expr);
@@ -540,9 +543,11 @@ public sealed class Parser
         if (Peek() is { Type: SyntaxType.Keyword, Text: "else" })
         {
             _position++;
-            var elseBlockNode = ParseScopedStatements();
 
-            return new IfNode(conditionNode, blockNode, elseBlockNode);
+            if (Peek() is { Type: SyntaxType.Keyword, Text: "if" })
+                return new IfNode(conditionNode, blockNode, ParseIfExpression(secondTypeToken));
+
+            return new IfNode(conditionNode, blockNode, ParseScopedStatements());
         }
 
         return new IfNode(conditionNode, blockNode);
@@ -608,12 +613,7 @@ public sealed class Parser
             secondReturnType = current;
         }
 
-        var block = ParseScopedStatements();
-
-        if (!_hasReturnNode)
-            block.Nodes.Add(new ReturnNode());
-        else
-            _hasReturnNode = false;
+        var block = ParseScopedStatements(true);
 
         return new FunctionDefinitionNode(nameToken.Text, args, returnType.Text,
             secondReturnType is null ? string.Empty : secondReturnType.Text, block, isPublic, isStatic, isNative);
