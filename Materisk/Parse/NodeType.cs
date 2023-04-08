@@ -33,9 +33,10 @@ public enum NodeType
     While,
     UsingDefinition,
     ModuleDefinition,
+    StructDefinition,
     FieldDefinition,
     FunctionDefinition,
     Instantiate,
-    Free,
+    Deallocate,
     StackInstantiate,
 }

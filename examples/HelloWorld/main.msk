@@ -10,6 +10,14 @@ mod dyn Test
 	}
 }
 
+stc dyn Rectangle
+{
+	fld pub x u32;
+	fld pub y u32;
+	fld pub width u32;
+	fld pub height u32;
+}
+
 mod pub Program
 {
 	fn pub main() void
@@ -25,5 +33,10 @@ mod pub Program
 		}
 
 		dealloc test;
+
+		var rectangle ptr Rectangle = (ptr Rectangle)Memory.allocate(sizeof Rectangle); // TODO: sizeof stc
+		rectangle->x = 5; // TODO: -> syntax
+
+		Memory.free(rectangle);
 	}
 }

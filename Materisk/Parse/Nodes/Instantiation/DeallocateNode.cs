@@ -12,7 +12,7 @@ internal class DeallocateNode : SyntaxNode
         _identifierNode = identifierNode;
     }
 
-    public override NodeType Type => NodeType.Free;
+    public override NodeType Type => NodeType.Deallocate;
 
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {

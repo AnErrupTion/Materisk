@@ -119,6 +119,10 @@ public sealed class Parser
             {
                 return ParseModuleDefinition();
             }
+            case { Type: SyntaxType.Keyword, Text: "stc" }:
+            {
+                return ParseStructDefinition();
+            }
         }
 
         var exprNode = ParseExpression(null!);
@@ -153,23 +157,54 @@ public sealed class Parser
         var moduleName = MatchToken(SyntaxType.Identifier);
 
         MatchToken(SyntaxType.LBraces);
-        var body = ParseModuleBody(isStatic);
+
+        var body = new List<SyntaxNode>();
+
+        while (Peek() is { Type: SyntaxType.Keyword, Text: "fld" })
+            body.Add(ParseFieldExpression(isStatic));
+
+        while (Peek() is { Type: SyntaxType.Keyword, Text: "fn" })
+            body.Add(ParseFunctionDefinition(isStatic));
+
         MatchToken(SyntaxType.RBraces);
 
         return new ModuleDefinitionNode(moduleName.Text, body, isPublic, isStatic);
     }
 
-    private List<SyntaxNode> ParseModuleBody(bool isStatic)
+    private SyntaxNode ParseStructDefinition()
     {
-        var nodes = new List<SyntaxNode>();
+        MatchKeyword("stc");
+
+        var isPublic = false;
+        var isStatic = true;
+
+        if (Peek() is { Type: SyntaxType.Keyword, Text: "pub" })
+        {
+            _position++;
+            isPublic = true;
+        }
+
+        if (Peek() is { Type: SyntaxType.Keyword, Text: "dyn" })
+        {
+            _position++;
+            isStatic = false;
+        }
+
+        if (isStatic)
+            throw new InvalidOperationException("Can not have static structs!");
+
+        var moduleName = MatchToken(SyntaxType.Identifier);
+
+        MatchToken(SyntaxType.LBraces);
+
+        var body = new List<SyntaxNode>();
 
         while (Peek() is { Type: SyntaxType.Keyword, Text: "fld" })
-            nodes.Add(ParseFieldExpression(isStatic));
+            body.Add(ParseFieldExpression(isStatic));
 
-        while (Peek() is { Type: SyntaxType.Keyword, Text: "fn" })
-            nodes.Add(ParseFunctionDefinition(isStatic));
+        MatchToken(SyntaxType.RBraces);
 
-        return nodes;
+        return new StructDefinitionNode(moduleName.Text, body, isPublic);
     }
 
     private SyntaxNode ParseExpression(SyntaxToken? secondTypeToken)
@@ -291,7 +326,7 @@ public sealed class Parser
     {
         var current = Peek();
         var lookAhead = Peek(1);
-        
+
         if (current.Type is SyntaxType.LParen && lookAhead.Text
                 is "u8" or "u16" or "u32" or "u64"
                 or "i8" or "i16" or "i32" or "i64"

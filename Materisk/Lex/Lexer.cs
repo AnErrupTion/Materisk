@@ -353,6 +353,7 @@ public sealed class Lexer
         or "var" or "fld" or "mut"
         or "using"
         or "alloc" or "dealloc" or "stackalloc"
-        or "fn" or "mod" or "dyn" or "pub" or "native" or "ext" or "impl"
+        or "fn" or "mod" or "stc"
+        or "dyn" or "pub" or "native" or "ext" or "impl"
         or "true" or "false";
 }

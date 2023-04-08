@@ -18,14 +18,14 @@ public sealed class MateriskType : MateriskUnit
         Methods = new();
     }
 
-    public void BuildStruct()
+    public void BuildStruct(bool packed)
     {
         var fields = new LLVMTypeRef[Fields.Count];
 
         for (var i = 0; i < fields.Length; i++)
             fields[i] = Fields[i].Type;
 
-        Type = LLVMTypeRef.CreateStruct(fields, false);
+        Type = LLVMTypeRef.CreateStruct(fields, packed);
     }
 
     public override LLVMValueRef Load() => throw new NotImplementedException();
