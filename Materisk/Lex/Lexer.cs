@@ -350,7 +350,7 @@ public sealed class Lexer
         is "return" or "continue" or "break"
         or "if" or "elif" or "else"
         or "for" or "while" or "fn" or "var" or "fld" or "mut" or "as"
-        or "using" or "native" or "ext" or "impl" or "alloc"
+        or "using" or "native" or "ext" or "impl" or "alloc" or "stackalloc"
         or "mod" or "dyn" or "pub"
         or "true" or "false";
 }

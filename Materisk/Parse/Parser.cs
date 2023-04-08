@@ -4,6 +4,7 @@ using Materisk.Parse.Nodes;
 using Materisk.Parse.Nodes.Branch;
 using Materisk.Parse.Nodes.Definition;
 using Materisk.Parse.Nodes.Identifier;
+using Materisk.Parse.Nodes.Instantiation;
 using Materisk.Parse.Nodes.Literal;
 using Materisk.Parse.Nodes.Misc;
 using Materisk.Parse.Nodes.Operator;
@@ -500,6 +501,7 @@ public sealed class Parser
             SyntaxType.Keyword when current.Text == "for" => ParseForExpression(secondTypeToken),
             SyntaxType.Keyword when current.Text == "while" => ParseWhileExpression(secondTypeToken),
             SyntaxType.Keyword when current.Text == "alloc" => ParseInstantiateExpression(secondTypeToken),
+            SyntaxType.Keyword when current.Text == "stackalloc" => ParseStackInstantiateExpression(secondTypeToken),
             _ => throw new InvalidOperationException($"Unexpected token {Peek().Type} at position {Peek().Position} in atom expression!")
         };
     }
@@ -701,6 +703,35 @@ public sealed class Parser
         }
 
         return new InstantiateNode(ident.Text, argumentNodes);
+    }
+
+    private SyntaxNode ParseStackInstantiateExpression(SyntaxToken? secondTypeToken)
+    {
+        _position++;
+        var ident = MatchToken(SyntaxType.Identifier);
+
+        var argumentNodes = new List<SyntaxNode>();
+
+        if (Peek().Type is SyntaxType.LParen)
+        {
+            _position++;
+
+            if (Peek().Type is not SyntaxType.RParen)
+            {
+                argumentNodes.Add(ParseExpression(secondTypeToken));
+
+                while (Peek().Type is SyntaxType.Comma)
+                {
+                    _position++;
+
+                    argumentNodes.Add(ParseExpression(secondTypeToken));
+                }
+
+                MatchToken(SyntaxType.RParen);
+            } else _position++;
+        }
+
+        return new StackInstantiateNode(ident.Text, argumentNodes);
     }
 
     private List<MethodArgument> ParseFunctionArgs()

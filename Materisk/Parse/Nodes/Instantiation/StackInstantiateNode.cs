@@ -2,14 +2,14 @@
 using Materisk.TypeSystem;
 using Materisk.Utils;
 
-namespace Materisk.Parse.Nodes.Misc;
+namespace Materisk.Parse.Nodes.Instantiation;
 
-internal class InstantiateNode : SyntaxNode
+internal class StackInstantiateNode : SyntaxNode
 {
     private readonly string _identifier;
     private readonly List<SyntaxNode> _argumentNodes;
 
-    public InstantiateNode(string identifier, List<SyntaxNode> argumentNodes)
+    public StackInstantiateNode(string identifier, List<SyntaxNode> argumentNodes)
     {
         _identifier = identifier;
         _argumentNodes = argumentNodes;
@@ -21,39 +21,21 @@ internal class InstantiateNode : SyntaxNode
     {
         MateriskType? constructorType = null;
         MateriskMethod? constructor = null;
-        MateriskMethod? allocate = null;
 
         foreach (var mType in module.Types)
             foreach (var mMethod in mType.Methods)
-            {
-                if (allocate is not null && constructor is not null && constructorType is not null)
-                    break;
-
                 if (mType.Name == _identifier && mMethod.Name is "ctor")
                 {
                     constructorType = mType;
                     constructor = mMethod;
+                    break;
                 }
-                else if (mType.Name is "Memory" && mMethod.Name is "allocate")
-                {
-                    allocate = mMethod;
-                }
-            }
 
         if (constructorType is null || constructor is null)
             throw new InvalidOperationException($"Unable to find constructor for type: {module.Name}.{_identifier}");
 
-        if (allocate is null)
-            throw new InvalidOperationException($"Unable to find method: Memory.allocate()");
-
-        // Allocate a new struct
-        var newStruct = module.LlvmBuilder.BuildCall2(
-            allocate.Type,
-            allocate.LlvmMethod,
-            new[] { LLVMValueRef.CreateConstInt(
-                LLVMTypeRef.Int64,
-                LlvmUtils.GetAllocateSize(constructorType.Fields) / 8,
-                true) });
+        // Allocate a new struct on the stack
+        var newStruct = module.LlvmBuilder.BuildAlloca(constructorType.Type);
 
         // Construct arguments
         var args = new LLVMValueRef[_argumentNodes.Count + 1];
