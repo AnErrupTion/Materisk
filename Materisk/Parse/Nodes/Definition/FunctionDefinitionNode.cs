@@ -32,7 +32,7 @@ internal class FunctionDefinitionNode : SyntaxNode
         IsNativeImpl = isNativeImpl;
     }
 
-    public override NodeType Type => NodeType.ModuleFunctionDefinition;
+    public override NodeType Type => NodeType.FunctionDefinition;
 
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {

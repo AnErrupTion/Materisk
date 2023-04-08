@@ -32,10 +32,10 @@ public enum NodeType
     Cast,
     While,
     UsingDefinition,
-    FunctionDefinition,
-    FieldDefinition,
-    ModuleFieldDefinition,
-    Instantiate,
     ModuleDefinition,
-    ModuleFunctionDefinition
+    FieldDefinition,
+    FunctionDefinition,
+    Instantiate,
+    Free,
+    StackInstantiate,
 }

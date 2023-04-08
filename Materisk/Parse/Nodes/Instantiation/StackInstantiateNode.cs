@@ -1,6 +1,5 @@
 ﻿using LLVMSharp.Interop;
 using Materisk.TypeSystem;
-using Materisk.Utils;
 
 namespace Materisk.Parse.Nodes.Instantiation;
 
@@ -15,7 +14,7 @@ internal class StackInstantiateNode : SyntaxNode
         _argumentNodes = argumentNodes;
     }
 
-    public override NodeType Type => NodeType.Instantiate;
+    public override NodeType Type => NodeType.StackInstantiate;
 
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {

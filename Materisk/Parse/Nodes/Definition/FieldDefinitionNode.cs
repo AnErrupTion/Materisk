@@ -21,7 +21,7 @@ internal class FieldDefinitionNode : SyntaxNode
         _secondType = secondType;
     }
 
-    public override NodeType Type => NodeType.ModuleFieldDefinition;
+    public override NodeType Type => NodeType.FieldDefinition;
 
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {

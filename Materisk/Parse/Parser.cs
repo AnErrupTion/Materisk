@@ -501,6 +501,7 @@ public sealed class Parser
             SyntaxType.Keyword when current.Text == "for" => ParseForExpression(secondTypeToken),
             SyntaxType.Keyword when current.Text == "while" => ParseWhileExpression(secondTypeToken),
             SyntaxType.Keyword when current.Text == "alloc" => ParseInstantiateExpression(secondTypeToken),
+            SyntaxType.Keyword when current.Text == "dealloc" => ParseDeallocateExpression(secondTypeToken),
             SyntaxType.Keyword when current.Text == "stackalloc" => ParseStackInstantiateExpression(secondTypeToken),
             _ => throw new InvalidOperationException($"Unexpected token {Peek().Type} at position {Peek().Position} in atom expression!")
         };
@@ -703,6 +704,14 @@ public sealed class Parser
         }
 
         return new InstantiateNode(ident.Text, argumentNodes);
+    }
+
+    private SyntaxNode ParseDeallocateExpression(SyntaxToken? secondTypeToken)
+    {
+        _position++;
+        var expr = ParseExpression(secondTypeToken);
+
+        return new DeallocateNode(expr);
     }
 
     private SyntaxNode ParseStackInstantiateExpression(SyntaxToken? secondTypeToken)

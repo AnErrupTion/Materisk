@@ -16,12 +16,14 @@ mod pub Program
 	{
 		Console.println("Hello, World!");
 
-		var test Test = stackalloc Test();
+		var test Test = alloc Test();
 		var x u32 = test.x;
 
 		if (x == 9)
 		{
 			Console.println("Pass!");
 		}
+
+		dealloc test;
 	}
 }

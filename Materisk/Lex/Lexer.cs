@@ -347,10 +347,12 @@ public sealed class Lexer
     }
 
     private static bool IsKeyword(string text) => text
-        is "return" or "continue" or "break"
-        or "if" or "elif" or "else"
-        or "for" or "while" or "fn" or "var" or "fld" or "mut" or "as"
-        or "using" or "native" or "ext" or "impl" or "alloc" or "stackalloc"
-        or "mod" or "dyn" or "pub"
+        is "return"
+        or "if" or "else"
+        or "continue" or "break" or "for" or "while"
+        or "var" or "fld" or "mut"
+        or "using"
+        or "alloc" or "stackalloc" or "dealloc"
+        or "fn" or "mod" or "dyn" or "pub" or "native" or "ext" or "impl"
         or "true" or "false";
 }
