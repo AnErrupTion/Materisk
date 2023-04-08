@@ -352,7 +352,7 @@ public sealed class Lexer
         or "continue" or "break" or "for" or "while"
         or "var" or "fld" or "mut"
         or "using"
-        or "alloc" or "stackalloc" or "dealloc"
+        or "alloc" or "dealloc" or "stackalloc"
         or "fn" or "mod" or "dyn" or "pub" or "native" or "ext" or "impl"
         or "true" or "false";
 }
