@@ -15,7 +15,7 @@ internal static class LlvmNativeFuncImpl
         {
             case "Memory" when method.Name is "allocate":
             {
-                MallocType = LLVMTypeRef.CreateFunction(LlvmUtils.VoidPointer, new[] { LLVMTypeRef.Int32 });
+                MallocType = LLVMTypeRef.CreateFunction(LlvmUtils.VoidPointer, new[] { LLVMTypeRef.Int64 });
                 Malloc = module.LlvmModule.AddFunction("malloc", MallocType);
                 Malloc.Linkage = LLVMLinkage.LLVMExternalLinkage;
 

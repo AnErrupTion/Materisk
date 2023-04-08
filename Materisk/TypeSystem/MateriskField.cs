@@ -9,7 +9,7 @@ public sealed class MateriskField : MateriskUnit
     public readonly MateriskType ParentType;
     public readonly string Name;
 
-    public MateriskField(MateriskType type, string name, MateriskAttributes attributes, LLVMTypeRef fieldType, LLVMTypeRef pointerElementType, bool signed)
+    public MateriskField(MateriskType type, string name, MateriskAttributes attributes, string typeName, LLVMTypeRef fieldType, LLVMTypeRef pointerElementType, bool signed)
     {
         if (type.Attributes.HasFlag(MateriskAttributes.Static))
         {
@@ -20,6 +20,7 @@ public sealed class MateriskField : MateriskUnit
         ParentType = type;
         Name = name;
         Attributes = attributes;
+        TypeName = typeName;
         Type = fieldType;
         PointerElementType = pointerElementType;
         Signed = signed;

@@ -25,15 +25,32 @@ internal class FieldDefinitionNode : SyntaxNode
 
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
-        var pointerElementType = _type switch
+        string typeName;
+        LLVMTypeRef pointerElementType = null;
+
+        switch (_type)
         {
-            "ptr" or "arr" when !string.IsNullOrEmpty(_secondType) => TypeSigUtils.GetTypeSignatureFor(module, _secondType),
-            "str" => LLVMTypeRef.Int8,
-            _ => null
-        };
+            case "ptr" or "arr" when !string.IsNullOrEmpty(_secondType):
+            {
+                typeName = _secondType;
+                pointerElementType = TypeSigUtils.GetTypeSignatureFor(module, _secondType);
+                break;
+            }
+            case "str":
+            {
+                typeName = "str";
+                pointerElementType = LLVMTypeRef.Int8;
+                break;
+            }
+            default:
+            {
+                typeName = _type;
+                break;
+            }
+        }
 
         var newField = new MateriskField(type, _name,
-            MateriskAttributesUtils.CreateAttributes(_isPublic, _isStatic, false, false),
+            MateriskAttributesUtils.CreateAttributes(_isPublic, _isStatic, false, false), typeName,
             TypeSigUtils.GetTypeSignatureFor(module, _type), pointerElementType, _type[0] is 'i');
 
         type.Fields.Add(newField);

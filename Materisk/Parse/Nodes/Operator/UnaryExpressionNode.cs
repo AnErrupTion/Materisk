@@ -1,6 +1,5 @@
 ﻿using LLVMSharp.Interop;
 using Materisk.TypeSystem;
-using Materisk.Utils;
 
 namespace Materisk.Parse.Nodes.Operator;
 

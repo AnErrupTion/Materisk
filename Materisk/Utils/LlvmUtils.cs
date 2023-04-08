@@ -1,4 +1,5 @@
 using LLVMSharp.Interop;
+using Materisk.TypeSystem;
 
 namespace Materisk.Utils;
 
@@ -42,5 +43,31 @@ internal static class LlvmUtils
             LLVMCodeModel.LLVMCodeModelDefault);
         DataLayout = TargetMachine.CreateTargetDataLayout();
         NoStdLib = noStdLib;
+    }
+
+    public static ulong GetAllocateSize(List<MateriskField> fields)
+    {
+        ulong allocateSize = 0;
+
+        foreach (var field in fields)
+        {
+            if (field.Type.SubtypesCount > 0)
+            {
+                MateriskType? type = null;
+                foreach (var mType in field.ParentType.ParentModule.Types)
+                    if (mType.Name == field.TypeName)
+                    {
+                        type = mType;
+                        break;
+                    }
+
+                if (type is null)
+                    throw new InvalidOperationException($"Could not find type with name \"{field.TypeName}\" in module: {field.ParentType.ParentModule.Name}");
+
+                allocateSize += GetAllocateSize(type.Fields);
+            } else allocateSize += DataLayout.SizeOfTypeInBits(field.Type);
+        }
+
+        return allocateSize;
     }
 }

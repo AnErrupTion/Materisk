@@ -39,6 +39,6 @@ mod pub StringUtils
 
 mod pub Memory
 {
-	fn native pub allocate(u32 size) ptr void {}
+	fn native pub allocate(u64 size) ptr void {}
 	fn native pub free(ptr void pointer) void {}
 }
