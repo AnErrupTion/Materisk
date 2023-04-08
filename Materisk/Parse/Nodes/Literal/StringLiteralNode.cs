@@ -27,8 +27,9 @@ internal class StringLiteralNode : SyntaxNode
 
         var global = module.LlvmModule.AddGlobal(
             LLVMTypeRef.CreateArray(llvmType, (uint)(_text.Length + 1)),
-            $"str_{_text.GetHashCode()}");
+            $"str_{module.Counter++}");
         global.Initializer = LLVMValueRef.CreateConstArray(llvmType, values);
+        global.Linkage = LLVMLinkage.LLVMInternalLinkage;
         global.IsGlobalConstant = true;
         return global.ToMateriskValue();
     }

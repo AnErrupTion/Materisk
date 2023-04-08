@@ -8,6 +8,8 @@ public sealed class MateriskModule : MateriskUnit
     public LLVMModuleRef LlvmModule;
     public LLVMBuilderRef LlvmBuilder;
 
+    public uint Counter;
+
     public readonly string Name;
     public readonly List<MateriskType> Types;
 
@@ -15,6 +17,8 @@ public sealed class MateriskModule : MateriskUnit
     {
         LlvmModule = LLVMModuleRef.CreateWithName(name);
         LlvmBuilder = LLVMBuilderRef.Create(LLVMContextRef.Global);
+
+        Counter = 0;
 
         unsafe { LLVM.SetModuleDataLayout(LlvmModule, LlvmUtils.DataLayout); }
         LlvmModule.Target = LlvmUtils.TargetTriple;
