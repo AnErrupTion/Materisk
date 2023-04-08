@@ -18,22 +18,18 @@ internal class StringLiteralNode : SyntaxNode
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
         var llvmType = LLVMTypeRef.Int8;
-        var llvmValue = module.LlvmBuilder.BuildAlloca(LLVMTypeRef.CreateArray(llvmType, (uint)(_text.Length + 1)));
+        var values = new LLVMValueRef[_text.Length + 1];
 
-        // Store items
         for (var i = 0; i < _text.Length; i++)
-        {
-            var llvmChar = LLVMValueRef.CreateConstInt(llvmType, Convert.ToUInt64(_text[i]), true);
-            var llvmIndex = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, Convert.ToUInt64(i), true);
-            var llvmPtr = module.LlvmBuilder.BuildGEP2(llvmType, llvmValue, new[] { llvmIndex });
-            module.LlvmBuilder.BuildStore(llvmChar, llvmPtr);
-        }
+            values[i] = LLVMValueRef.CreateConstInt(llvmType, Convert.ToUInt64(_text[i]), true);
 
-        // Store null char
-        var charIndex = LLVMValueRef.CreateConstInt(LLVMTypeRef.Int32, Convert.ToUInt64(_text.Length), true);
-        var charPtr = module.LlvmBuilder.BuildGEP2(llvmType, llvmValue, new[] { charIndex });
-        module.LlvmBuilder.BuildStore(LlvmUtils.ByteZero, charPtr);
+        values[_text.Length] = LlvmUtils.ByteZero;
 
-        return llvmValue.ToMateriskValue();
+        var global = module.LlvmModule.AddGlobal(
+            LLVMTypeRef.CreateArray(llvmType, (uint)(_text.Length + 1)),
+            $"str_{_text.GetHashCode()}");
+        global.Initializer = LLVMValueRef.CreateConstArray(llvmType, values);
+        global.IsGlobalConstant = true;
+        return global.ToMateriskValue();
     }
 }
