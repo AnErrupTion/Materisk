@@ -8,9 +8,10 @@ public sealed class MateriskMethodArgument : MateriskUnit
     public readonly string Name;
     public LLVMValueRef Value;
 
-    public MateriskMethodArgument(string name, LLVMTypeRef type, LLVMTypeRef pointerElementType, bool signed)
+    public MateriskMethodArgument(string name, string typeName, LLVMTypeRef type, LLVMTypeRef pointerElementType, bool signed)
     {
         Name = name;
+        TypeName = typeName;
         Type = type;
         PointerElementType = pointerElementType;
         Signed = signed;

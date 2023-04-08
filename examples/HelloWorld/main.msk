@@ -14,9 +14,14 @@ mod pub Program
 {
 	fn pub main() void
 	{
-		var test ptr Test = alloc Test();
-		//var x u32 = test.x;
-
 		Console.println("Hello, World!");
+
+		var test ptr Test = alloc Test();
+		var x u32 = test.x;
+
+		if (x == 9)
+		{
+			Console.println("Pass!");
+		}
 	}
 }

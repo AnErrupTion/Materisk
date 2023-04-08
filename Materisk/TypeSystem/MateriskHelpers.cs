@@ -39,15 +39,33 @@ internal static class MateriskHelpers
             var firstType = arg.Type;
             var secondType = arg.SecondType;
             var argType = TypeSigUtils.GetTypeSignatureFor(module, firstType, secondType);
-            var pointerElementType = firstType switch
+
+            string typeName;
+            LLVMTypeRef pointerElementType = null;
+
+            switch (firstType)
             {
-                "ptr" or "arr" when !string.IsNullOrEmpty(secondType) => TypeSigUtils.GetTypeSignatureFor(module, secondType),
-                "str" => LLVMTypeRef.Int8,
-                _ => null
-            };
+                case "ptr" or "arr" when !string.IsNullOrEmpty(secondType):
+                {
+                    typeName = secondType;
+                    pointerElementType = TypeSigUtils.GetTypeSignatureFor(module, secondType);
+                    break;
+                }
+                case "str":
+                {
+                    typeName = "str";
+                    pointerElementType = LLVMTypeRef.Int8;
+                    break;
+                }
+                default:
+                {
+                    typeName = firstType;
+                    break;
+                }
+            }
 
             parameters.Add(argType);
-            argts.Add(new(arg.Name, argType, pointerElementType, firstType[0] is 'i'));
+            argts.Add(new(arg.Name, typeName, argType, pointerElementType, firstType[0] is 'i'));
         }
 
         var newMethod = new MateriskMethod(

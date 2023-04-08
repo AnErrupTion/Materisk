@@ -31,8 +31,8 @@ internal class DotNode : SyntaxNode
                     var name = rvn.Name;
                     var typeName = currentValue switch
                     {
-                        MateriskMethodArgument argument => argument.ParentMethod.ParentType.Name,
-                        MateriskLocalVariable variable => variable.ParentMethod.ParentType.Name,
+                        MateriskMethodArgument argument => argument.TypeName,
+                        MateriskLocalVariable variable => variable.TypeName,
                         MateriskType mType => mType.Name,
                         _ => method.ParentType.Name
                     };
@@ -54,8 +54,8 @@ internal class DotNode : SyntaxNode
                     if (mField is null)
                         throw new InvalidOperationException($"Unable to find field with name \"{name}\" in type: {module.Name}.{typeName}");
 
-                    if (currentValue is MateriskMethodArgument { Name: "self" } arg)
-                        currentValue = mField.LoadInstance(arg.Load(), mFieldIndex).ToMateriskValue();
+                    if (currentValue is MateriskMethodArgument or MateriskLocalVariable)
+                        currentValue = mField.LoadInstance(currentValue.Load(), mFieldIndex).ToMateriskValue();
                     else
                         currentValue = mField;
                     break;
@@ -65,7 +65,8 @@ internal class DotNode : SyntaxNode
                     var name = aen.Identifier;
                     var typeName = currentValue switch
                     {
-                        MateriskLocalVariable variable => variable.ParentMethod.ParentType.Name,
+                        MateriskMethodArgument argument => argument.TypeName,
+                        MateriskLocalVariable variable => variable.TypeName,
                         MateriskType mType => mType.Name,
                         _ => method.ParentType.Name
                     };
@@ -88,8 +89,8 @@ internal class DotNode : SyntaxNode
                     if (mField is null)
                         throw new InvalidOperationException($"Unable to find field with name \"{name}\" in module: {module.Name}");
 
-                    if (currentValue is MateriskMethodArgument { Name: "self" } arg)
-                        mField.StoreInstance(arg.Load(), mFieldIndex, value.Load());
+                    if (currentValue is MateriskMethodArgument or MateriskLocalVariable)
+                        mField.StoreInstance(currentValue.Load(), mFieldIndex, value.Load());
                     else
                         mField.Store(value.Load());
                     break;

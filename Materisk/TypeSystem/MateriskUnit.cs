@@ -6,6 +6,8 @@ public abstract class MateriskUnit
 {
     public MateriskAttributes Attributes { get; protected init; }
 
+    public string TypeName { get; protected init; }
+
     public LLVMTypeRef Type { get; protected set; }
 
     public LLVMTypeRef PointerElementType { get; protected init; }

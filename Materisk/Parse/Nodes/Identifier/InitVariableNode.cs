@@ -31,6 +31,7 @@ internal class InitVariableNode : SyntaxNode
         var value = _expr.Emit(module, type, method, thenBlock, elseBlock).Load();
         var valueType = value.TypeOf;
 
+        string typeName;
         LLVMTypeRef pointerElementType = null;
 
         switch (_type)
@@ -38,12 +39,19 @@ internal class InitVariableNode : SyntaxNode
             case "ptr" or "arr" when !string.IsNullOrEmpty(_secondType):
             {
                 value = module.LlvmBuilder.BuildIntToPtr(value, LLVMTypeRef.CreatePointer(valueType, 0));
+                typeName = _secondType;
                 pointerElementType = TypeSigUtils.GetTypeSignatureFor(module, _secondType);
                 break;
             }
             case "str":
             {
+                typeName = "str";
                 pointerElementType = LLVMTypeRef.Int8;
+                break;
+            }
+            default:
+            {
+                typeName = _type;
                 break;
             }
         }
@@ -55,7 +63,7 @@ internal class InitVariableNode : SyntaxNode
             module.LlvmBuilder.BuildStore(constValue, value);
         }
 
-        var variable = new MateriskLocalVariable(method, _name, _mutable, valueType, pointerElementType, _type[0] is 'i', value);
+        var variable = new MateriskLocalVariable(method, _name, _mutable, typeName, valueType, pointerElementType, _type[0] is 'i', value);
         method.Variables.Add(variable);
         return variable;
     }
