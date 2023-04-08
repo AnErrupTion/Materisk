@@ -36,8 +36,20 @@ internal static class MateriskHelpers
 
         foreach (var arg in args)
         {
-            var firstType = arg.Type;
-            var secondType = arg.SecondType;
+            string firstType;
+            string secondType;
+
+            if (arg.Name is "self" && !isStatic)
+            {
+                firstType = "ptr";
+                secondType = arg.Type;
+            }
+            else
+            {
+                firstType = arg.Type;
+                secondType = arg.SecondType;
+            }
+
             var argType = TypeSigUtils.GetTypeSignatureFor(module, firstType, secondType);
 
             string typeName;

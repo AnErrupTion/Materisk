@@ -4,7 +4,7 @@ mod dyn Test
 {
 	fld pub x u32;
 
-	fn pub ctor(ptr Test self) void
+	fn pub ctor(Test self) void
 	{
 		self.x = 9;
 	}
@@ -16,7 +16,7 @@ mod pub Program
 	{
 		Console.println("Hello, World!");
 
-		var test ptr Test = alloc Test();
+		var test Test = alloc Test();
 		var x u32 = test.x;
 
 		if (x == 9)
