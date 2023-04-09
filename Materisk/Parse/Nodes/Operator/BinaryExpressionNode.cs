@@ -71,8 +71,7 @@ internal class BinaryExpressionNode : SyntaxNode
                 ? module.LlvmBuilder.BuildFCmp(LLVMRealPredicate.LLVMRealOGE, leftValue, rightValue)
                 : module.LlvmBuilder.BuildICmp(LLVMIntPredicate.LLVMIntUGE, leftValue, rightValue),
             "&&" => module.LlvmBuilder.BuildAnd(leftValue, rightValue),
-            "||" => module.LlvmBuilder.BuildOr(leftValue, rightValue),
-            _ => throw new InvalidOperationException($"Trying to do a binary expression on: \"{_operator}\"")
+            "||" => module.LlvmBuilder.BuildOr(leftValue, rightValue)
         };
 
         return resultValue.ToMateriskValue();

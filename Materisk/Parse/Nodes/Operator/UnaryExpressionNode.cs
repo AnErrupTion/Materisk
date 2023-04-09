@@ -26,9 +26,7 @@ internal class UnaryExpressionNode : SyntaxNode
                 : throw new InvalidOperationException($"Trying to do a unary bang expression on: {value.TypeOf}"),
             "-" => value.TypeOf == LLVMTypeRef.Float || value.TypeOf == LLVMTypeRef.Double
                 ? module.LlvmBuilder.BuildFNeg(value)
-                : module.LlvmBuilder.BuildNeg(value),
-            "+" => value,
-            _ => throw new InvalidOperationException($"Trying to do a unary expression on: \"{_operator}\"")
+                : module.LlvmBuilder.BuildNeg(value)
         };
         return resultValue.ToMateriskValue();
     }
