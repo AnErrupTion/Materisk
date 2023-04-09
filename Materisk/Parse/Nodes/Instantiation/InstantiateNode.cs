@@ -19,32 +19,9 @@ internal class InstantiateNode : SyntaxNode
 
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
-        MateriskType? constructorType = null;
-        MateriskMethod? constructor = null;
-        MateriskMethod? allocate = null;
-
-        foreach (var mType in module.Types)
-            foreach (var mMethod in mType.Methods)
-            {
-                if (allocate is not null && constructor is not null && constructorType is not null)
-                    break;
-
-                if (mType.Name == _identifier && mMethod.Name is "ctor")
-                {
-                    constructorType = mType;
-                    constructor = mMethod;
-                }
-                else if (mType.Name is "Memory" && mMethod.Name is "allocate")
-                {
-                    allocate = mMethod;
-                }
-            }
-
-        if (constructorType is null || constructor is null)
-            throw new InvalidOperationException($"Unable to find constructor for type: {module.Name}.{_identifier}");
-
-        if (allocate is null)
-            throw new InvalidOperationException($"Unable to find method: Memory.allocate()");
+        // Get required methods
+        var (constructorType, constructor) = MateriskHelpers.GetOrCreateMethod(module, _identifier, "ctor");
+        var (_, allocate) = MateriskHelpers.GetOrCreateMethod(module, "Memory", "allocate");
 
         // Allocate a new struct on the heap
         var newStruct = module.LlvmBuilder.BuildCall2(

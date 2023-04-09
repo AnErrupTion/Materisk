@@ -19,29 +19,29 @@ internal class IdentifierNode : SyntaxNode
         if (Name is "self" && !method.Attributes.HasFlag(MateriskAttributes.Static))
             return method.Arguments[0];
 
-        foreach (var import in module.Imports)
-            if (import.Key == Name)
-                return import.Value;
-
-        foreach (var typeDef in module.Types)
-            if (typeDef.Name == Name)
-                return typeDef;
-
-        foreach (var field in module.Types[0].Fields)
-            if (field.Name == Name)
-                return field;
-
-        foreach (var meth in module.Types[0].Methods)
-            if (meth.Name == Name)
-                return meth;
+        foreach (var variable in method.Variables)
+            if (variable.Name == Name)
+                return variable;
 
         foreach (var arg in method.Arguments)
             if (arg.Name == Name)
                 return arg;
 
-        foreach (var variable in method.Variables)
-            if (variable.Name == Name)
-                return variable;
+        foreach (var meth in module.Types[0].Methods)
+            if (meth.Name == Name)
+                return meth;
+
+        foreach (var field in module.Types[0].Fields)
+            if (field.Name == Name)
+                return field;
+
+        foreach (var typeDef in module.Types)
+            if (typeDef.Name == Name)
+                return typeDef;
+
+        foreach (var import in module.Imports)
+            if (import.Key == Name)
+                return import.Value;
 
         throw new InvalidOperationException($"Unable to find value for identifier: {Name}");
     }

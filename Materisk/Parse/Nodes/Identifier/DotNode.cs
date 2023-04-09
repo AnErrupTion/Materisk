@@ -45,7 +45,6 @@ internal class DotNode : SyntaxNode
                     }
                     else
                     {
-                        var name = rvn.Name;
                         var typeName = currentValue switch
                         {
                             MateriskMethodArgument argument => argument.TypeName,
@@ -53,6 +52,7 @@ internal class DotNode : SyntaxNode
                             MateriskType mType => mType.Name,
                             _ => method.ParentType.Name
                         };
+                        var name = rvn.Name;
 
                         var mFieldIndex = 0U;
                         MateriskField? mField = null;
@@ -97,7 +97,6 @@ internal class DotNode : SyntaxNode
                     }
                     else
                     {
-                        var name = aen.Identifier;
                         var typeName = currentValue switch
                         {
                             MateriskMethodArgument argument => argument.TypeName,
@@ -105,6 +104,7 @@ internal class DotNode : SyntaxNode
                             MateriskType mType => mType.Name,
                             _ => method.ParentType.Name
                         };
+                        var name = aen.Identifier;
                         var value = aen.Expr.Emit(module, type, method, thenBlock, elseBlock);
 
                         var mFieldIndex = 0U;
@@ -133,20 +133,9 @@ internal class DotNode : SyntaxNode
                 }
                 case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:
                 {
-                    var name = cnIdentNode.Name;
                     var typeName = currentValue is MateriskType mType ? mType.Name : currentValue.ToString();
-    
-                    MateriskMethod? newMethod = null;
-                    foreach (var typeDef in module.Types)
-                        foreach (var meth in typeDef.Methods)
-                            if (typeDef.Name == typeName && meth.Name == name)
-                            {
-                                newMethod = meth;
-                                break;
-                            }
-
-                    if (newMethod == null)
-                        throw new InvalidOperationException($"Unable to find method with name \"{name}\" in module: {module.Name}");
+                    var name = cnIdentNode.Name;
+                    var (_, newMethod) = MateriskHelpers.GetOrCreateMethod(module, typeName!, name);
 
                     var args = cn.EmitArgs(module, type, method, thenBlock, elseBlock);
                     currentValue = module.LlvmBuilder.BuildCall2(newMethod.Type, newMethod.Load(), args).ToMateriskValue();

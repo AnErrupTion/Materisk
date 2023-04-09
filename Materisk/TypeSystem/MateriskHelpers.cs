@@ -15,14 +15,14 @@ internal static class MateriskHelpers
     public static MateriskModule CreateModuleEmit(string name, SyntaxNode rootNode)
     {
         if (!Directory.Exists("output")) Directory.CreateDirectory("output");
-        if (!Directory.Exists("llvm")) Directory.CreateDirectory("llvm");
+        //if (!Directory.Exists("llvm")) Directory.CreateDirectory("llvm");
 
         var module = new MateriskModule(name);
 
         rootNode.Emit(module, null!, null!, null!, null!);
 
-        module.LlvmModule.WriteBitcodeToFile($"llvm/{name}.ir");
-        module.LlvmModule.Dump();
+        /*module.LlvmModule.WriteBitcodeToFile($"llvm/{name}.ir");
+        module.LlvmModule.Dump();*/
         module.LlvmModule.Verify(LLVMVerifierFailureAction.LLVMAbortProcessAction);
 
         LlvmUtils.TargetMachine.EmitToFile(module.LlvmModule, $"output/{name}.o", LLVMCodeGenFileType.LLVMObjectFile);
@@ -90,5 +90,87 @@ internal static class MateriskHelpers
             argts.ToArray());
 
         return newMethod;
+    }
+
+    public static (MateriskType, MateriskMethod) GetOrCreateMethod(MateriskModule module, string typeName, string name)
+    {
+        MateriskType? newType = null;
+        MateriskMethod? newMethod = null;
+
+        foreach (var typeDef in module.Types)
+        {
+            if (typeDef.Name == typeName)
+                newType = typeDef;
+
+            foreach (var meth in typeDef.Methods)
+            {
+                if (newType is null || meth.Name != name)
+                    continue;
+
+                newMethod = meth;
+                break;
+            }
+        }
+
+        if (newType is null)
+        {
+            MateriskType? resolvedType = null;
+
+            foreach (var import in module.Imports)
+            {
+                foreach (var typeDef in import.Value.Types)
+                {
+                    if (typeDef.Name == typeName)
+                    {
+                        resolvedType = typeDef;
+                        break;
+                    }
+                }
+            }
+            
+            if (resolvedType is null)
+                throw new InvalidOperationException($"Unable to find type with name: {typeName}");
+
+            newType = new MateriskType(
+                module,
+                resolvedType.Name,
+                resolvedType.Attributes
+            );
+            module.Types.Add(newType);
+        }
+
+        if (newMethod is null)
+        {
+            MateriskMethod? resolvedMethod = null;
+
+            foreach (var import in module.Imports)
+            {
+                foreach (var typeDef in import.Value.Types)
+                {
+                    foreach (var meth in typeDef.Methods)
+                    {
+                        if (typeDef.Name != typeName || meth.Name != name)
+                            continue;
+
+                        resolvedMethod = meth;
+                        break;
+                    }
+                }
+            }
+
+            if (resolvedMethod is null)
+                throw new InvalidOperationException($"Unable to find method with name: {typeName}.{name}");
+
+            newMethod = new MateriskMethod(
+                newType,
+                name,
+                resolvedMethod.Attributes | MateriskAttributes.External,
+                resolvedMethod.Type,
+                resolvedMethod.Arguments
+            );
+            newType.Methods.Add(newMethod);
+        }
+
+        return (newType, newMethod);
     }
 }
