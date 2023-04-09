@@ -1,5 +1,6 @@
 //export "main";
 
+// TODO: Scoped using declarations
 using std = import "corelib.msk";
 
 mod dyn Test
@@ -38,7 +39,6 @@ mod pub Program
 
 		//var rectangle ptr Rectangle = (ptr Rectangle)std.Memory.allocate(sizeof Rectangle); // TODO: sizeof stc
 		//rectangle->x = 5; // TODO: -> syntax
-
 		//Memory.free(rectangle);
 	}
 }
