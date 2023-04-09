@@ -122,11 +122,73 @@ public sealed class Parser
             }
             case { Type: SyntaxType.Keyword, Text: "mod" }:
             {
-                return ParseModuleDefinition();
+                _position++;
+
+                var isPublic = false;
+                var isStatic = true;
+
+                if (Peek() is { Type: SyntaxType.Keyword, Text: "pub" })
+                {
+                    _position++;
+                    isPublic = true;
+                }
+
+                if (Peek() is { Type: SyntaxType.Keyword, Text: "dyn" })
+                {
+                    _position++;
+                    isStatic = false;
+                }
+
+                var moduleName = MatchToken(SyntaxType.Identifier);
+
+                MatchToken(SyntaxType.LBraces);
+
+                var body = new List<SyntaxNode>();
+
+                while (Peek() is { Type: SyntaxType.Keyword, Text: "fld" })
+                    body.Add(ParseFieldExpression(isStatic));
+
+                while (Peek() is { Type: SyntaxType.Keyword, Text: "fn" })
+                    body.Add(ParseFunctionDefinition(isStatic));
+
+                MatchToken(SyntaxType.RBraces);
+
+                return new ModuleDefinitionNode(moduleName.Text, body, isPublic, isStatic);
             }
             case { Type: SyntaxType.Keyword, Text: "stc" }:
             {
-                return ParseStructDefinition();
+                _position++;
+
+                var isPublic = false;
+                var isStatic = true;
+
+                if (Peek() is { Type: SyntaxType.Keyword, Text: "pub" })
+                {
+                    _position++;
+                    isPublic = true;
+                }
+
+                if (Peek() is { Type: SyntaxType.Keyword, Text: "dyn" })
+                {
+                    _position++;
+                    isStatic = false;
+                }
+
+                if (isStatic)
+                    throw new InvalidOperationException("Can not have static structs!");
+
+                var moduleName = MatchToken(SyntaxType.Identifier);
+
+                MatchToken(SyntaxType.LBraces);
+
+                var body = new List<SyntaxNode>();
+
+                while (Peek() is { Type: SyntaxType.Keyword, Text: "fld" })
+                    body.Add(ParseFieldExpression(isStatic));
+
+                MatchToken(SyntaxType.RBraces);
+
+                return new StructDefinitionNode(moduleName.Text, body, isPublic);
             }
         }
 
@@ -138,78 +200,6 @@ public sealed class Parser
             _position++;
 
         return exprNode;
-    }
-
-    private SyntaxNode ParseModuleDefinition()
-    {
-        MatchKeyword("mod");
-
-        var isPublic = false;
-        var isStatic = true;
-
-        if (Peek() is { Type: SyntaxType.Keyword, Text: "pub" })
-        {
-            _position++;
-            isPublic = true;
-        }
-
-        if (Peek() is { Type: SyntaxType.Keyword, Text: "dyn" })
-        {
-            _position++;
-            isStatic = false;
-        }
-
-        var moduleName = MatchToken(SyntaxType.Identifier);
-
-        MatchToken(SyntaxType.LBraces);
-
-        var body = new List<SyntaxNode>();
-
-        while (Peek() is { Type: SyntaxType.Keyword, Text: "fld" })
-            body.Add(ParseFieldExpression(isStatic));
-
-        while (Peek() is { Type: SyntaxType.Keyword, Text: "fn" })
-            body.Add(ParseFunctionDefinition(isStatic));
-
-        MatchToken(SyntaxType.RBraces);
-
-        return new ModuleDefinitionNode(moduleName.Text, body, isPublic, isStatic);
-    }
-
-    private SyntaxNode ParseStructDefinition()
-    {
-        MatchKeyword("stc");
-
-        var isPublic = false;
-        var isStatic = true;
-
-        if (Peek() is { Type: SyntaxType.Keyword, Text: "pub" })
-        {
-            _position++;
-            isPublic = true;
-        }
-
-        if (Peek() is { Type: SyntaxType.Keyword, Text: "dyn" })
-        {
-            _position++;
-            isStatic = false;
-        }
-
-        if (isStatic)
-            throw new InvalidOperationException("Can not have static structs!");
-
-        var moduleName = MatchToken(SyntaxType.Identifier);
-
-        MatchToken(SyntaxType.LBraces);
-
-        var body = new List<SyntaxNode>();
-
-        while (Peek() is { Type: SyntaxType.Keyword, Text: "fld" })
-            body.Add(ParseFieldExpression(isStatic));
-
-        MatchToken(SyntaxType.RBraces);
-
-        return new StructDefinitionNode(moduleName.Text, body, isPublic);
     }
 
     private SyntaxNode ParseExpression(SyntaxToken? secondTypeToken)

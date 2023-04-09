@@ -32,6 +32,7 @@ public enum NodeType
     Cast,
     While,
     UsingDefinition,
+    ExportDefinition,
     ModuleDefinition,
     StructDefinition,
     FieldDefinition,

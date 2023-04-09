@@ -58,15 +58,15 @@ internal class DotNode : SyntaxNode
                         MateriskField? mField = null;
 
                         foreach (var typeDef in module.Types)
-                        foreach (var field in typeDef.Fields)
-                        {
-                            if (typeDef.Name == typeName && field.Name == name)
+                            foreach (var field in typeDef.Fields)
                             {
-                                mField = field;
-                                break;
+                                if (typeDef.Name == typeName && field.Name == name)
+                                {
+                                    mField = field;
+                                    break;
+                                }
+                                mFieldIndex++;
                             }
-                            mFieldIndex++;
-                        }
 
                         if (mField is null)
                             throw new InvalidOperationException($"Unable to find field with name \"{name}\" in type: {module.Name}.{typeName}");
@@ -111,15 +111,15 @@ internal class DotNode : SyntaxNode
                         MateriskField? mField = null;
 
                         foreach (var typeDef in module.Types)
-                        foreach (var field in typeDef.Fields)
-                        {
-                            if (typeDef.Name == typeName && field.Name == name)
+                            foreach (var field in typeDef.Fields)
                             {
-                                mField = field;
-                                break;
+                                if (typeDef.Name == typeName && field.Name == name)
+                                {
+                                    mField = field;
+                                    break;
+                                }
+                                mFieldIndex++;
                             }
-                            mFieldIndex++;
-                        }
 
                         if (mField is null)
                             throw new InvalidOperationException($"Unable to find field with name \"{name}\" in module: {module.Name}");
