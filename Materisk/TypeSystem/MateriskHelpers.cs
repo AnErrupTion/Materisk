@@ -21,8 +21,8 @@ internal static class MateriskHelpers
 
         rootNode.Emit(module, null!, null!, null!, null!);
 
-        /*module.LlvmModule.WriteBitcodeToFile($"llvm/{name}.ir");
-        module.LlvmModule.Dump();*/
+        //module.LlvmModule.WriteBitcodeToFile($"llvm/{name}.ir");
+        module.LlvmModule.Dump();
         module.LlvmModule.Verify(LLVMVerifierFailureAction.LLVMAbortProcessAction);
 
         LlvmUtils.TargetMachine.EmitToFile(module.LlvmModule, $"output/{name}.o", LLVMCodeGenFileType.LLVMObjectFile);

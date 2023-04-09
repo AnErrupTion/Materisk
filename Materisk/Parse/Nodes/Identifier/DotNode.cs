@@ -54,25 +54,29 @@ internal class DotNode : SyntaxNode
                         };
                         var name = rvn.Name;
 
-                        var mFieldIndex = 0U;
+                        var mFieldIndex = 0;
                         MateriskField? mField = null;
 
                         foreach (var typeDef in module.Types)
-                            foreach (var field in typeDef.Fields)
+                        {
+                            for (var i = 0; i < typeDef.Fields.Count; i++)
                             {
-                                if (typeDef.Name == typeName && field.Name == name)
-                                {
-                                    mField = field;
-                                    break;
-                                }
-                                mFieldIndex++;
+                                var field = typeDef.Fields[i];
+
+                                if (typeDef.Name != typeName || field.Name != name)
+                                    continue;
+
+                                mField = field;
+                                mFieldIndex = i;
+                                break;
                             }
+                        }
 
                         if (mField is null)
                             throw new InvalidOperationException($"Unable to find field with name \"{name}\" in type: {module.Name}.{typeName}");
 
                         if (currentValue is MateriskMethodArgument or MateriskLocalVariable)
-                            currentValue = mField.LoadInstance(currentValue.Load(), mFieldIndex).ToMateriskValue();
+                            currentValue = mField.LoadInstance(currentValue.Load(), (uint)mFieldIndex).ToMateriskValue();
                         else
                             currentValue = mField;
                     }
@@ -107,25 +111,29 @@ internal class DotNode : SyntaxNode
                         var name = aen.Identifier;
                         var value = aen.Expr.Emit(module, type, method, thenBlock, elseBlock);
 
-                        var mFieldIndex = 0U;
+                        var mFieldIndex = 0;
                         MateriskField? mField = null;
 
                         foreach (var typeDef in module.Types)
-                            foreach (var field in typeDef.Fields)
+                        {
+                            for (var i = 0; i < typeDef.Fields.Count; i++)
                             {
-                                if (typeDef.Name == typeName && field.Name == name)
-                                {
-                                    mField = field;
-                                    break;
-                                }
-                                mFieldIndex++;
+                                var field = typeDef.Fields[i];
+
+                                if (typeDef.Name != typeName || field.Name != name)
+                                    continue;
+
+                                mField = field;
+                                mFieldIndex = i;
+                                break;
                             }
+                        }
 
                         if (mField is null)
                             throw new InvalidOperationException($"Unable to find field with name \"{name}\" in module: {module.Name}");
 
                         if (currentValue is MateriskMethodArgument or MateriskLocalVariable)
-                            mField.StoreInstance(currentValue.Load(), mFieldIndex, value.Load());
+                            mField.StoreInstance(currentValue.Load(), (uint)mFieldIndex, value.Load());
                         else
                             mField.Store(value.Load());
                     }

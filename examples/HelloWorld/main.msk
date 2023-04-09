@@ -12,6 +12,14 @@ mod dyn Test
 	}
 }
 
+stc dyn Rectangle
+{
+	fld pub x u32;
+	fld pub y u32;
+	fld pub width u32;
+	fld pub height u32;
+}
+
 mod pub Program
 {
 	fn pub main() void
