@@ -545,6 +545,7 @@ public sealed class Parser
             case SyntaxType.Keyword when current.Text is "alloc": return ParseInstantiateExpression(secondTypeToken);
             case SyntaxType.Keyword when current.Text is "dealloc": return ParseDeallocateExpression(secondTypeToken);
             case SyntaxType.Keyword when current.Text is "stackalloc": return ParseStackInstantiateExpression(secondTypeToken);
+            case SyntaxType.Keyword when current.Text is "sizeof": return ParseSizeofExpression();
             default:
             {
                 _diagnostics.Add(Diagnostic.Create(_path, current, "Unexpected token in atom expression!"));
@@ -791,6 +792,13 @@ public sealed class Parser
         }
 
         return new StackInstantiateNode(ident.Text, argumentNodes);
+    }
+
+    private SyntaxNode ParseSizeofExpression()
+    {
+        _position++;
+        var identifier = MatchToken(SyntaxType.Identifier).Text;
+        return new SizeofNode(new IdentifierNode(identifier));
     }
 
     private List<MethodArgument> ParseFunctionArgs()

@@ -27,6 +27,7 @@ public enum NodeType
     Identifier,
     Array,
     Index,
+    Sizeof,
     If,
     For,
     Cast,

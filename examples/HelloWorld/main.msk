@@ -37,8 +37,9 @@ mod pub Program
 
 		dealloc test;
 
-		//var rectangle ptr Rectangle = (ptr Rectangle)std.Memory.allocate(sizeof Rectangle); // TODO: sizeof stc
+		// TODO: sizeof for u8, i8, etc...
+		var rectangle ptr Rectangle = (ptr Rectangle)std.Memory.allocate(sizeof Rectangle);
 		//rectangle->x = 5; // TODO: -> syntax
-		//Memory.free(rectangle);
+		Memory.free((ptr void)rectangle);
 	}
 }

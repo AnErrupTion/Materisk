@@ -362,6 +362,7 @@ public sealed class Lexer
         or "using" or "import" or "export"
         or "alloc" or "dealloc" or "stackalloc"
         or "fn" or "mod" or "stc"
+        or "sizeof"
         or "dyn" or "pub" or "native" or "ext" or "impl"
         or "true" or "false";
 }
