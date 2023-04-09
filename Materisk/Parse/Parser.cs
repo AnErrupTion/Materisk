@@ -14,20 +14,24 @@ namespace Materisk.Parse;
 
 public sealed class Parser
 {
+    private readonly string _path;
     private readonly List<SyntaxToken> _tokens;
+    private readonly List<Diagnostic> _diagnostics;
 
     private int _position;
 
-    public Parser(List<SyntaxToken> tokens)
+    public Parser(string path, List<SyntaxToken> tokens, List<Diagnostic> diagnostics)
     {
+        _path = path;
         _tokens = tokens;
+        _diagnostics = diagnostics;
     }
 
     public SyntaxNode Parse()
     {
         var nodes = new List<SyntaxNode>();
 
-        while (Peek().Type != SyntaxType.Eof)
+        while (Peek().Type is not SyntaxType.Eof)
             nodes.Add(ParseStatement());
 
         return new BlockNode(nodes);
@@ -42,10 +46,10 @@ public sealed class Parser
         var nodes = new List<SyntaxNode>();
         var hasReturn = false;
 
-        while ((current = Peek()).Type != SyntaxType.RBraces)
+        while ((current = Peek()).Type is not SyntaxType.RBraces)
         {
-            if (current.Type == SyntaxType.Eof)
-                throw new InvalidOperationException($"Unclosed block at position: {current.Position}");
+            if (current.Type is SyntaxType.Eof)
+                _diagnostics.Add(Diagnostic.Create(_path, current, "Unclosed block"));
 
             var statement = ParseStatement(false);
             if (checkForReturn && statement is ReturnNode)
@@ -66,7 +70,7 @@ public sealed class Parser
     {
         switch (Peek())
         {
-            case { Type: SyntaxType.Keyword, Text: "return" } when Peek(1).Type == SyntaxType.Semicolon:
+            case { Type: SyntaxType.Keyword, Text: "return" } when Peek(1).Type is SyntaxType.Semicolon:
             {
                 _position += 2;
                 var ret = new ReturnNode();
@@ -100,15 +104,19 @@ public sealed class Parser
                 MatchToken(SyntaxType.Equals);
                 MatchKeyword("import");
 
-                var path = MatchToken(SyntaxType.String).Text;
+                var pathToken = MatchToken(SyntaxType.String);
+                var path = pathToken.Text;
                 MatchToken(SyntaxType.Semicolon);
 
                 if (!File.Exists(path))
-                    throw new InvalidOperationException($"Failed to import \"{path}\": File not found");
+                {
+                    _diagnostics.Add(Diagnostic.Create(_path, pathToken, "Import file was not found"));
+                    return new UsingDefinitionNode(identifier, null!);
+                }
 
-                var lexer = new Lexer(File.ReadAllText(path)); 
+                var lexer = new Lexer(path, _diagnostics); 
                 var lexedTokens = lexer.Lex(); 
-                var parser = new Parser(lexedTokens); 
+                var parser = new Parser(path, lexedTokens, _diagnostics); 
 
                 return new UsingDefinitionNode(identifier, parser.Parse());
             }
@@ -159,23 +167,26 @@ public sealed class Parser
             {
                 _position++;
 
+                var current = Peek();
                 var isPublic = false;
                 var isStatic = true;
 
-                if (Peek() is { Type: SyntaxType.Keyword, Text: "pub" })
+                if (current is { Type: SyntaxType.Keyword, Text: "pub" })
                 {
                     _position++;
                     isPublic = true;
                 }
 
-                if (Peek() is { Type: SyntaxType.Keyword, Text: "dyn" })
+                current = Peek();
+
+                if (current is { Type: SyntaxType.Keyword, Text: "dyn" })
                 {
                     _position++;
                     isStatic = false;
                 }
 
                 if (isStatic)
-                    throw new InvalidOperationException("Can not have static structs!");
+                    _diagnostics.Add(Diagnostic.Create(_path, current, "Can not have static structs!"));
 
                 var moduleName = MatchToken(SyntaxType.Identifier);
 
@@ -213,7 +224,7 @@ public sealed class Parser
             var ident = MatchToken(SyntaxType.Identifier);
 
             if (string.IsNullOrEmpty(ident.Text))
-                throw new InvalidOperationException("Can not assign to a non-existent identifier!");
+                _diagnostics.Add(Diagnostic.Create(_path, ident, "Can not assign to a non-existent identifier!"));
 
             var mutable = false;
 
@@ -234,14 +245,14 @@ public sealed class Parser
             if (current.Type is SyntaxType.Identifier)
                 secondType = MatchToken(SyntaxType.Identifier);
             else if (current.Type is not SyntaxType.Equals)
-                throw new InvalidOperationException($"Variable initialization needs an expression: {ident.Text}");
+                _diagnostics.Add(Diagnostic.Create(_path, current, "Variable initialization needs an expression!"));
 
             _position++;
             var expr = ParseExpression(secondType);
             return new InitVariableNode(mutable, ident.Text, type.Text, secondType is null ? string.Empty : secondType.Text, expr);
         }
 
-        if (current.Type == SyntaxType.Identifier && Peek(1).Type
+        if (current.Type is SyntaxType.Identifier && Peek(1).Type
                 is SyntaxType.Equals
                 or SyntaxType.PlusEquals or SyntaxType.PlusPlus
                 or SyntaxType.MinusEquals or SyntaxType.MinusMinus
@@ -253,7 +264,7 @@ public sealed class Parser
             var ident = MatchToken(SyntaxType.Identifier);
 
             if (string.IsNullOrEmpty(ident.Text))
-                throw new InvalidOperationException("Can not assign to a non-existent identifier!");
+                _diagnostics.Add(Diagnostic.Create(_path, ident, "Can not assign to a non-existent identifier!"));
 
             current = Peek();
 
@@ -329,7 +340,7 @@ public sealed class Parser
                 or "str" or "ptr" or "arr")
         {
             if (lookAhead.Text is "arr")
-                throw new InvalidOperationException("Can not cast type to array!");
+                _diagnostics.Add(Diagnostic.Create(_path, lookAhead, "Can not cast type to array!"));
 
             _position += 2;
 
@@ -381,7 +392,7 @@ public sealed class Parser
                         var ident = MatchToken(SyntaxType.Identifier);
 
                         if (string.IsNullOrEmpty(ident.Text))
-                            throw new InvalidOperationException("Can not assign to a non-existent identifier!");
+                            _diagnostics.Add(Diagnostic.Create(_path, ident, "Can not assign to a non-existent identifier!"));
 
                         MatchToken(SyntaxType.Equals);
                         var expr = ParseExpression(secondTypeToken);
@@ -483,7 +494,8 @@ public sealed class Parser
                 if (double.TryParse(numberText, CultureInfo.InvariantCulture, out var doubleNumber))
                     return new DoubleLiteralNode(doubleNumber);
 
-                throw new InvalidOperationException($"Unable to parse number: {numberText}");
+                _diagnostics.Add(Diagnostic.Create(_path, current, "Invalid number!"));
+                return null!;
             }
             case SyntaxType.String:
             {
@@ -526,15 +538,19 @@ public sealed class Parser
             }
         }
 
-        return current.Type switch
+        switch (current.Type)
         {
-            SyntaxType.Keyword when current.Text == "for" => ParseForExpression(secondTypeToken),
-            SyntaxType.Keyword when current.Text == "while" => ParseWhileExpression(secondTypeToken),
-            SyntaxType.Keyword when current.Text == "alloc" => ParseInstantiateExpression(secondTypeToken),
-            SyntaxType.Keyword when current.Text == "dealloc" => ParseDeallocateExpression(secondTypeToken),
-            SyntaxType.Keyword when current.Text == "stackalloc" => ParseStackInstantiateExpression(secondTypeToken),
-            _ => throw new InvalidOperationException($"Unexpected token {Peek().Type} at position {Peek().Position} in atom expression!")
-        };
+            case SyntaxType.Keyword when current.Text is "for": return ParseForExpression(secondTypeToken);
+            case SyntaxType.Keyword when current.Text is "while": return ParseWhileExpression(secondTypeToken);
+            case SyntaxType.Keyword when current.Text is "alloc": return ParseInstantiateExpression(secondTypeToken);
+            case SyntaxType.Keyword when current.Text is "dealloc": return ParseDeallocateExpression(secondTypeToken);
+            case SyntaxType.Keyword when current.Text is "stackalloc": return ParseStackInstantiateExpression(secondTypeToken);
+            default:
+            {
+                _diagnostics.Add(Diagnostic.Create(_path, current, "Unexpected token in atom expression!"));
+                return null!;
+            }
+        }
     }
 
     private SyntaxNode ParseIndexExpression(SyntaxToken? secondTypeToken)
@@ -558,17 +574,19 @@ public sealed class Parser
     private SyntaxNode ParseArrayExpression(SyntaxToken? secondTypeToken)
     {
         if (secondTypeToken is null)
-            throw new InvalidOperationException("Invalid array type!");
+            _diagnostics.Add(Diagnostic.Create(_path, secondTypeToken!, "Array type is null!"));
 
         MatchToken(SyntaxType.LSqBracket);
 
-        if (Peek().Type == SyntaxType.RSqBracket)
-            throw new InvalidOperationException("Array length not specified!");
+        var current = Peek();
+
+        if (current.Type is SyntaxType.RSqBracket)
+            _diagnostics.Add(Diagnostic.Create(_path, current, "Array length not specified!"));
 
         var expr = ParseExpression(null!);
         MatchToken(SyntaxType.RSqBracket);
 
-        return new ArrayNode(secondTypeToken.Text, expr);
+        return new ArrayNode(secondTypeToken is null ? string.Empty : secondTypeToken.Text, expr);
     }
 
     private SyntaxNode ParseIfExpression(SyntaxToken? secondTypeToken)
@@ -698,8 +716,10 @@ public sealed class Parser
             secondType = current;
         }
 
-        if (Peek().Type is SyntaxType.Equals)
-            throw new InvalidOperationException($"Can not initialize a field directly: {nameToken.Text}");
+        current = Peek();
+
+        if (current.Type is SyntaxType.Equals)
+            _diagnostics.Add(Diagnostic.Create(_path, current, "Can not initialize a field directly!"));
 
         MatchToken(SyntaxType.Semicolon);
 
@@ -794,7 +814,7 @@ public sealed class Parser
 
             args.Add(new(type.Text, secondType is null ? string.Empty : secondType.Text, ident.Text));
 
-            while (Peek().Type == SyntaxType.Comma)
+            while (Peek().Type is SyntaxType.Comma)
             {
                 _position++;
 
@@ -827,25 +847,21 @@ public sealed class Parser
     {
         var current = Peek();
 
-        if (current.Type == type)
-        {
-            _position++;
-            return current;
-        }
+        _position++;
 
-        throw new InvalidOperationException($"Unexpected token \"{current.Type}\" at position {_position}, expected: {type} ");
+        if (current.Type != type)
+            _diagnostics.Add(Diagnostic.Create(_path, current, $"Unexpected token of type \"{current.Type}\", expected: {type}"));
+
+        return current;
     }
 
     private void MatchKeyword(string value)
     {
         var current = Peek();
 
-        if (current.Type == SyntaxType.Keyword && current.Text == value)
-        {
-            _position++;
-            return;
-        }
+        _position++;
 
-        throw new InvalidOperationException($"Unexpected token \"{current.Type}\" at position {_position}, expected Keyword with value: {value} ");
+        if (current.Type is not SyntaxType.Keyword || current.Text != value)
+            _diagnostics.Add(Diagnostic.Create(_path, current, $"Unexpected token of type \"{current.Type}\", expected Keyword with value: {value}"));
     }
 }

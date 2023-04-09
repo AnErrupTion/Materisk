@@ -3,6 +3,7 @@ using Materisk.Emit;
 using Materisk.Lex;
 using Materisk.Parse;
 using Materisk.Parse.Nodes;
+using Materisk.Utils;
 
 namespace MateriskCLI;
 
@@ -21,6 +22,7 @@ public static class Program
         var directory = Path.GetDirectoryName(path);
         var name = Path.GetFileNameWithoutExtension(path);
         var watch = new Stopwatch();
+        var diagnostics = new List<Diagnostic>();
 
         if (!string.IsNullOrEmpty(directory))
         {
@@ -28,7 +30,7 @@ public static class Program
             path = Path.GetFileName(path);
         }
 
-        var lexer = new Lexer(File.ReadAllText(path));
+        var lexer = new Lexer(path, diagnostics);
 
         watch.Start();
         var lexedTokens = lexer.Lex();
@@ -36,17 +38,35 @@ public static class Program
 
         Console.WriteLine($"Lexed tokens in {watch.Elapsed.Milliseconds} ms ({watch.Elapsed.Seconds} s).");
 
+        if (diagnostics.Count > 0)
+        {
+            foreach (var diagnostic in diagnostics)
+                Console.WriteLine(diagnostic.Text);
+
+            Console.WriteLine("Found errors while lexing! Aborting.");
+            Environment.Exit(1);
+        }
+
         if (settings.ShowLexOutput)
             foreach (var tok in lexedTokens)
                 Console.WriteLine(tok.ToString());
 
-        var parser = new Parser(lexedTokens);
+        var parser = new Parser(path, lexedTokens, diagnostics);
 
         watch.Restart();
         var ast = parser.Parse();
         watch.Stop();
 
         Console.WriteLine($"Parsed nodes in {watch.Elapsed.Milliseconds} ms ({watch.Elapsed.Seconds} s).");
+
+        if (diagnostics.Count > 0)
+        {
+            foreach (var diagnostic in diagnostics)
+                Console.WriteLine(diagnostic.Text);
+
+            Console.WriteLine("Found errors while parsing! Aborting.");
+            Environment.Exit(1);
+        }
 
         if (settings.ShowParseOutput)
             PrintTree(ast);

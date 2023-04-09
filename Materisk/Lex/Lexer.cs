@@ -1,18 +1,23 @@
 ﻿using System.Text;
+using Materisk.Utils;
 
 namespace Materisk.Lex;
 
 public sealed class Lexer
 {
-    private readonly StringBuilder _builder;
+    private readonly string _path;
+    private readonly List<Diagnostic> _diagnostics;
     private readonly string _code;
+    private readonly StringBuilder _builder;
 
     private int _position;
 
-    public Lexer(string code)
+    public Lexer(string path, List<Diagnostic> diagnostics)
     {
+        _path = path;
+        _code = File.ReadAllText(path);
+        _diagnostics = diagnostics;
         _builder = new();
-        _code = code;
         _position = 0;
     }
 
@@ -236,7 +241,7 @@ public sealed class Lexer
                 else if (char.IsWhiteSpace(current))
                     _position++;
                 else
-                    throw new InvalidOperationException($"Bad token at position {_position} with text: {current}");
+                    _diagnostics.Add(Diagnostic.Create(_path, CreateBadToken(current.ToString()), "Bad character"));
 
                 continue;
             }
@@ -295,13 +300,14 @@ public sealed class Lexer
                 _position++;
 
                 current = Peek();
-                _builder.Append(current switch
+
+                switch (current)
                 {
-                    '"' => "\"",
-                    'n' => "\n",
-                    '\\' => "\\",
-                    _ => throw new InvalidOperationException($"Invalid escape sequence \"\\{current}\" at position: {_position}")
-                });
+                    case '"': _builder.Append('\"'); break;
+                    case 'n': _builder.Append('\n'); break;
+                    case '\\': _builder.Append('\\'); break;
+                    default: _diagnostics.Add(Diagnostic.Create(_path, CreateBadToken(current.ToString()), "Invalid escape sequence")); break;
+                }
 
                 _position++;
             }
@@ -345,6 +351,8 @@ public sealed class Lexer
 
         return new(SyntaxType.Number, _position - 1, _builder.ToString());
     }
+
+    private SyntaxToken CreateBadToken(string text) => new(SyntaxType.BadToken, _position, text);
 
     private static bool IsKeyword(string text) => text
         is "return"
