@@ -12,6 +12,7 @@ public sealed class MateriskModule : MateriskUnit
 
     public readonly string Name;
     public readonly List<MateriskType> Types;
+    public readonly Dictionary<string, MateriskModule> Imports;
 
     public MateriskModule(string name)
     {
@@ -25,6 +26,7 @@ public sealed class MateriskModule : MateriskUnit
 
         Name = name;
         Types = new();
+        Imports = new();
     }
 
     public override LLVMValueRef Load() => throw new NotSupportedException();

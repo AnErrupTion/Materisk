@@ -5,23 +5,28 @@ namespace Materisk.Parse.Nodes.Definition;
 
 internal class UsingDefinitionNode : SyntaxNode
 {
-    public readonly string Path;
-    public readonly SyntaxNode RootNode;
+    private readonly string _identifier;
+    private readonly SyntaxNode _rootNode;
+    private MateriskType? _lastType;
 
-    private MateriskType _lastType;
-
-    public UsingDefinitionNode(string path, SyntaxNode rootNode)
+    public UsingDefinitionNode(string identifier, SyntaxNode rootNode)
     {
-        Path = path;
-        RootNode = rootNode;
+        _identifier = identifier;
+        _rootNode = rootNode;
+        _lastType = null;
     }
 
     public override NodeType Type => NodeType.UsingDefinition;
 
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
-        WalkTree(RootNode, module);
-        return MateriskHelpers.CreateModuleEmit(System.IO.Path.GetFileNameWithoutExtension(Path), RootNode);
+        WalkTree(_rootNode, module);
+
+        var newModule = MateriskHelpers.CreateModuleEmit(_identifier, _rootNode);
+
+        module.Imports.Add(_identifier, newModule);
+
+        return newModule;
     }
     
     private void WalkTree(SyntaxNode node, MateriskModule module)
@@ -42,7 +47,7 @@ internal class UsingDefinitionNode : SyntaxNode
             {
                 var newMethod = MateriskHelpers.AddMethod(
                     module,
-                    _lastType,
+                    _lastType!,
                     funcNode.Name,
                     funcNode.Args,
                     funcNode.IsPublic,
@@ -51,7 +56,7 @@ internal class UsingDefinitionNode : SyntaxNode
                     true,
                     funcNode.ReturnType,
                     funcNode.SecondReturnType);
-                _lastType.Methods.Add(newMethod);
+                _lastType!.Methods.Add(newMethod);
                 break;
             }
         }

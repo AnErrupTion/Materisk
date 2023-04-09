@@ -28,19 +28,36 @@ internal class DotNode : SyntaxNode
             {
                 case IdentifierNode rvn:
                 {
-                    var name = rvn.Name;
-                    var typeName = currentValue switch
+                    if (currentValue is MateriskModule mModule)
                     {
-                        MateriskMethodArgument argument => argument.TypeName,
-                        MateriskLocalVariable variable => variable.TypeName,
-                        MateriskType mType => mType.Name,
-                        _ => method.ParentType.Name
-                    };
+                        var name = rvn.Name;
 
-                    var mFieldIndex = 0U;
-                    MateriskField? mField = null;
+                        MateriskType? mType = null;
 
-                    foreach (var typeDef in module.Types)
+                        foreach (var typeDef in mModule.Types)
+                            if (typeDef.Name == name)
+                            {
+                                mType = typeDef;
+                                break;
+                            }
+
+                        currentValue = mType ?? throw new InvalidOperationException($"Unable to find type with name \"{name}\" in module: {mModule.Name}");
+                    }
+                    else
+                    {
+                        var name = rvn.Name;
+                        var typeName = currentValue switch
+                        {
+                            MateriskMethodArgument argument => argument.TypeName,
+                            MateriskLocalVariable variable => variable.TypeName,
+                            MateriskType mType => mType.Name,
+                            _ => method.ParentType.Name
+                        };
+
+                        var mFieldIndex = 0U;
+                        MateriskField? mField = null;
+
+                        foreach (var typeDef in module.Types)
                         foreach (var field in typeDef.Fields)
                         {
                             if (typeDef.Name == typeName && field.Name == name)
@@ -51,31 +68,49 @@ internal class DotNode : SyntaxNode
                             mFieldIndex++;
                         }
 
-                    if (mField is null)
-                        throw new InvalidOperationException($"Unable to find field with name \"{name}\" in type: {module.Name}.{typeName}");
+                        if (mField is null)
+                            throw new InvalidOperationException($"Unable to find field with name \"{name}\" in type: {module.Name}.{typeName}");
 
-                    if (currentValue is MateriskMethodArgument or MateriskLocalVariable)
-                        currentValue = mField.LoadInstance(currentValue.Load(), mFieldIndex).ToMateriskValue();
-                    else
-                        currentValue = mField;
+                        if (currentValue is MateriskMethodArgument or MateriskLocalVariable)
+                            currentValue = mField.LoadInstance(currentValue.Load(), mFieldIndex).ToMateriskValue();
+                        else
+                            currentValue = mField;
+                    }
                     break;
                 }
                 case AssignExpressionNode aen:
                 {
-                    var name = aen.Identifier;
-                    var typeName = currentValue switch
+                    if (currentValue is MateriskModule mModule)
                     {
-                        MateriskMethodArgument argument => argument.TypeName,
-                        MateriskLocalVariable variable => variable.TypeName,
-                        MateriskType mType => mType.Name,
-                        _ => method.ParentType.Name
-                    };
-                    var value = aen.Expr.Emit(module, type, method, thenBlock, elseBlock);
+                        var name = aen.Identifier;
 
-                    var mFieldIndex = 0U;
-                    MateriskField? mField = null;
+                        MateriskType? mType = null;
 
-                    foreach (var typeDef in module.Types)
+                        foreach (var typeDef in mModule.Types)
+                            if (typeDef.Name == name)
+                            {
+                                mType = typeDef;
+                                break;
+                            }
+
+                        currentValue = mType ?? throw new InvalidOperationException($"Unable to find type with name \"{name}\" in module: {mModule.Name}");
+                    }
+                    else
+                    {
+                        var name = aen.Identifier;
+                        var typeName = currentValue switch
+                        {
+                            MateriskMethodArgument argument => argument.TypeName,
+                            MateriskLocalVariable variable => variable.TypeName,
+                            MateriskType mType => mType.Name,
+                            _ => method.ParentType.Name
+                        };
+                        var value = aen.Expr.Emit(module, type, method, thenBlock, elseBlock);
+
+                        var mFieldIndex = 0U;
+                        MateriskField? mField = null;
+
+                        foreach (var typeDef in module.Types)
                         foreach (var field in typeDef.Fields)
                         {
                             if (typeDef.Name == typeName && field.Name == name)
@@ -86,13 +121,14 @@ internal class DotNode : SyntaxNode
                             mFieldIndex++;
                         }
 
-                    if (mField is null)
-                        throw new InvalidOperationException($"Unable to find field with name \"{name}\" in module: {module.Name}");
+                        if (mField is null)
+                            throw new InvalidOperationException($"Unable to find field with name \"{name}\" in module: {module.Name}");
 
-                    if (currentValue is MateriskMethodArgument or MateriskLocalVariable)
-                        mField.StoreInstance(currentValue.Load(), mFieldIndex, value.Load());
-                    else
-                        mField.Store(value.Load());
+                        if (currentValue is MateriskMethodArgument or MateriskLocalVariable)
+                            mField.StoreInstance(currentValue.Load(), mFieldIndex, value.Load());
+                        else
+                            mField.Store(value.Load());
+                    }
                     break;
                 }
                 case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:

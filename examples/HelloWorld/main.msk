@@ -1,4 +1,6 @@
-using "corelib.msk";
+//export "main";
+
+using std = import "corelib.msk";
 
 mod dyn Test
 {
@@ -10,33 +12,25 @@ mod dyn Test
 	}
 }
 
-stc dyn Rectangle
-{
-	fld pub x u32;
-	fld pub y u32;
-	fld pub width u32;
-	fld pub height u32;
-}
-
 mod pub Program
 {
 	fn pub main() void
 	{
-		Console.println("Hello, World!");
+		std.Console.println("Hello, World!");
 
 		var test Test = alloc Test();
 		var x u32 = test.x;
 
 		if (x == 9)
 		{
-			Console.println("Pass!");
+			std.Console.println("Pass!");
 		}
 
 		dealloc test;
 
-		var rectangle ptr Rectangle = (ptr Rectangle)Memory.allocate(sizeof Rectangle); // TODO: sizeof stc
-		rectangle->x = 5; // TODO: -> syntax
+		//var rectangle ptr Rectangle = (ptr Rectangle)std.Memory.allocate(sizeof Rectangle); // TODO: sizeof stc
+		//rectangle->x = 5; // TODO: -> syntax
 
-		Memory.free(rectangle);
+		//Memory.free(rectangle);
 	}
 }

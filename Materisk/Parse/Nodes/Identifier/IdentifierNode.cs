@@ -19,6 +19,10 @@ internal class IdentifierNode : SyntaxNode
         if (Name is "self" && !method.Attributes.HasFlag(MateriskAttributes.Static))
             return method.Arguments[0];
 
+        foreach (var import in module.Imports)
+            if (import.Key == Name)
+                return import.Value;
+
         foreach (var typeDef in module.Types)
             if (typeDef.Name == Name)
                 return typeDef;

@@ -351,7 +351,7 @@ public sealed class Lexer
         or "if" or "else"
         or "continue" or "break" or "for" or "while"
         or "var" or "fld" or "mut"
-        or "using"
+        or "using" or "import" or "export"
         or "alloc" or "dealloc" or "stackalloc"
         or "fn" or "mod" or "stc"
         or "dyn" or "pub" or "native" or "ext" or "impl"

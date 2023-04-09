@@ -1,3 +1,5 @@
+//export "corelib";
+
 mod pub Console
 {
 	fn native pub print(str text) void {}

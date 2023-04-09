@@ -94,6 +94,11 @@ public sealed class Parser
             case { Type: SyntaxType.Keyword, Text: "using" }:
             {
                 _position++;
+                
+                var identifier = MatchToken(SyntaxType.Identifier).Text;
+
+                MatchToken(SyntaxType.Equals);
+                MatchKeyword("import");
 
                 var path = MatchToken(SyntaxType.String).Text;
                 MatchToken(SyntaxType.Semicolon);
@@ -105,7 +110,7 @@ public sealed class Parser
                 var lexedTokens = lexer.Lex(); 
                 var parser = new Parser(lexedTokens); 
 
-                return new UsingDefinitionNode(path, parser.Parse());
+                return new UsingDefinitionNode(identifier, parser.Parse());
             }
             case { Type: SyntaxType.Keyword, Text: "fld" }:
             {
