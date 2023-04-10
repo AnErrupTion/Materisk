@@ -34,8 +34,8 @@ internal class ForNode : SyntaxNode
         var conditionValue = module.LlvmBuilder.BuildCondBr(ifValue, llvmThenBlock, llvmElseBlock);
 
         module.LlvmBuilder.PositionAtEnd(llvmThenBlock);
-        _stepNode.Emit(module, type, method, llvmThenBlock, llvmElseBlock);
         _block.Emit(module, type, method, llvmThenBlock, llvmElseBlock).Load();
+        _stepNode.Emit(module, type, method, llvmThenBlock, llvmElseBlock);
 
         // To handle "break", "continue" and "return"
         if (module.LlvmBuilder.InsertBlock.LastInstruction is { InstructionOpcode: not LLVMOpcode.LLVMBr and not LLVMOpcode.LLVMRet })
