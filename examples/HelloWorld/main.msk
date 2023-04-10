@@ -48,7 +48,7 @@ mod pub Program
 		}
 
 		var rectangle ptr Rectangle = (ptr Rectangle)std.Memory.allocate(sizeof Rectangle);
-		//rectangle->x = 5; // TODO: -> syntax
+		rectangle->x = 5;
 		Memory.free((ptr void)rectangle);
 	}
 }

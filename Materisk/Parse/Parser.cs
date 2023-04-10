@@ -373,42 +373,78 @@ public sealed class Parser
             return expr;
         }
 
-        return ParseDotExpression(secondTypeToken);
+        return ParsePointerDotExpression(secondTypeToken);
+    }
+
+    private SyntaxNode ParsePointerDotExpression(SyntaxToken? secondTypeToken)
+    {
+        var dotNode = ParseDotExpression(secondTypeToken);
+        var nextNodes = new List<SyntaxNode>();
+
+        if (Peek().Type is not SyntaxType.PointerDot)
+            return dotNode;
+
+        while (Peek().Type is SyntaxType.PointerDot)
+        {
+            _position++;
+
+            if (Peek().Type is not SyntaxType.Identifier)
+                continue;
+
+            var current = Peek(1);
+
+            if (current.Type is not SyntaxType.Equals)
+                _diagnostics.Add(Diagnostic.Create(_path, current, "Can not call methods on a struct!"));
+
+            var ident = MatchToken(SyntaxType.Identifier);
+
+            if (string.IsNullOrEmpty(ident.Text))
+                _diagnostics.Add(Diagnostic.Create(_path, ident, "Can not assign to a non-existent identifier!"));
+
+            MatchToken(SyntaxType.Equals);
+            var expr = ParseExpression(secondTypeToken);
+
+            nextNodes.Add(new AssignExpressionNode(ident.Text, expr));
+        }
+
+        return new PointerDotNode(dotNode, nextNodes);
     }
 
     private SyntaxNode ParseDotExpression(SyntaxToken? secondTypeToken)
     {
         var callNode = ParseCallExpression(secondTypeToken);
-        var accessStack = new DotNode(callNode);
+        var nextNodes = new List<SyntaxNode>();
 
-        if (Peek().Type is SyntaxType.Dot)
-            while (Peek().Type is SyntaxType.Dot)
-            {
-                _position++;
-
-                if (Peek().Type is SyntaxType.Identifier)
-                    if (Peek(1).Type is SyntaxType.Equals)
-                    {
-                        var ident = MatchToken(SyntaxType.Identifier);
-
-                        if (string.IsNullOrEmpty(ident.Text))
-                            _diagnostics.Add(Diagnostic.Create(_path, ident, "Can not assign to a non-existent identifier!"));
-
-                        MatchToken(SyntaxType.Equals);
-                        var expr = ParseExpression(secondTypeToken);
-
-                        accessStack.NextNodes.Add(new AssignExpressionNode(ident.Text, expr));
-                    }
-                    else
-                    {
-                        var n = ParseCallExpression(secondTypeToken);
-                        accessStack.NextNodes.Add(n);
-                    }
-            }
-        else
+        if (Peek().Type is not SyntaxType.Dot)
             return callNode;
 
-        return accessStack;
+        while (Peek().Type is SyntaxType.Dot)
+        {
+            _position++;
+
+            if (Peek().Type is not SyntaxType.Identifier)
+                continue;
+
+            if (Peek(1).Type is SyntaxType.Equals)
+            {
+                var ident = MatchToken(SyntaxType.Identifier);
+
+                if (string.IsNullOrEmpty(ident.Text))
+                    _diagnostics.Add(Diagnostic.Create(_path, ident, "Can not assign to a non-existent identifier!"));
+
+                MatchToken(SyntaxType.Equals);
+                var expr = ParseExpression(secondTypeToken);
+
+                nextNodes.Add(new AssignExpressionNode(ident.Text, expr));
+            }
+            else
+            {
+                var n = ParseCallExpression(secondTypeToken);
+                nextNodes.Add(n);
+            }
+        }
+
+        return new DotNode(callNode, nextNodes);
     }
 
     private SyntaxNode ParseCallExpression(SyntaxToken? secondTypeToken)

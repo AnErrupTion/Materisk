@@ -4,14 +4,14 @@ using Materisk.TypeSystem;
 
 namespace Materisk.Parse.Nodes.Identifier;
 
-internal class DotNode : SyntaxNode
+internal class PointerDotNode : SyntaxNode
 {
-    private readonly SyntaxNode _callNode;
+    private readonly SyntaxNode _dotNode;
     private readonly List<SyntaxNode> _nextNodes;
 
-    public DotNode(SyntaxNode callNode, List<SyntaxNode> nextNodes)
+    public PointerDotNode(SyntaxNode dotNode, List<SyntaxNode> nextNodes)
     {
-        _callNode = callNode;
+        _dotNode = dotNode;
         _nextNodes = nextNodes;
     }
 
@@ -19,7 +19,7 @@ internal class DotNode : SyntaxNode
 
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
-        var currentValue = _callNode.Emit(module, type, method, thenBlock, elseBlock);
+        var currentValue = _dotNode.Emit(module, type, method, thenBlock, elseBlock);
 
         foreach (var node in _nextNodes)
         {
@@ -38,8 +38,8 @@ internal class DotNode : SyntaxNode
                             if (typeDef.Name != name)
                                 continue;
 
-                            if (typeDef.Attributes.HasFlag(MateriskAttributes.Struct))
-                                throw new InvalidOperationException($"Trying to use the dot syntax on a struct: {typeDef.ParentModule.Name}.{typeDef.Name}");
+                            if (!typeDef.Attributes.HasFlag(MateriskAttributes.Struct))
+                                throw new InvalidOperationException($"Trying to use the dot syntax on a module: {typeDef.ParentModule.Name}.{typeDef.Name}");
 
                             mType = typeDef;
                             break;
@@ -63,8 +63,8 @@ internal class DotNode : SyntaxNode
 
                         foreach (var typeDef in module.Types)
                         {
-                            if (typeDef.Name == typeName && typeDef.Attributes.HasFlag(MateriskAttributes.Struct))
-                                throw new InvalidOperationException($"Trying to use the dot syntax on a struct: {typeDef.ParentModule.Name}.{typeDef.Name}");
+                            if (typeDef.Name == typeName && !typeDef.Attributes.HasFlag(MateriskAttributes.Struct))
+                                throw new InvalidOperationException($"Trying to use the pointer dot syntax on a module: {typeDef.ParentModule.Name}.{typeDef.Name}");
 
                             for (var i = 0; i < typeDef.Fields.Count; i++)
                             {
@@ -102,8 +102,8 @@ internal class DotNode : SyntaxNode
                             if (typeDef.Name != name)
                                 continue;
 
-                            if (typeDef.Attributes.HasFlag(MateriskAttributes.Struct))
-                                throw new InvalidOperationException($"Trying to use the dot syntax on a struct: {typeDef.ParentModule.Name}.{typeDef.Name}");
+                            if (!typeDef.Attributes.HasFlag(MateriskAttributes.Struct))
+                                throw new InvalidOperationException($"Trying to use the dot syntax on a module: {typeDef.ParentModule.Name}.{typeDef.Name}");
 
                             mType = typeDef;
                             break;
@@ -128,8 +128,8 @@ internal class DotNode : SyntaxNode
 
                         foreach (var typeDef in module.Types)
                         {
-                            if (typeDef.Name == typeName && typeDef.Attributes.HasFlag(MateriskAttributes.Struct))
-                                throw new InvalidOperationException($"Trying to use the dot syntax on a struct: {typeDef.ParentModule.Name}.{typeDef.Name}");
+                            if (typeDef.Name == typeName && !typeDef.Attributes.HasFlag(MateriskAttributes.Struct))
+                                throw new InvalidOperationException($"Trying to use the pointer dot syntax on a module: {typeDef.ParentModule.Name}.{typeDef.Name}");
 
                             for (var i = 0; i < typeDef.Fields.Count; i++)
                             {
@@ -154,26 +154,6 @@ internal class DotNode : SyntaxNode
                     }
                     break;
                 }
-                case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:
-                {
-                    if (currentValue is MateriskType newType && newType.Attributes.HasFlag(MateriskAttributes.Struct))
-                        throw new InvalidOperationException($"Trying to use call a method on a struct: {newType.ParentModule.Name}.{newType.Name}");
-
-                    var typeName = currentValue switch
-                    {
-                        MateriskMethodArgument argument => argument.TypeName,
-                        MateriskLocalVariable variable => variable.TypeName,
-                        MateriskType mType => mType.Name,
-                        _ => method.ParentType.Name
-                    };
-                    var name = cnIdentNode.Name;
-                    var (_, newMethod) = MateriskHelpers.GetOrCreateMethod(module, typeName!, name);
-
-                    var args = cn.EmitArgs(module, type, method, thenBlock, elseBlock);
-                    currentValue = module.LlvmBuilder.BuildCall2(newMethod.Type, newMethod.Load(), args).ToMateriskValue();
-                    break;
-                }
-                case CallNode: throw new InvalidOperationException("Tried to call a non identifier in dot node stack.");
                 default: throw new InvalidOperationException("Unexpected node in dot node stack!");
             }
         }
@@ -183,7 +163,7 @@ internal class DotNode : SyntaxNode
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return _callNode;
+        yield return _dotNode;
         foreach (var node in _nextNodes) yield return node;
     }
 }

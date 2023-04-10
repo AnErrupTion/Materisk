@@ -127,6 +127,11 @@ public sealed class Lexer
                         _position++;
                         insertToken = new(SyntaxType.MinusEquals, _position, "-=");
                     }
+                    else if (lookAhead == '>')
+                    {
+                        _position++;
+                        insertToken = new(SyntaxType.PointerDot, _position, "->");
+                    }
                     else insertToken = new(SyntaxType.Minus, _position, "-");
 
                     break;
