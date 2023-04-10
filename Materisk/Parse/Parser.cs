@@ -394,12 +394,18 @@ public sealed class Parser
             var current = Peek(1);
 
             if (current.Type is not SyntaxType.Equals)
+            {
                 _diagnostics.Add(Diagnostic.Create(_path, current, "Can not call methods on a struct!"));
+                return null!;
+            }
 
             var ident = MatchToken(SyntaxType.Identifier);
 
             if (string.IsNullOrEmpty(ident.Text))
+            {
                 _diagnostics.Add(Diagnostic.Create(_path, ident, "Can not assign to a non-existent identifier!"));
+                return null!;
+            }
 
             MatchToken(SyntaxType.Equals);
             var expr = ParseExpression(secondTypeToken);
@@ -430,7 +436,10 @@ public sealed class Parser
                 var ident = MatchToken(SyntaxType.Identifier);
 
                 if (string.IsNullOrEmpty(ident.Text))
+                {
                     _diagnostics.Add(Diagnostic.Create(_path, ident, "Can not assign to a non-existent identifier!"));
+                    return null!;
+                }
 
                 MatchToken(SyntaxType.Equals);
                 var expr = ParseExpression(secondTypeToken);
@@ -611,19 +620,25 @@ public sealed class Parser
     private SyntaxNode ParseArrayExpression(SyntaxToken? secondTypeToken)
     {
         if (secondTypeToken is null)
+        {
             _diagnostics.Add(Diagnostic.Create(_path, secondTypeToken!, "Array type is null!"));
+            return null!;
+        }
 
         MatchToken(SyntaxType.LSqBracket);
 
         var current = Peek();
 
         if (current.Type is SyntaxType.RSqBracket)
+        {
             _diagnostics.Add(Diagnostic.Create(_path, current, "Array length not specified!"));
+            return null!;
+        }
 
         var expr = ParseExpression(null!);
         MatchToken(SyntaxType.RSqBracket);
 
-        return new ArrayNode(secondTypeToken is null ? string.Empty : secondTypeToken.Text, expr);
+        return new ArrayNode(secondTypeToken.Text, expr);
     }
 
     private SyntaxNode ParseIfExpression(SyntaxToken? secondTypeToken)
@@ -756,7 +771,10 @@ public sealed class Parser
         current = Peek();
 
         if (current.Type is SyntaxType.Equals)
+        {
             _diagnostics.Add(Diagnostic.Create(_path, current, "Can not initialize a field directly!"));
+            return null!;
+        }
 
         MatchToken(SyntaxType.Semicolon);
 
