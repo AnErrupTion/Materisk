@@ -19,6 +19,7 @@ stc dyn Rectangle
 	fld pub y u32;
 	fld pub width u32;
 	fld pub height u32;
+	fld pub test bool;
 }
 
 mod pub Program
@@ -37,7 +38,15 @@ mod pub Program
 
 		dealloc test;
 
-		// TODO: sizeof for u8, i8, etc...
+		if (sizeof bool == 1/8)
+		{
+			std.Console.println("Pass!");
+		}
+		else
+		{
+			std.Console.println("Fail!");
+		}
+
 		var rectangle ptr Rectangle = (ptr Rectangle)std.Memory.allocate(sizeof Rectangle);
 		//rectangle->x = 5; // TODO: -> syntax
 		Memory.free((ptr void)rectangle);

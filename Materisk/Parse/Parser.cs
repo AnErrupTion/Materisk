@@ -797,8 +797,7 @@ public sealed class Parser
     private SyntaxNode ParseSizeofExpression()
     {
         _position++;
-        var identifier = MatchToken(SyntaxType.Identifier).Text;
-        return new SizeofNode(new IdentifierNode(identifier));
+        return new SizeofNode(MatchToken(SyntaxType.Identifier).Text);
     }
 
     private List<MethodArgument> ParseFunctionArgs()
