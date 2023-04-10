@@ -52,9 +52,11 @@ internal class CastNode : SyntaxNode
                     default:
                     {
                         foreach (var mType in module.Types)
+                        {
                             if (mType.Name == _secondType)
-                                return module.LlvmBuilder.BuildPointerCast(llvmValue,
+                                return module.LlvmBuilder.BuildIntToPtr(llvmValue,
                                     LLVMTypeRef.CreatePointer(mType.Type, 0)).ToMateriskValue();
+                        }
 
                         throw new InvalidOperationException($"Can not cast to pointer type \"{_secondType}\" in method: {module.Name}.{type.Name}.{method.Name}");
                     }
