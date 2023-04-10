@@ -35,11 +35,16 @@ internal class DotNode : SyntaxNode
                         MateriskType? mType = null;
 
                         foreach (var typeDef in mModule.Types)
-                            if (typeDef.Name == name)
-                            {
-                                mType = typeDef;
-                                break;
-                            }
+                        {
+                            if (typeDef.Name != name)
+                                continue;
+
+                            if (typeDef.Attributes.HasFlag(MateriskAttributes.Struct))
+                                throw new InvalidOperationException($"Trying to use the dot syntax on a struct: {typeDef.ParentModule.Name}.{typeDef.Name}");
+
+                            mType = typeDef;
+                            break;
+                        }
 
                         currentValue = mType ?? throw new InvalidOperationException($"Unable to find type with name \"{name}\" in module: {mModule.Name}");
                     }
@@ -59,6 +64,9 @@ internal class DotNode : SyntaxNode
 
                         foreach (var typeDef in module.Types)
                         {
+                            if (typeDef.Name == typeName && typeDef.Attributes.HasFlag(MateriskAttributes.Struct))
+                                throw new InvalidOperationException($"Trying to use the dot syntax on a struct: {typeDef.ParentModule.Name}.{typeDef.Name}");
+
                             for (var i = 0; i < typeDef.Fields.Count; i++)
                             {
                                 var field = typeDef.Fields[i];
@@ -91,11 +99,16 @@ internal class DotNode : SyntaxNode
                         MateriskType? mType = null;
 
                         foreach (var typeDef in mModule.Types)
-                            if (typeDef.Name == name)
-                            {
-                                mType = typeDef;
-                                break;
-                            }
+                        {
+                            if (typeDef.Name != name)
+                                continue;
+
+                            if (typeDef.Attributes.HasFlag(MateriskAttributes.Struct))
+                                throw new InvalidOperationException($"Trying to use the dot syntax on a struct: {typeDef.ParentModule.Name}.{typeDef.Name}");
+
+                            mType = typeDef;
+                            break;
+                        }
 
                         currentValue = mType ?? throw new InvalidOperationException($"Unable to find type with name \"{name}\" in module: {mModule.Name}");
                     }
@@ -116,6 +129,9 @@ internal class DotNode : SyntaxNode
 
                         foreach (var typeDef in module.Types)
                         {
+                            if (typeDef.Name == typeName && typeDef.Attributes.HasFlag(MateriskAttributes.Struct))
+                                throw new InvalidOperationException($"Trying to use the dot syntax on a struct: {typeDef.ParentModule.Name}.{typeDef.Name}");
+
                             for (var i = 0; i < typeDef.Fields.Count; i++)
                             {
                                 var field = typeDef.Fields[i];
@@ -141,7 +157,16 @@ internal class DotNode : SyntaxNode
                 }
                 case CallNode { ToCallNode: IdentifierNode cnIdentNode } cn:
                 {
-                    var typeName = currentValue is MateriskType mType ? mType.Name : currentValue.ToString();
+                    if (currentValue is MateriskType newType && newType.Attributes.HasFlag(MateriskAttributes.Struct))
+                        throw new InvalidOperationException($"Trying to use call a method on a struct: {newType.ParentModule.Name}.{newType.Name}");
+
+                    var typeName = currentValue switch
+                    {
+                        MateriskMethodArgument argument => argument.TypeName,
+                        MateriskLocalVariable variable => variable.TypeName,
+                        MateriskType mType => mType.Name,
+                        _ => method.ParentType.Name
+                    };
                     var name = cnIdentNode.Name;
                     var (_, newMethod) = MateriskHelpers.GetOrCreateMethod(module, typeName!, name);
 
