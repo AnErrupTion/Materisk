@@ -254,8 +254,8 @@ public sealed class Parser
 
         if (current.Type is SyntaxType.Identifier && Peek(1).Type
                 is SyntaxType.Equals
-                or SyntaxType.PlusEquals or SyntaxType.PlusPlus
-                or SyntaxType.MinusEquals or SyntaxType.MinusMinus
+                or SyntaxType.PlusEquals
+                or SyntaxType.MinusEquals
                 or SyntaxType.MulEquals
                 or SyntaxType.DivEquals
                 or SyntaxType.ModEquals
@@ -279,14 +279,6 @@ public sealed class Parser
                     var identifier = new IdentifierNode(ident.Text);
                     var operatorToken = MatchToken(current.Type);
                     var expression = ParseExpression(secondTypeToken);
-                    return new AssignExpressionNode(ident.Text, new BinaryExpressionNode(identifier, operatorToken.Text, expression));
-                }
-                case SyntaxType.PlusPlus:
-                case SyntaxType.MinusMinus:
-                {
-                    var identifier = new IdentifierNode(ident.Text);
-                    var operatorToken = MatchToken(current.Type);
-                    var expression = new UIntLiteralNode(1);
                     return new AssignExpressionNode(ident.Text, new BinaryExpressionNode(identifier, operatorToken.Text, expression));
                 }
             }
@@ -408,7 +400,7 @@ public sealed class Parser
             }
             else
             {
-                var n = ParseCallExpression(secondTypeToken);
+                var n = ParseDotExpression(secondTypeToken);
                 nextNodes.Add(n);
             }
         }

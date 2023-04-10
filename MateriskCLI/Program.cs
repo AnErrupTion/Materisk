@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Materisk.Bind;
 using Materisk.Emit;
 using Materisk.Lex;
 using Materisk.Parse;
@@ -70,6 +71,14 @@ public static class Program
 
         if (settings.ShowParseOutput)
             PrintTree(ast);
+
+        var binder = new Binder(path, ast, diagnostics);
+
+        watch.Restart();
+        ast = binder.Bind();
+        watch.Stop();
+
+        Console.WriteLine($"Bound nodes in {watch.Elapsed.Milliseconds} ms ({watch.Elapsed.Seconds} s).");
 
         var emitter = new Emitter(name, ast);
 

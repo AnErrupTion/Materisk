@@ -7,7 +7,7 @@ public enum SyntaxType
     Keyword,
     Identifier,
     Equals,
-    PlusEquals, MinusEquals, ModEquals, MulEquals, DivEquals, PlusPlus, MinusMinus,
+    PlusEquals, MinusEquals, ModEquals, MulEquals, DivEquals,
     BangEquals, EqualsEquals, AndAnd, OrOr,
     LessThan, GreaterThan, GreaterThanEqu, LessThanEqu,
     Plus, Minus, Mod, Mul, Div,

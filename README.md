@@ -13,27 +13,3 @@ Materisk achieves these in part thanks to LLVM, which is a core dependency to th
 Materisk limits itself to the ANSI libc specification, which means it is extremely portable and that your code can be compiled for any system following that specification.
 
 Not only that, but Materisk implements many useful and time-saving features from OOP languages (such as instantiation) without becoming OOP, thanks to some compiler magic. However, it doesn't try to implement syntatic sugar (such as foreach loops), which only improve productivity in the short run.
-
-# Getting started
-
-Clone the repository:
-
-```
-git clone https://github.com/AnErrupTion/Materisk
-```
-
-Build the project:
-
-```
-cd Materisk
-dotnet build Materisk.sln
-```
-
-Build and run the Hello World example:
-
-```
-cd bin
-./MateriskCLI ../examples/HelloWorld/main.msk
-clang ../examples/HelloWorld/output/corelib.o ../examples/HelloWorld/output/main.o -o main
-./main
-```

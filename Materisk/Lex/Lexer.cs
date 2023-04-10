@@ -99,12 +99,7 @@ public sealed class Lexer
                 {
                     var lookAhead = Peek(1);
 
-                    if (lookAhead == '+')
-                    {
-                        _position++;
-                        insertToken = new(SyntaxType.PlusPlus, _position, "++");
-                    }
-                    else if (lookAhead == '=')
+                    if (lookAhead == '=')
                     {
                         _position++;
                         insertToken = new(SyntaxType.PlusEquals, _position, "+=");
@@ -117,12 +112,7 @@ public sealed class Lexer
                 {
                     var lookAhead = Peek(1);
 
-                    if (lookAhead == '-')
-                    {
-                        _position++;
-                        insertToken = new(SyntaxType.MinusMinus, _position, "--");
-                    }
-                    else if (lookAhead == '=')
+                    if (lookAhead == '=')
                     {
                         _position++;
                         insertToken = new(SyntaxType.MinusEquals, _position, "-=");
