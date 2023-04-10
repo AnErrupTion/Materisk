@@ -41,4 +41,5 @@ public enum NodeType
     Instantiate,
     Deallocate,
     StackInstantiate,
+    StructStackInstantiate
 }

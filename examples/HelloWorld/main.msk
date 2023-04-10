@@ -12,17 +12,21 @@ mod pub NativeImpl
 
 stc dyn VgaEntry
 {
-	fld pub x u32;
-	fld pub y u32;
-	fld pub width u32;
-	fld pub height u32;
-	fld pub test bool;
+	fld pub character u8;
+	fld pub color u8;
 }
 
 mod pub Program
 {
 	fn pub main() void
 	{
+		var entry ptr VgaEntry = alloca VgaEntry;
+		entry->character = 65;
+		entry->color = 15;
+
+		var pointer ptr VgaEntry = (ptr VgaEntry)0xB8000;
+		pointer[0] = entry;
+
 		while (true) {}
 	}
 }

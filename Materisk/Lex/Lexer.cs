@@ -329,32 +329,84 @@ public sealed class Lexer
 
     private SyntaxToken ParseNumber()
     {
+        var style = NumberStyle.Decimal;
+
         _builder.Clear();
 
         while (true)
         {
             var current = Peek();
-
-            if ((char.IsDigit(current) || current is '.') && current is not '\0')
-            {
-                _builder.Append(current);
-                _position++;
-                continue;
-            }
-
             var lookAhead = Peek(1);
 
-            if (char.IsLetter(current) && char.IsLetter(lookAhead))
+            switch (current)
             {
-                _builder.Append(current);
-                _builder.Append(lookAhead);
-                _position += 2;
+                case '0' when lookAhead is 'x':
+                {
+                    _position += 2;
+                    style = NumberStyle.Hexadecimal;
+                    continue;
+                }
+                case '0' when lookAhead is 'b':
+                {
+                    _position += 2;
+                    style = NumberStyle.Binary;
+                    continue;
+                }
+            }
+
+            switch (style)
+            {
+                case NumberStyle.Decimal:
+                {
+                    if ((char.IsDigit(current) || current is '.') && current is not '\0')
+                    {
+                        _builder.Append(current);
+                        _position++;
+                        continue;
+                    }
+
+                    if (char.IsLetter(current) && char.IsLetter(lookAhead))
+                    {
+                        _builder.Append(current);
+                        _builder.Append(lookAhead);
+                        _position += 2;
+                    }
+
+                    break;
+                }
+                case NumberStyle.Hexadecimal:
+                {
+                    if (char.IsDigit(current) || char.ToLowerInvariant(current) is 'a' or 'b' or 'c' or 'd' or 'e' or 'f')
+                    {
+                        _builder.Append(current);
+                        _position++;
+                        continue;
+                    }
+
+                    break;
+                }
+                case NumberStyle.Binary:
+                {
+                    if (current is '0' or '1')
+                    {
+                        _builder.Append(current);
+                        _position++;
+                        continue;
+                    }
+
+                    break;
+                }
             }
 
             break;
         }
 
-        return new(SyntaxType.Number, _position - 1, _builder.ToString());
+        return new(style switch
+        {
+            NumberStyle.Decimal => SyntaxType.Decimal,
+            NumberStyle.Hexadecimal => SyntaxType.Hexadecimal,
+            NumberStyle.Binary => SyntaxType.Binary
+        }, _position - 1, _builder.ToString());
     }
 
     private SyntaxToken CreateBadToken(string text) => new(SyntaxType.BadToken, _position, text);
@@ -365,7 +417,7 @@ public sealed class Lexer
         or "continue" or "break" or "for" or "while"
         or "var" or "fld" or "mut"
         or "using" or "import" or "export"
-        or "alloc" or "dealloc" or "stackalloc"
+        or "alloc" or "dealloc" or "stackalloc" or "alloca"
         or "fn" or "mod" or "stc"
         or "sizeof"
         or "dyn" or "pub" or "native" or "ext" or "impl"

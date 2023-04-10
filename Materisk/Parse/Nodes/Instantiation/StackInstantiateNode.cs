@@ -18,20 +18,7 @@ internal class StackInstantiateNode : SyntaxNode
 
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
-        MateriskType? constructorType = null;
-        MateriskMethod? constructor = null;
-
-        foreach (var mType in module.Types)
-            foreach (var mMethod in mType.Methods)
-                if (mType.Name == _identifier && mMethod.Name is "ctor")
-                {
-                    constructorType = mType;
-                    constructor = mMethod;
-                    break;
-                }
-
-        if (constructorType is null || constructor is null)
-            throw new InvalidOperationException($"Unable to find constructor for type: {module.Name}.{_identifier}");
+        var (constructorType, constructor) = MateriskHelpers.GetOrCreateMethod(module, _identifier, "ctor");
 
         // Allocate a new struct on the stack
         var newStruct = module.LlvmBuilder.BuildAlloca(constructorType.Type);

@@ -491,55 +491,61 @@ public sealed class Parser
 
         switch (current.Type)
         {
-            case SyntaxType.Number:
+            case SyntaxType.Decimal or SyntaxType.Hexadecimal or SyntaxType.Binary:
             {
                 _position++;
 
                 var numberText = current.Text;
+                var numberStyle = current.Type switch
+                {
+                    SyntaxType.Decimal => NumberStyles.Number,
+                    SyntaxType.Hexadecimal => NumberStyles.HexNumber,
+                    SyntaxType.Binary => NumberStyles.None // TODO
+                };
 
-                if (numberText.EndsWith("SB") && sbyte.TryParse(numberText[..^2], CultureInfo.InvariantCulture, out var sbyteNumber))
+                if (numberText.EndsWith("SB") && sbyte.TryParse(numberText[..^2], numberStyle, CultureInfo.InvariantCulture, out var sbyteNumber))
                     return new SByteLiteralNode(sbyteNumber);
 
-                if (numberText.EndsWith("UB") && byte.TryParse(numberText[..^2], CultureInfo.InvariantCulture, out var byteNumber))
+                if (numberText.EndsWith("UB") && byte.TryParse(numberText[..^2], numberStyle, CultureInfo.InvariantCulture, out var byteNumber))
                     return new ByteLiteralNode(byteNumber);
 
-                if (numberText.EndsWith("SS") && short.TryParse(numberText[..^2], CultureInfo.InvariantCulture, out var shortNumber))
+                if (numberText.EndsWith("SS") && short.TryParse(numberText[..^2], numberStyle, CultureInfo.InvariantCulture, out var shortNumber))
                     return new ShortLiteralNode(shortNumber);
 
-                if (numberText.EndsWith("US") && ushort.TryParse(numberText[..^2], CultureInfo.InvariantCulture, out var ushortNumber))
+                if (numberText.EndsWith("US") && ushort.TryParse(numberText[..^2], numberStyle, CultureInfo.InvariantCulture, out var ushortNumber))
                     return new UShortLiteralNode(ushortNumber);
 
-                if (numberText.EndsWith("SI") && int.TryParse(numberText[..^2], CultureInfo.InvariantCulture, out var intNumberExplicit))
+                if (numberText.EndsWith("SI") && int.TryParse(numberText[..^2], numberStyle, CultureInfo.InvariantCulture, out var intNumberExplicit))
                     return new IntLiteralNode(intNumberExplicit);
 
-                if (numberText.EndsWith("UI") && uint.TryParse(numberText[..^2], CultureInfo.InvariantCulture, out var uintNumberExplicit))
+                if (numberText.EndsWith("UI") && uint.TryParse(numberText[..^2], numberStyle, CultureInfo.InvariantCulture, out var uintNumberExplicit))
                     return new UIntLiteralNode(uintNumberExplicit);
 
-                if (numberText.EndsWith("SL") && long.TryParse(numberText[..^2], CultureInfo.InvariantCulture, out var longNumberExplicit))
+                if (numberText.EndsWith("SL") && long.TryParse(numberText[..^2], numberStyle, CultureInfo.InvariantCulture, out var longNumberExplicit))
                     return new LongLiteralNode(longNumberExplicit);
 
-                if (numberText.EndsWith("UL") && ulong.TryParse(numberText[..^2], CultureInfo.InvariantCulture, out var ulongNumberExplicit))
+                if (numberText.EndsWith("UL") && ulong.TryParse(numberText[..^2], numberStyle, CultureInfo.InvariantCulture, out var ulongNumberExplicit))
                     return new ULongLiteralNode(ulongNumberExplicit);
 
-                if (uint.TryParse(numberText, CultureInfo.InvariantCulture, out var uintNumber))
+                if (uint.TryParse(numberText, numberStyle, CultureInfo.InvariantCulture, out var uintNumber))
                     return new UIntLiteralNode(uintNumber);
 
-                if (ulong.TryParse(numberText, CultureInfo.InvariantCulture, out var ulongNumber))
+                if (ulong.TryParse(numberText, numberStyle, CultureInfo.InvariantCulture, out var ulongNumber))
                     return new ULongLiteralNode(ulongNumber);
 
-                if (int.TryParse(numberText, CultureInfo.InvariantCulture, out var intNumber))
+                if (int.TryParse(numberText, numberStyle, CultureInfo.InvariantCulture, out var intNumber))
                     return new IntLiteralNode(intNumber);
 
-                if (long.TryParse(numberText, CultureInfo.InvariantCulture, out var longNumber))
+                if (long.TryParse(numberText, numberStyle, CultureInfo.InvariantCulture, out var longNumber))
                     return new LongLiteralNode(longNumber);
 
-                if (float.TryParse(numberText, CultureInfo.InvariantCulture, out var floatNumber))
+                if (float.TryParse(numberText, numberStyle, CultureInfo.InvariantCulture, out var floatNumber))
                     return new FloatLiteralNode(floatNumber);
 
-                if (double.TryParse(numberText, CultureInfo.InvariantCulture, out var doubleNumber))
+                if (double.TryParse(numberText, numberStyle, CultureInfo.InvariantCulture, out var doubleNumber))
                     return new DoubleLiteralNode(doubleNumber);
 
-                _diagnostics.Add(Diagnostic.Create(_path, current, "Invalid number!"));
+                _diagnostics.Add(Diagnostic.Create(_path, current, "Invalid decimal number!"));
                 return null!;
             }
             case SyntaxType.String:
@@ -590,6 +596,7 @@ public sealed class Parser
             case SyntaxType.Keyword when current.Text is "alloc": return ParseInstantiateExpression(secondTypeToken);
             case SyntaxType.Keyword when current.Text is "dealloc": return ParseDeallocateExpression(secondTypeToken);
             case SyntaxType.Keyword when current.Text is "stackalloc": return ParseStackInstantiateExpression(secondTypeToken);
+            case SyntaxType.Keyword when current.Text is "alloca": return ParseStructStackInstantiateExpression();
             case SyntaxType.Keyword when current.Text is "sizeof": return ParseSizeofExpression();
             default:
             {
@@ -787,26 +794,31 @@ public sealed class Parser
         _position++;
         var ident = MatchToken(SyntaxType.Identifier);
 
+        var current = Peek();
+
+        if (current.Type is not SyntaxType.LParen)
+        {
+            _diagnostics.Add(Diagnostic.Create(_path, current, "Parentheses are required when using alloc!"));
+            return null!;
+        }
+
         var argumentNodes = new List<SyntaxNode>();
 
-        if (Peek().Type is SyntaxType.LParen)
+        _position++;
+
+        if (Peek().Type is not SyntaxType.RParen)
         {
-            _position++;
+            argumentNodes.Add(ParseExpression(secondTypeToken));
 
-            if (Peek().Type is not SyntaxType.RParen)
+            while (Peek().Type is SyntaxType.Comma)
             {
+                _position++;
+
                 argumentNodes.Add(ParseExpression(secondTypeToken));
+            }
 
-                while (Peek().Type is SyntaxType.Comma)
-                {
-                    _position++;
-
-                    argumentNodes.Add(ParseExpression(secondTypeToken));
-                }
-
-                MatchToken(SyntaxType.RParen);
-            } else _position++;
-        }
+            MatchToken(SyntaxType.RParen);
+        } else _position++;
 
         return new InstantiateNode(ident.Text, argumentNodes);
     }
@@ -824,28 +836,43 @@ public sealed class Parser
         _position++;
         var ident = MatchToken(SyntaxType.Identifier);
 
-        var argumentNodes = new List<SyntaxNode>();
+        var current = Peek();
 
-        if (Peek().Type is SyntaxType.LParen)
+        if (current.Type is not SyntaxType.LParen)
         {
-            _position++;
-
-            if (Peek().Type is not SyntaxType.RParen)
-            {
-                argumentNodes.Add(ParseExpression(secondTypeToken));
-
-                while (Peek().Type is SyntaxType.Comma)
-                {
-                    _position++;
-
-                    argumentNodes.Add(ParseExpression(secondTypeToken));
-                }
-
-                MatchToken(SyntaxType.RParen);
-            } else _position++;
+            _diagnostics.Add(Diagnostic.Create(_path, current, "Parentheses are required when using stackalloc!"));
+            return null!;
         }
 
+        var argumentNodes = new List<SyntaxNode>();
+
+        _position++;
+
+        if (Peek().Type is not SyntaxType.RParen)
+        {
+            argumentNodes.Add(ParseExpression(secondTypeToken));
+
+            while (Peek().Type is SyntaxType.Comma)
+            {
+                _position++;
+
+                argumentNodes.Add(ParseExpression(secondTypeToken));
+            }
+
+            MatchToken(SyntaxType.RParen);
+        } else _position++;
+
         return new StackInstantiateNode(ident.Text, argumentNodes);
+    }
+
+    private SyntaxNode ParseStructStackInstantiateExpression()
+    {
+        _position++;
+
+        var ident = MatchToken(SyntaxType.Identifier);
+        MatchToken(SyntaxType.Semicolon);
+
+        return new StructStackInstantiateNode(new IdentifierNode(ident.Text));
     }
 
     private SyntaxNode ParseSizeofExpression()
