@@ -95,7 +95,7 @@ internal static class MateriskHelpers
         return newMethod;
     }
 
-    public static (MateriskType, MateriskMethod) GetOrCreateMethod(MateriskModule module, string typeName, string name)
+    public static (MateriskType, MateriskMethod) GetOrCreateMethod(MateriskModule module, string typeName, string name, bool isExternal = true)
     {
         MateriskType? newType = null;
         MateriskMethod? newMethod = null;
@@ -164,10 +164,17 @@ internal static class MateriskHelpers
             if (resolvedMethod is null)
                 throw new InvalidOperationException($"Unable to find method with name: {typeName}.{name}");
 
+            var attributes = resolvedMethod.Attributes;
+
+            if (isExternal)
+                attributes |= MateriskAttributes.External;
+            else if (attributes.HasFlag(MateriskAttributes.External))
+                attributes &= ~MateriskAttributes.External;
+
             newMethod = new MateriskMethod(
                 newType,
                 name,
-                resolvedMethod.Attributes | MateriskAttributes.External,
+                attributes,
                 resolvedMethod.Type,
                 resolvedMethod.Arguments
             );

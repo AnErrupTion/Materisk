@@ -42,23 +42,19 @@ internal class FunctionDefinitionNode : SyntaxNode
             var typeName = names[0];
             var methodName = names[1];
 
-            foreach (var mType in module.Types)
-                foreach (var mMethod in mType.Methods)
-                    if (mType.Name == typeName && mMethod.Name == methodName)
-                    {
-                        var entryBlock = mMethod.LlvmMethod.AppendBasicBlock("entry");
-                        module.LlvmBuilder.PositionAtEnd(entryBlock);
-                        Body.Emit(module, type, mMethod, thenBlock, elseBlock);
-                        return mMethod;
-                    }
-
-            throw new InvalidOperationException($"Unable to find native function for implementation: {module.Name}.{typeName}.{methodName}");
+            var (_, myBrandNewNugg) = MateriskHelpers.GetOrCreateMethod(module, typeName, methodName, false);
+            Body.Emit(module, type, myBrandNewNugg, thenBlock, elseBlock);
+            return myBrandNewNugg;
         }
 
         foreach (var mType in module.Types)
+        {
             foreach (var mMethod in mType.Methods)
+            {
                 if (mType.Name == type.Name && mMethod.Name == Name)
                     throw new InvalidOperationException($"Method already exists: {module.Name}.{type.Name}.{Name}");
+            }
+        }
 
         var newMethod = MateriskHelpers.AddMethod(module, type, Name, Args, IsPublic, IsStatic, IsNative, (IsNative && LlvmUtils.NoStdLib) || IsExternal, ReturnType, SecondReturnType);
 

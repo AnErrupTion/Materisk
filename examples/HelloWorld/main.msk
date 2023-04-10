@@ -3,17 +3,14 @@
 // TODO: Scoped using declarations
 using std = import "corelib.msk";
 
-mod dyn Test
+mod pub NativeImpl
 {
-	fld pub x u32;
-
-	fn pub ctor(Test self) void
-	{
-		self.x = 9;
-	}
+	fn impl pub Console_print(str text) void {}
+	fn impl pub Memory_allocate(u64 size) ptr void { return (ptr void)0; }
+	fn impl pub Memory_free(ptr void pointer) void {}
 }
 
-stc dyn Rectangle
+stc dyn VgaEntry
 {
 	fld pub x u32;
 	fld pub y u32;
@@ -26,29 +23,6 @@ mod pub Program
 {
 	fn pub main() void
 	{
-		std.Console.println("Hello, World!");
-
-		var test Test = alloc Test();
-		var x u32 = test.x;
-
-		if (x == 9)
-		{
-			std.Console.println("Pass!");
-		}
-
-		dealloc test;
-
-		if (sizeof bool == 1/8)
-		{
-			std.Console.println("Pass!");
-		}
-		else
-		{
-			std.Console.println("Fail!");
-		}
-
-		var rectangle ptr Rectangle = (ptr Rectangle)std.Memory.allocate(sizeof Rectangle);
-		rectangle->x = 5;
-		Memory.free((ptr void)rectangle);
+		while (true) {}
 	}
 }
