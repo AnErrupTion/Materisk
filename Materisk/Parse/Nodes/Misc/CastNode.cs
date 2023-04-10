@@ -21,7 +21,8 @@ internal class CastNode : SyntaxNode
 
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
-        var llvmValue = _node.Emit(module, type, method, thenBlock, elseBlock).Load();
+        var value = _node.Emit(module, type, method, thenBlock, elseBlock);
+        var llvmValue = value.Load();
         LLVMValueRef resultValue;
         switch (_type)
         {
@@ -42,20 +43,36 @@ internal class CastNode : SyntaxNode
             case "ptr" when !string.IsNullOrEmpty(_secondType):
                 switch (_secondType)
                 {
-                    case "i8" or "u8": resultValue = module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.BytePointer); break;
-                    case "i16" or "u16": resultValue = module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.ShortPointer); break;
-                    case "i32" or "u32": resultValue = module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.IntPointer); break;
-                    case "i64" or "u64": resultValue = module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.LongPointer); break;
-                    case "f32": resultValue = module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.FloatPointer); break;
-                    case "f64": resultValue = module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.DoublePointer); break;
-                    case "void": resultValue = module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.VoidPointer); break;
+                    case "i8" or "u8": resultValue = value.PointerElementType != null
+                        ? module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.BytePointer)
+                        : module.LlvmBuilder.BuildIntToPtr(llvmValue, LlvmUtils.BytePointer); break;
+                    case "i16" or "u16": resultValue = value.PointerElementType != null
+                        ? module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.ShortPointer)
+                        : module.LlvmBuilder.BuildIntToPtr(llvmValue, LlvmUtils.ShortPointer); break;
+                    case "i32" or "u32": resultValue = value.PointerElementType != null
+                        ? module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.IntPointer)
+                        : module.LlvmBuilder.BuildIntToPtr(llvmValue, LlvmUtils.IntPointer); break;
+                    case "i64" or "u64": resultValue = value.PointerElementType != null
+                        ? module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.LongPointer)
+                        : module.LlvmBuilder.BuildIntToPtr(llvmValue, LlvmUtils.LongPointer); break;
+                    case "f32": resultValue = value.PointerElementType != null
+                        ? module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.FloatPointer)
+                        : module.LlvmBuilder.BuildIntToPtr(llvmValue, LlvmUtils.FloatPointer); break;
+                    case "f64": resultValue = value.PointerElementType != null
+                        ? module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.DoublePointer)
+                        : module.LlvmBuilder.BuildIntToPtr(llvmValue, LlvmUtils.DoublePointer); break;
+                    case "void": resultValue = value.PointerElementType != null
+                        ? module.LlvmBuilder.BuildPointerCast(llvmValue, LlvmUtils.VoidPointer)
+                        : module.LlvmBuilder.BuildIntToPtr(llvmValue, LlvmUtils.VoidPointer); break;
                     default:
                     {
                         foreach (var mType in module.Types)
                         {
                             if (mType.Name == _secondType)
-                                return module.LlvmBuilder.BuildIntToPtr(llvmValue,
-                                    LLVMTypeRef.CreatePointer(mType.Type, 0)).ToMateriskValue();
+                                return (value.PointerElementType != null
+                                    ? module.LlvmBuilder.BuildPointerCast(llvmValue, LLVMTypeRef.CreatePointer(mType.Type, 0))
+                                    : module.LlvmBuilder.BuildIntToPtr(llvmValue, LLVMTypeRef.CreatePointer(mType.Type, 0)))
+                                    .ToMateriskValue();
                         }
 
                         throw new InvalidOperationException($"Can not cast to pointer type \"{_secondType}\" in method: {module.Name}.{type.Name}.{method.Name}");
