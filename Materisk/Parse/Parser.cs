@@ -391,26 +391,26 @@ public sealed class Parser
             if (Peek().Type is not SyntaxType.Identifier)
                 continue;
 
-            var current = Peek(1);
-
-            if (current.Type is not SyntaxType.Equals)
+            if (Peek(1).Type is SyntaxType.Equals)
             {
-                _diagnostics.Add(Diagnostic.Create(_path, current, "Can not call methods on a struct!"));
-                return null!;
+                var ident = MatchToken(SyntaxType.Identifier);
+
+                if (string.IsNullOrEmpty(ident.Text))
+                {
+                    _diagnostics.Add(Diagnostic.Create(_path, ident, "Can not assign to a non-existent identifier!"));
+                    return null!;
+                }
+
+                MatchToken(SyntaxType.Equals);
+                var expr = ParseExpression(secondTypeToken);
+
+                nextNodes.Add(new AssignExpressionNode(ident.Text, expr));
             }
-
-            var ident = MatchToken(SyntaxType.Identifier);
-
-            if (string.IsNullOrEmpty(ident.Text))
+            else
             {
-                _diagnostics.Add(Diagnostic.Create(_path, ident, "Can not assign to a non-existent identifier!"));
-                return null!;
+                var n = ParseCallExpression(secondTypeToken);
+                nextNodes.Add(n);
             }
-
-            MatchToken(SyntaxType.Equals);
-            var expr = ParseExpression(secondTypeToken);
-
-            nextNodes.Add(new AssignExpressionNode(ident.Text, expr));
         }
 
         return new PointerDotNode(dotNode, nextNodes);

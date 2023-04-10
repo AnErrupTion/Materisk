@@ -24,8 +24,9 @@ mod pub Program
 		entry->character = 65;
 		entry->color = 15;
 
-		var pointer ptr VgaEntry = (ptr VgaEntry)0xB8000;
-		pointer[0] = entry;
+		var pointer ptr u8 = (ptr u8)0xB8000;
+		pointer[0] = entry->character;
+		pointer[1] = entry->color;
 
 		while (true) {}
 	}
