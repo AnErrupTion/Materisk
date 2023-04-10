@@ -22,6 +22,9 @@ internal class SizeofNode : SyntaxNode
         if (identifier is not MateriskType mType)
             throw new InvalidOperationException($"Identifier is not type: {identifier}");
 
+        if (!mType.Attributes.HasFlag(MateriskAttributes.Struct))
+            throw new InvalidOperationException($"Type is not struct: {mType.ParentModule.Name}.{mType.Name}");
+
         return LLVMValueRef.CreateConstInt(
             LLVMTypeRef.Int64,
             LlvmUtils.GetAllocateSize(mType.Fields) / 8,

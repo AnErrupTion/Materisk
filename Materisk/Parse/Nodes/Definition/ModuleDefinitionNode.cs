@@ -22,7 +22,7 @@ internal class ModuleDefinitionNode : SyntaxNode
 
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
-        var newType = new MateriskType(module, Name, MateriskAttributesUtils.CreateAttributes(IsPublic, IsStatic, false, false));
+        var newType = new MateriskType(module, Name, MateriskAttributesUtils.CreateAttributes(IsPublic, IsStatic, false, false, false));
 
         module.Types.Add(newType);
 

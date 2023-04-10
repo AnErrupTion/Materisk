@@ -37,20 +37,23 @@ internal static class MateriskHelpers
         foreach (var arg in args)
         {
             string firstType;
+            bool firstTypeIsPointer;
             string secondType;
 
             if (arg.Name is "self" && !isStatic)
             {
                 firstType = "ptr";
+                firstTypeIsPointer = false; // In the Materisk code, it's "X self", not "ptr X self"!
                 secondType = arg.Type;
             }
             else
             {
                 firstType = arg.Type;
+                firstTypeIsPointer = firstType is "ptr";
                 secondType = arg.SecondType;
             }
 
-            var argType = TypeSigUtils.GetTypeSignatureFor(module, firstType, secondType);
+            var argType = TypeSigUtils.GetTypeSignatureFor(module, firstType, firstTypeIsPointer, secondType);
 
             string typeName;
             LLVMTypeRef pointerElementType = null;
@@ -60,7 +63,7 @@ internal static class MateriskHelpers
                 case "ptr" or "arr" when !string.IsNullOrEmpty(secondType):
                 {
                     typeName = secondType;
-                    pointerElementType = TypeSigUtils.GetTypeSignatureFor(module, secondType);
+                    pointerElementType = TypeSigUtils.GetTypeSignatureFor(module, secondType, firstTypeIsPointer);
                     break;
                 }
                 case "str":
@@ -83,9 +86,9 @@ internal static class MateriskHelpers
         var newMethod = new MateriskMethod(
             type,
             name,
-            MateriskAttributesUtils.CreateAttributes(isPublic, isStatic, isNative, isExternal),
+            MateriskAttributesUtils.CreateAttributes(isPublic, isStatic, isNative, isExternal, false),
             LLVMTypeRef.CreateFunction(
-                TypeSigUtils.GetTypeSignatureFor(module, returnType, secondReturnType),
+                TypeSigUtils.GetTypeSignatureFor(module, returnType, returnType is "ptr", secondReturnType),
                 parameters.ToArray()),
             argts.ToArray());
 

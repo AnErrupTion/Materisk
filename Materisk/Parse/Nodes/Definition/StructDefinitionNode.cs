@@ -20,7 +20,7 @@ internal class StructDefinitionNode : SyntaxNode
 
     public override MateriskUnit Emit(MateriskModule module, MateriskType type, MateriskMethod method, LLVMBasicBlockRef thenBlock, LLVMBasicBlockRef elseBlock)
     {
-        var newType = new MateriskType(module, Name, MateriskAttributesUtils.CreateAttributes(IsPublic, false, false, false));
+        var newType = new MateriskType(module, Name, MateriskAttributesUtils.CreateAttributes(IsPublic, false, false, false, true));
 
         module.Types.Add(newType);
 

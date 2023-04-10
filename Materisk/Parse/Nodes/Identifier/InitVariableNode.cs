@@ -40,7 +40,7 @@ internal class InitVariableNode : SyntaxNode
             {
                 value = module.LlvmBuilder.BuildIntToPtr(value, LLVMTypeRef.CreatePointer(valueType, 0));
                 typeName = _secondType;
-                pointerElementType = TypeSigUtils.GetTypeSignatureFor(module, _secondType);
+                pointerElementType = TypeSigUtils.GetTypeSignatureFor(module, _secondType, _type is "ptr");
                 break;
             }
             case "str":

@@ -5,7 +5,7 @@ namespace Materisk.Utils;
 
 internal static class TypeSigUtils
 {
-    public static LLVMTypeRef GetTypeSignatureFor(MateriskModule module, string name, string secondName = "")
+    public static LLVMTypeRef GetTypeSignatureFor(MateriskModule module, string name, bool isPointer = false, string secondName = "")
     {
         switch (name)
         {
@@ -75,8 +75,15 @@ internal static class TypeSigUtils
             default:
             {
                 foreach (var type in module.Types)
-                    if (type.Name == name)
-                        return type.Type;
+                {
+                    if (type.Name != name)
+                        continue;
+
+                    if (!type.Attributes.HasFlag(MateriskAttributes.Struct) && isPointer)
+                        throw new InvalidOperationException($"Found pointer of module: {module.Name}.{type.Name}");
+
+                    return type.Type;
+                }
 
                 throw new NotImplementedException($"Unimplemented type: {name}");
             }

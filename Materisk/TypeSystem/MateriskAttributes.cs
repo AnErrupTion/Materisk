@@ -7,5 +7,6 @@ public enum MateriskAttributes
     Public,
     Static,
     Native,
-    External
+    External,
+    Struct
 }
